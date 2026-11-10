@@ -188,6 +188,18 @@
   .hname{font-size:11.5px;color:#6a3f95;font-weight:700;line-height:1.2} .dnote{font-size:11px;color:var(--muted);line-height:1.2}
   .dayed{margin-top:10px;display:grid;gap:8px}
   .holtab{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel)} .holtab th,.holtab td{border:1px solid var(--edge);padding:5px 7px;text-align:left;vertical-align:top} .holtab th{background:#e7eedc;font-family:Cinzel,serif}
+  .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start} @media(max-width:760px){.qgrid{grid-template-columns:1fr}}
+  .qcard,.rcard{background:var(--panel);border:1px solid var(--edge);border-left:6px solid var(--gold);border-radius:12px;padding:12px;margin-top:10px;box-shadow:0 2px 6px rgba(90,60,20,.12)}
+  .qtitle{font-family:Cinzel,serif;font-size:20px;color:#4a3410;display:flex;align-items:center;gap:6px;justify-content:space-between}
+  .qtype{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .ql{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px dotted var(--edge)} .qi{font-size:18px;width:24px;text-align:center} .qt{flex:1;line-height:1.35}
+  .rcard{border-left-color:#8a6fae;text-align:center} .rq{font-size:19px;line-height:1.45;font-style:italic;padding:6px 4px} .rq.mono{font-style:normal;font-family:monospace;letter-spacing:.12em;word-break:break-word}
+  .rh{color:var(--muted);margin-top:4px} .ra{margin-top:8px;font-family:Cinzel,serif;font-size:20px;color:var(--good)}
+  .lockrows{display:grid;gap:6px;justify-content:center} .lr{display:flex;align-items:center;gap:6px;justify-content:center}
+  .rune{display:inline-flex;width:38px;height:44px;align-items:center;justify-content:center;font-size:24px;background:#f4ead3;border:1px solid var(--edge);border-radius:8px;font-weight:700}
+  .lr .fb{min-width:70px;text-align:left;margin-left:6px} .lr.q .rune{background:#33462a;color:#e9c46a} .lr.sol .rune{background:var(--good);color:#fff}
+  .showtxt{font-family:Cinzel,serif;color:#f2e2b0;font-size:clamp(22px,4.5vw,40px);line-height:1.45;max-width:900px;margin-top:10px}
+  .showtxt .rune{background:#2a2114;color:#e9c46a;border-color:#b8913f;width:56px;height:64px;font-size:34px;margin:4px}
   @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
   #show[hidden]{display:none}
@@ -274,6 +286,7 @@
       <button class="hubcard" data-hub="fight"><span class="hi">⚔️</span><b>Fight Club</b><small>Kampftracker mit Initiative, Generator, Monsterbuch und Szene</small></button>
       <button class="hubcard" data-hub="npc"><span class="hi">🧙</span><b>NPCFindr</b><small>NPCs mit Namen, Beschreibung und einer seltsamen Eigenart</small></button>
       <button class="hubcard" data-hub="cal"><span class="hi">📅</span><b>Kalender</b><small>Kalender von Aetheria: Tage abhaken, Feiertage, Notizen</small></button>
+      <button class="hubcard" data-hub="quest"><span class="hi">📜</span><b>Questmaster</b><small>Quests und Rätsel auf Knopfdruck</small></button>
     </div></div>
 </div>
 <div id="view-npc" class="view" hidden>
@@ -283,6 +296,14 @@
 <g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
 <g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
   <div class="hubpage" id="npcBody"></div>
+</div>
+<div id="view-quest" class="view" hidden>
+  <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage" id="questBody"></div>
 </div>
 <div id="view-cal" class="view" hidden>
   <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
@@ -330,7 +351,7 @@ var PARTY0=[['Alphonse',28,15,0],['Cassian',28,15,0],['Azrakar',28,15,0],['Franz
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); return true; }catch(e){ return false; } }
 function load(){ try{ var r=localStorage.getItem(KEY); if(r){ var o=JSON.parse(r); if(o&&o.combatants){ S=Object.assign(S,o); } } }catch(e){}
   if(!S.party||!S.party.length) S.party=PARTY0.map(function(p){return Object.assign({},p);});
-  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; if(!S.npcF) S.npcF={g:'m',race:'zufall',age:'jung'}; if(!S.npcs) S.npcs=[]; if(S.npcCur===undefined) S.npcCur=null; if(!S.cal) S.cal=calDefaults(); }
+  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; if(!S.npcF) S.npcF={g:'m',race:'zufall',age:'jung'}; if(!S.npcs) S.npcs=[]; if(S.npcCur===undefined) S.npcCur=null; if(!S.cal) S.cal=calDefaults(); if(!S.qF) S.qF={type:'zufall'}; if(!S.quests) S.quests=[]; if(S.qCur===undefined) S.qCur=null; if(!S.qR) S.qR='raetsel'; if(S.qRid===undefined) S.qRid=null; if(S.qRunes===undefined) S.qRunes=true; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function $(id){return document.getElementById(id);}
 function d(n){return Math.floor(Math.random()*n)+1;}
@@ -1095,7 +1116,7 @@ function downloadImg(){ imgBlob(function(b){ var u=URL.createObjectURL(b), a=doc
   toast('Download gestartet. In der Claude-Vorschau sind Downloads gesperrt, auf GitHub klappt es.'); }); }
 function shareImg(){ imgBlob(function(b){ var f=new File([b],fileName(),{type:'image/jpeg'});
   if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({files:[f],title:lbTitleTxt}).catch(function(){}); else toast('Teilen wird von diesem Browser nicht unterstützt. Nutze „Herunterladen“.'); }); }
-function showPlayers(){ var src=curImgSrc(); if(!src){ toast('Noch kein Bild vorhanden.'); return; } $('showImg').src=src; $('showName').textContent=lbTitleTxt; $('show').hidden=false;
+function showPlayers(){ var src=curImgSrc(); if(!src){ toast('Noch kein Bild vorhanden.'); return; } $('showImg').style.display=''; $('showImg').src=src; $('showName').textContent=lbTitleTxt; $('show').hidden=false;
   try{ var el=$('show'); (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }catch(e){} }
 function hideShow(){ $('show').hidden=true; try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} }
 function genImage(){
@@ -1622,13 +1643,13 @@ function renderScene(){
 }
 
 /* =================== HUBS =================== */
-var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender'};
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster'};
 function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
 function showView(v,push){
-  ['hub','fight','npc','cal'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  ['hub','fight','npc','cal','quest'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
-  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal();
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest();
   window.scrollTo(0,0); save();
 }
 window.addEventListener('hashchange',function(){ var v=viewFromHash(); if(v!==S.view) showView(v,false); });
@@ -1807,6 +1828,152 @@ document.addEventListener('change',function(e){ var t=e.target;
 });
 document.addEventListener('input',function(e){ if(e.target.id==='npcSearch'){ npcQ=e.target.value; var pos=e.target.selectionStart; renderNpc(); var s=$('npcSearch'); if(s){ s.focus(); try{ s.setSelectionRange(pos,pos); }catch(x){} } } });
 document.addEventListener('click',function(e){ if(e.target.id==='npcGo') genNpc(); });
+
+/* =================== Questmaster =================== */
+var QTYPES={rettung:'Rettung',beschaffung:'Beschaffung',jagd:'Jagd',eskorte:'Eskorte',mysterium:'Mysterium',schutz:'Schutz',diplomatie:'Diplomatie',erkundung:'Erkundung',diebstahl:'Diebstahl'};
+var QT={
+ town:L('Undorheim,Krähenfurt,Moosbrück,Eichenwacht,Silbertal,Nebelhain,Rabenstein,Dornwiesen,Kupferberg,Weidenau,Lumenfels,Saatfeld'),
+ place:L('der verlassenen Mine,dem Turm des Magiers,der Sumpfruine,der Gruft unter der Kapelle,der Schmugglerhöhle,dem Elfenhain,der Kanalisation,dem alten Leuchtturm,dem versunkenen Tempel,dem Gipfelkloster,der Krone eines Uraltbaums,der Grenzfestung'),
+ giver:L('Verzweifelte Bäuerin,Zwergischer Händler,Tempelpriesterin,Fremder im grauen Mantel,Bürgermeister,Diebesgilde,Alter Druide,Junger Adliger,Kind mit Münzbeutel,Geist eines Ritters,Hauptfrau der Wache,Gnomische Erfinderin'),
+ who:L('die Tochter des Müllers,einen entführten Priester,einen Elfenboten,die Karawane der Händlergilde,ein Drachenei,den Sohn des Barons,eine Gruppe Pilger,den letzten Heiler des Dorfes'),
+ what:L('ein heiliges Reliquiar,die Karte zum Gaia-Schrein,ein Fass Zwergenbier,ein seltenes Tiefenkraut,ein versiegeltes Buch,den Siegelring des Fürsten,einen Splitter des Weltenbaums,das Herz eines Golems'),
+ mystery:L('wer die Brunnen vergiftet,warum die Toten nicht ruhen,wohin die Kinder verschwinden,wer hinter den Bränden steckt,was nachts im Wald leuchtet,warum die Ernte verdorrt'),
+ parties:L('Holzfällern und Druiden,zwei Zwergenclans,Fischern und Flussnixen,der Gilde und der Wache,zwei verfeindeten Adelshäusern,Bauern und Halblingen'),
+ foe:L('Plünderern,einer Goblinhorde,Untoten,einem Kult,Söldnern,wilden Tieren'),
+ twist:L('Der Auftraggeber lügt.,Rivalisierende Abenteurer.,Ein Verräter beim Auftraggeber.,Nur drei Tage Zeit.,Die Wache ist bestochen.,Der Ort ist heilig.,Ein Unwetter zieht auf.,Jemand folgt der Gruppe.,Der Weltenbaum zeigt ein Zeichen.,Die Belohnung ist gefälscht.'),
+ twistX:{rettung:L('Das Opfer will nicht gerettet werden.,Das Opfer ist längst geflohen.'),jagd:L('Das Monster beschützt etwas.,Das Monster war einst ein Mensch.'),beschaffung:L('Der Gegenstand ist verflucht.,Der Gegenstand ist eine Fälschung.'),diebstahl:L('Der Gegenstand ist verflucht.,Der Besitzer erwartet die Diebe.'),eskorte:L('Die Begleitperson hat ein Geheimnis.'),mysterium:L('Der Schuldige ist ein Freund.'),schutz:L('Die Angreifer sind selbst auf der Flucht.'),diplomatie:L('Beide Seiten haben recht.'),erkundung:L('Der Ort ist nicht verlassen.')},
+ tw1:L('Das Flüstern,Das Erbe,Der Fluch,Das Lied,Das Schweigen,Das Echo,Das Siegel,Die Schatten,Der Ruf,Die Dornen,Die Asche,Der Schwur'),
+ extra:L('Heiltrank,Karte zu einem Schatz,Gefallen eines Adligen,seltener Edelstein,freie Unterkunft,wertvolle Information,Pferd mit Sattel,Zugang zur Bibliothek')
+};
+var QFX={rettung:['Befreien','who','place'],beschaffung:['Holen','what','place'],jagd:['Erlegen','mon','place'],eskorte:['Begleiten','who','town'],mysterium:['Aufklären','mystery','town'],
+ schutz:['Verteidigen','town','foe'],diplomatie:['Schlichten','parties',''],erkundung:['Erkunden','place',''],diebstahl:['Stehlen','what','giver']};
+function qGoal(q){ var p=q.parts;
+  switch(q.type){ case 'rettung': return p.a+' aus '+p.b+' befreien'; case 'beschaffung': return p.a+' aus '+p.b+' holen'; case 'jagd': return (p.a+' bei '+p.b+' erlegen').replace(' bei dem ',' beim ');
+    case 'eskorte': return p.a+' nach '+p.b+' bringen'; case 'mysterium': return 'Aufklären, '+p.a+' ('+p.b+')'; case 'schutz': return p.a+' vor '+p.b+' schützen';
+    case 'diplomatie': return 'Streit zwischen '+p.a+' schlichten'; case 'erkundung': return 'Bei '+p.a+' alles erkunden und kartieren'; default: return p.a+' stehlen'; } }
+function qMon(){ var L2=lvlNow(), lo=Math.max(0,CRS.indexOf(String(Math.max(1,Math.floor(L2/2))))-1), hi=CRS.indexOf(String(Math.min(30,L2+1)));
+  var pool=genPool(Object.assign({},S.gen,{types:[]})).filter(function(m){ var i=CRS.indexOf(m.cr); return i>=lo&&i<=hi; }); var m=rndOf(pool.length?pool:SRD); return {de:m.de,cr:m.cr}; }
+function qPart(kind){ if(kind==='mon') return qMon(); if(!kind) return ''; if(kind==='who'||kind==='what'||kind==='place'||kind==='town'||kind==='mystery'||kind==='parties'||kind==='foe'||kind==='giver') return rndOf(QT[kind]); return ''; }
+function qVal(v){ return v&&v.de?v.de+' (HG '+v.cr+')':v; }
+function qReward(){ var L2=lvlNow(), g=Math.round(L2*(40+Math.random()*80)/10)*10; return g+' GM'+(Math.random()<0.6?' + '+rndOf(QT.extra):''); }
+function qTitle(q){ var t=rndOf(QT.tw1), loc=q.type==='eskorte'||q.type==='mysterium'||q.type==='schutz'?(q.parts.b&&q.parts.b.length<20?q.parts.b:q.parts.a):rndOf(QT.town);
+  return t+' von '+(typeof loc==='string'&&loc.length<16?loc:rndOf(QT.town)); }
+function genQuest(){
+  var type=S.qF.type==='zufall'?rndOf(Object.keys(QTYPES)):S.qF.type, fx=QFX[type], q={id:'q'+Date.now(),type:type,parts:{}};
+  q.parts.a=qPart(fx[1]); q.parts.b=qPart(fx[2]); if(q.parts.a&&q.parts.a.de) q.parts.a=qVal(q.parts.a);
+  q.giver=rndOf(QT.giver); q.twist=qTwist(type); q.reward=qReward(); q.title=qTitle(q); q.goal=qGoal(q); S.qCur=q; save(); renderQuest();
+}
+function qReroll(w){ var q=S.qCur; if(!q) return; var fx=QFX[q.type];
+  if(w==='goal'){ q.parts.a=qPart(fx[1]); q.parts.b=qPart(fx[2]); if(q.parts.a&&q.parts.a.de) q.parts.a=qVal(q.parts.a); q.goal=qGoal(q); }
+  else if(w==='giver') q.giver=rndOf(QT.giver); else if(w==='twist') q.twist=qTwist(q.type); else if(w==='reward') q.reward=qReward(); else if(w==='title') q.title=qTitle(q);
+  save(); renderQuest(); }
+function qTwist(type){ return rndOf(QT.twist.concat(QT.twistX[type]||[],QT.twistX[type]||[])); }
+function qText(q){ return q.title+'\n🎯 '+q.goal+'\n👤 '+q.giver+'\n⚡ '+q.twist+'\n💰 '+q.reward; }
+function questCard(q,saved){
+  function line(ic,txt,w){ return '<div class="ql"><span class="qi">'+ic+'</span><span class="qt">'+esc(txt)+'</span>'+(saved?'':'<button class="sm" data-act="qre" data-w="'+w+'">↻</button>')+'</div>'; }
+  return '<div class="qcard'+(saved?' saved':'')+'"><div class="qtitle">'+esc(q.title)+(saved?'':' <button class="sm" data-act="qre" data-w="title">↻</button>')+'</div><div class="qtype">'+QTYPES[q.type]+'</div>'+
+    line('🎯',q.goal,'goal')+line('👤',q.giver,'giver')+line('⚡',q.twist,'twist')+line('💰',q.reward,'reward')+
+    '<div class="row" style="margin-top:8px">'+(saved?'':'<button class="sm pri" data-act="qsave">★</button>')+'<button class="sm" data-act="qcopy" data-qid="'+q.id+'">⧉</button>'+
+    (saved?'':'<button class="sm" data-act="qgiver">👤→🧙</button>')+(saved?'<button class="sm danger" data-act="qdel" data-qid="'+q.id+'">✕</button>':'')+'</div></div>';
+}
+/* Rätsel */
+var RIDDLES=[
+ ['Je mehr du wegnimmst, desto größer werde ich.','Ein Loch','graben'],
+ ['Ich habe Städte, aber keine Häuser, Wälder, aber keine Bäume, Wasser, aber keine Fische.','Eine Landkarte','Papier'],
+ ['Ich spreche ohne Mund und höre ohne Ohren. Der Wind erweckt mich.','Ein Echo','Berge'],
+ ['Was gehört dir, wird aber von anderen öfter benutzt?','Dein Name','rufen'],
+ ['Morgens auf vier Beinen, mittags auf zwei, abends auf drei.','Der Mensch','Leben'],
+ ['Je mehr davon da ist, desto weniger siehst du.','Dunkelheit','Nacht'],
+ ['Was zerbricht, sobald man es ausspricht?','Stille','leise'],
+ ['Ich bin leicht wie eine Feder, doch der Stärkste hält mich nicht lange.','Der Atem','Luft'],
+ ['Ich habe ein Bett, schlafe aber nie, und einen Mund, spreche aber nie.','Ein Fluss','Wasser'],
+ ['Ich wachse, wenn ich esse, und sterbe, wenn ich trinke.','Feuer','heiß'],
+ ['Was geht durchs Glas, ohne es zu zerbrechen?','Licht','Sonne'],
+ ['Wer mich baut, braucht mich nicht. Wer mich kauft, will mich nicht. Wer mich nutzt, weiß es nicht.','Ein Sarg','Grab'],
+ ['Je länger ich stehe, desto kürzer werde ich.','Eine Kerze','Docht'],
+ ['Ich habe einen Hals, aber keinen Kopf.','Eine Flasche','Wein'],
+ ['Was hat viele Zähne, beißt aber nie?','Ein Kamm','Haare'],
+ ['Was kommt einmal in jeder Minute, zweimal in jedem Moment, aber nie in tausend Jahren?','Der Buchstabe M','Schrift'],
+ ['Ich folge dir am Tag und verschwinde in der Nacht.','Dein Schatten','Licht'],
+ ['Ich bin immer vor dir, doch du siehst mich nie.','Die Zukunft','Zeit'],
+ ['Was hat einen Kopf und einen Fuß, aber keinen Körper?','Ein Bett','schlafen'],
+ ['Ich habe Flügel und fliege nicht, ich mahle und esse nicht.','Eine Windmühle','Korn'],
+ ['Gefangen bin ich wertvoll. Entkomme ich, ist alles verloren.','Ein Geheimnis','flüstern'],
+ ['Was wird größer, je mehr man davon teilt?','Freude','Lachen'],
+ ['Silbern und still schau ich nachts herab. Ich wachse und schwinde und bin doch immer ganz.','Der Mond','Himmel'],
+ ['Ich trage eine Krone aus Blättern und Schuhe aus Wurzeln, doch ich wandere nie.','Ein Baum','Gaia'],
+ ['Zwei Väter und zwei Söhne teilen drei Äpfel. Jeder bekommt einen ganzen. Wie?','Großvater, Vater und Sohn','drei'],
+ ['Was wird nass, während es trocknet?','Ein Handtuch','Bad'],
+ ['Welches Schloss hat kein Schlüsselloch?','Ein Luftschloss','Traum'],
+ ['Was kann man fangen, aber nicht werfen?','Einen Schnupfen','krank'],
+ ['Ich habe Hände, kann aber nicht klatschen.','Eine Uhr','Zeit'],
+ ['Ich habe Schlüssel, aber öffne kein Schloss.','Eine Orgel','Musik'],
+ ['Ich laufe ohne Beine und weine ohne Augen.','Eine Wolke','Regen'],
+ ['Mich zu vergessen ist leicht, mich zu brechen noch leichter, mich zu halten das Schwerste.','Ein Versprechen','Wort']];
+var RUNES=['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ'];
+function lockFb(code,g){ var p=0,w=0; for(var i=0;i<3;i++){ if(g[i]===code[i]) p++; else if(code.indexOf(g[i])>=0) w++; } return [p,w]; }
+function genLock(){
+  var all=[]; for(var a=0;a<10;a++) for(var b=0;b<10;b++) for(var c=0;c<10;c++) if(a!==b&&b!==c&&a!==c) all.push([a,b,c]);
+  var code=rndOf(all), clues=[], cand=all;
+  for(var tries=0;tries<200&&cand.length>1;tries++){
+    var g=rndOf(all), fb=lockFb(code,g); if(fb[0]===3) continue;
+    var nc=cand.filter(function(x){ var f=lockFb(x,g); return f[0]===fb[0]&&f[1]===fb[1]; });
+    if(nc.length<cand.length&&(fb[0]+fb[1]>0||clues.length<5)){ clues.push({g:g,fb:fb}); cand=nc; }
+  }
+  if(cand.length!==1||clues.length>6) return genLock(); return {kind:'lock',code:code,clues:clues};
+}
+var CIPHERS=L('DER SCHLUESSEL LIEGT UNTER DEM ALTAR,TRAUE NICHT DEM GRAUEN MANN,DREI SCHRITTE NACH LINKS,NUR DAS LICHT OEFFNET DIE TUER,GAIA SIEHT ALLES,DIE WURZEL KENNT DEN WEG,SPRICH DEN NAMEN DES BAUMES,DER VERRAETER TRAEGT EINEN RING,GRABE BEIM DRITTEN STEIN,UM MITTERNACHT AM BRUNNEN');
+function caesar(s,k){ return s.replace(/[A-Z]/g,function(ch){ return String.fromCharCode((ch.charCodeAt(0)-65+k+26)%26+65); }); }
+function genRiddle(){ var k=S.qR;
+  if(k==='raetsel'){ var r=rndOf(RIDDLES); S.qRid={kind:'raetsel',q:r[0],a:r[1],h:r[2]}; }
+  else if(k==='schloss') S.qRid=genLock();
+  else { var p=rndOf(CIPHERS), key=1+Math.floor(Math.random()*6); S.qRid={kind:'code',plain:p,key:key,ct:caesar(p,key)}; }
+  S.qShow=false; S.qHint=false; save(); renderQuest(); }
+function lockRow(g,useR){ return g.map(function(x){ return '<span class="rune">'+(useR?RUNES[x]:x)+'</span>'; }).join(''); }
+function riddleHtml(){ var r=S.qRid; if(!r) return '<div class="empty">🎲</div>'; var h='<div class="rcard">';
+  if(r.kind==='raetsel') h+='<div class="rq">„'+esc(r.q)+'“</div>'+(S.qHint?'<div class="rh">💡 '+esc(r.h)+'</div>':'')+(S.qShow?'<div class="ra">'+esc(r.a)+'</div>':'');
+  else if(r.kind==='lock'){ var R=S.qRunes;
+    h+='<div class="lockrows">'+r.clues.map(function(c){ return '<div class="lr">'+lockRow(c.g,R)+'<span class="fb">'+(c.fb[0]?'<b>'+c.fb[0]+'</b>✔ ':'')+(c.fb[1]?'<b>'+c.fb[1]+'</b>↔ ':'')+(!c.fb[0]&&!c.fb[1]?'✕':'')+'</span></div>'; }).join('')+
+      '<div class="lr q">'+lockRow(S.qShow?r.code:['?','?','?'].map(function(){return -1;}),R).replace(/>undefined</g,'>?<').replace(/>-1</g,'>?<')+'</div></div>'+
+      '<div class="hint">✔ richtig &amp; richtiger Platz · ↔ richtig, falscher Platz · ✕ nichts stimmt</div>';
+    if(S.qShow) h=h.replace('<div class="lr q">','<div class="lr q sol">'); }
+  else h+='<div class="rq mono">'+esc(r.ct)+'</div>'+(S.qHint?'<div class="rh">💡 Jeder Buchstabe '+r.key+' zurück</div>':'')+(S.qShow?'<div class="ra">'+esc(r.plain)+'</div>':'');
+  h+='<div class="row" style="margin-top:8px">'+(r.kind!=='lock'?'<button class="sm" data-act="rhint">💡</button>':'<button class="sm" data-act="rrunes">'+(S.qRunes?'123':'ᚠᚢᚦ')+'</button>')+
+    '<button class="sm" data-act="rshow">'+(S.qShow?'🙈':'👁')+' Lösung</button><button class="sm" data-act="rplay">🖼️ Zeigen</button></div></div>';
+  return h; }
+function renderQuest(){
+  var f=S.qF;
+  var h='<div class="hubtitle"><span>📜</span> Questmaster</div><div class="qgrid"><div>'+
+    '<div class="panel"><div class="row" style="margin:0"><select id="qType" style="flex:1"><option value="zufall">🎲 Quest</option>'+Object.keys(QTYPES).map(function(k){return '<option value="'+k+'"'+(f.type===k?' selected':'')+'>'+QTYPES[k]+'</option>';}).join('')+'</select>'+
+    '<label class="hint">St <input type="number" id="qLvl" min="1" max="20" value="'+lvlNow()+'" style="width:52px"></label></div><button class="pri big" id="qGo">📜 Quest würfeln</button></div>'+
+    (S.qCur?questCard(S.qCur,false):'')+'</div><div>'+
+    '<div class="panel"><div class="seg three">'+[['raetsel','❓ Rätsel'],['schloss','🔒 Schloss'],['code','✉️ Code']].map(function(x){return '<button class="'+(S.qR===x[0]?'on':'')+'" data-act="rkind" data-k="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>'+
+    '<button class="pri big" id="rGo">🎲 Rätsel würfeln</button></div>'+riddleHtml()+'</div></div>'+
+    (S.quests.length?'<details style="margin-top:14px"><summary class="hint">★ Gemerkte Quests ('+S.quests.length+')</summary>'+S.quests.slice().reverse().map(function(q){return questCard(q,true);}).join('')+'</details>':'');
+  $('questBody').innerHTML=h;
+}
+function showText(title,body){ $('showImg').style.display='none'; $('showName').innerHTML='<div style="font-size:clamp(16px,3vw,22px);opacity:.8">'+esc(title)+'</div><div class="showtxt">'+body+'</div>'; $('show').hidden=false; try{ var el=$('show'); (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }catch(e){} }
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]'); if(e.target.id==='qGo') genQuest(); if(e.target.id==='rGo') genRiddle(); if(!t) return;
+  switch(t.dataset.act){
+    case 'qre': qReroll(t.dataset.w); break;
+    case 'qsave': if(S.qCur&&!S.quests.some(function(x){return x.id===S.qCur.id;})){ S.quests.push(JSON.parse(JSON.stringify(S.qCur))); save(); toast('Quest gemerkt.'); renderQuest(); } break;
+    case 'qdel': S.quests=S.quests.filter(function(x){return x.id!==t.dataset.qid;}); save(); renderQuest(); break;
+    case 'qcopy': { var q=S.qCur&&S.qCur.id===t.dataset.qid?S.qCur:S.quests.find(function(x){return x.id===t.dataset.qid;}); try{ navigator.clipboard.writeText(qText(q)).then(function(){toast('Kopiert.');},function(){toast('Kopieren nicht möglich.');}); }catch(err){ toast('Kopieren nicht möglich.'); } break; }
+    case 'qgiver': { var q2=S.qCur; if(!q2) break; var race=rndOf(RACES)[0], g=/Bäuerin|Priesterin|Hauptfrau|Erfinderin/.test(q2.giver)?'w':(/Händler|Fremder|Bürgermeister|Druide|Adliger|Ritters/.test(q2.giver)?'m':rndOf(['m','w'])), age=/Kind/.test(q2.giver)?'kind':(/Alter/.test(q2.giver)?'alt':'jung');
+      if(/Zwerg/.test(q2.giver)) race='zwerg'; if(/Gnom/.test(q2.giver)) race='gnom';
+      var n={id:'n'+Date.now(),g:g,race:race,age:age}; n.name=npcName(race,g); n.desc=npcDesc(n); n.quirk=npcQuirk(n); n.notes='Auftraggeber: '+q2.title+' ('+q2.giver+')'; S.npcs.push(n); save(); toast('Als NPC gespeichert: '+n.name); break; }
+    case 'rkind': S.qR=t.dataset.k; S.qRid=null; save(); renderQuest(); break;
+    case 'rhint': S.qHint=!S.qHint; save(); renderQuest(); break;
+    case 'rshow': S.qShow=!S.qShow; save(); renderQuest(); break;
+    case 'rrunes': S.qRunes=!S.qRunes; save(); renderQuest(); break;
+    case 'rplay': { var r=S.qRid; if(!r) break;
+      if(r.kind==='raetsel') showText('Rätsel','„'+esc(r.q)+'“'); else if(r.kind==='code') showText('Geheime Botschaft','<span style="font-family:monospace;letter-spacing:.15em">'+esc(r.ct)+'</span>');
+      else showText('Runenschloss',r.clues.map(function(c){ return '<div>'+lockRow(c.g,true)+' <span style="font-size:.6em">'+(c.fb[0]?c.fb[0]+'✔ ':'')+(c.fb[1]?c.fb[1]+'↔ ':'')+(!c.fb[0]&&!c.fb[1]?'✕':'')+'</span></div>'; }).join('')+'<div>'+lockRow([-1,-1,-1],true).replace(/>undefined</g,'>?<')+'</div>');
+      break; }
+  }
+});
+document.addEventListener('change',function(e){ var t=e.target; if(t.id==='qType'){ S.qF.type=t.value; save(); } if(t.id==='qLvl'){ S.gen.level=Math.max(1,Math.min(20,parseInt(t.value,10)||1)); save(); } });
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
