@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Master Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#eadfc4;--panel:#f8f1df;--panel2:#efe4c8;--edge:#bfa06a;--ink:#2e2213;--muted:#6d5a3b;--gold:#8a5a12;
+        --hero:#2f6f8f;--mon:#a8432e;--good:#3f7d32;--warn:#b0700c;--bad:#b23a2a;--forest:#33462a;--leaf:#5c7d3c;--cream:#fbf5e4}
+  *{box-sizing:border-box}
+  html{background:var(--bg)}
+  body{background:radial-gradient(ellipse at 50% 0%,#f6edd6 0%,rgba(234,223,196,0) 60%),var(--bg)}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%22-6%202%20212%20224%22%3E%3Cg%20fill%3D%22%235c7d3c%22%20stroke%3D%22%235c7d3c%22%20stroke-linecap%3D%22round%22%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%22112%22%20r%3D%22104%22%20fill%3D%22none%22%20stroke-width%3D%223%22/%3E%0A%3Cg%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2258%22%20r%3D%2234%22/%3E%3Ccircle%20cx%3D%2262%22%20cy%3D%2276%22%20r%3D%2227%22/%3E%3Ccircle%20cx%3D%22138%22%20cy%3D%2276%22%20r%3D%2227%22/%3E%3Ccircle%20cx%3D%2244%22%20cy%3D%22102%22%20r%3D%2219%22/%3E%3Ccircle%20cx%3D%22156%22%20cy%3D%22102%22%20r%3D%2219%22/%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2244%22%20r%3D%2222%22/%3E%3Ccircle%20cx%3D%22120%22%20cy%3D%2244%22%20r%3D%2222%22/%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2292%22%20r%3D%2224%22/%3E%3Ccircle%20cx%3D%2276%22%20cy%3D%22104%22%20r%3D%2215%22/%3E%3Ccircle%20cx%3D%22124%22%20cy%3D%22104%22%20r%3D%2215%22/%3E%3C/g%3E%0A%3Cpath%20stroke%3D%22none%22%20d%3D%22M91%20200%20C94%20172%2095%20150%2089%20122%20L111%20122%20C105%20150%20106%20172%20109%20200%20Z%22/%3E%0A%3Cg%20fill%3D%22none%22%20stroke-width%3D%225%22%3E%3Cpath%20d%3D%22M97%20130%20C82%20118%2066%20112%2052%2098%22/%3E%3Cpath%20d%3D%22M103%20130%20C118%20118%20134%20112%20148%2098%22/%3E%3Cpath%20d%3D%22M100%20124%20C100%20108%2099%2096%20100%2080%22/%3E%3C/g%3E%0A%3Cg%20fill%3D%22none%22%20stroke-width%3D%224%22%3E%3Cpath%20d%3D%22M92%20198%20C74%20204%2054%20208%2030%20206%22/%3E%3Cpath%20d%3D%22M108%20198%20C126%20204%20146%20208%20170%20206%22/%3E%3Cpath%20d%3D%22M97%20202%20C90%20210%2080%20216%2066%20220%22/%3E%3Cpath%20d%3D%22M103%20202%20C110%20210%20120%20216%20134%20220%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center 120px/min(720px,90vw) no-repeat;opacity:.09}
+  .brand{display:flex;align-items:center;gap:8px;margin-right:6px}
+  .brand svg{width:38px;height:44px;filter:drop-shadow(0 0 6px rgba(233,196,106,.5))}
+  .brand .bt{font-family:Cinzel,serif;font-weight:700;color:#e9c46a;letter-spacing:.06em;line-height:1.05;font-size:15px}
+  .brand .bt small{display:block;font-size:10px;color:#cdd8b8;letter-spacing:.18em}
+  h3,.round,.ot,.grp,.sh b,.empty b{font-family:Cinzel,serif}
+  html,body{margin:0;color:var(--ink);font-family:"Alegreya Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15.5px}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;background:var(--panel2);border:1px solid var(--edge);border-radius:8px;padding:6px 10px;min-height:34px}
+  button:hover{border-color:var(--gold)}
+  button.pri{background:#7a5216;border-color:var(--gold);color:var(--cream)}
+  .card{box-shadow:0 2px 6px rgba(90,60,20,.12)}
+  aside{box-shadow:0 2px 8px rgba(90,60,20,.15)}
+  button.sm{padding:2px 8px;min-height:28px}
+  button.danger:hover{border-color:var(--bad);color:var(--bad)}
+  input,select,textarea{background:#fffaf0;border:1px solid var(--edge);border-radius:6px;padding:5px 7px}
+  input[type=number]{width:64px}
+  input:focus,select:focus{outline:1px solid var(--gold)}
+
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#3b5130,#2c3c24);border-bottom:3px solid #b8913f;box-shadow:0 2px 10px rgba(40,30,10,.25);padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  header .round{font-size:19px;font-weight:700;color:#e9c46a;margin-right:6px}
+  header label{color:#dfe6cf!important}
+  header button{background:#f4ecd6;border-color:#b8913f}
+  header button.pri{background:#b8862b;color:#2a1c06;border-color:#e9c46a}
+  header label{display:flex;gap:4px;align-items:center;color:var(--muted);font-size:13px}
+  header .sp{flex:1}
+  .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:12px;padding:12px;max-width:1500px;margin:0 auto}
+  @media(max-width:1000px){.wrap{grid-template-columns:1fr}}
+
+  #list{display:flex;flex-direction:column;gap:8px;position:relative}
+  .empty{color:var(--muted);text-align:center;padding:40px 10px;border:1px dashed var(--edge);border-radius:12px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-left:6px solid var(--hero);border-radius:12px;padding:8px 10px;
+        display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;will-change:transform}
+  .card.monster{border-left-color:var(--mon)}
+  .card.current{box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(176,122,26,.35);background:#fff3d0}
+  .card.down{opacity:.55;filter:grayscale(.7)}
+  .ini{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .ini .lab{font-size:11px;color:var(--muted)}
+  .ini input{width:62px;text-align:center;font-size:22px;font-weight:700;padding:2px}
+  .ini .pm{display:flex;gap:4px}
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .name{font-size:18px;font-weight:700;background:transparent;border:1px solid transparent;padding:2px 4px;min-width:0;flex:1 1 120px}
+  .name:hover,.name:focus{border-color:var(--edge);background:#fffaf0}
+  .chip{display:inline-flex;align-items:center;gap:4px;background:#fffaf0;border:1px solid var(--edge);border-radius:999px;padding:1px 8px;font-size:12px;color:var(--muted)}
+  .chip b{color:var(--ink)}
+  .hp{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+  .hp .cur{width:64px;text-align:center;font-weight:700;font-size:17px}
+  .hp .max{width:64px;text-align:center;color:var(--muted)}
+  .bar{height:9px;background:#fffaf0;border:1px solid var(--edge);border-radius:6px;overflow:hidden;margin-top:6px}
+  .bar>i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s}
+  .dmg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+  .dmg input{width:70px}
+  .conds{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
+  .cond{background:#ece2f4;border:1px solid #8a6fae;border-radius:999px;padding:0 8px;font-size:12px;cursor:pointer}
+  .cond:hover{border-color:var(--bad)}
+  .acts{margin-top:8px;border-top:1px dashed var(--edge);padding-top:8px;display:grid;gap:6px}
+  .act{background:#f4ead3;border:1px solid var(--edge);border-radius:8px;padding:6px 8px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+  .act .t{font-weight:700}
+  .act .d{color:var(--ink);font-size:14px;line-height:1.45;margin-top:4px}
+  .act .facts{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .fact{background:#fffaf0;border:1px solid var(--edge);border-radius:6px;padding:1px 7px;font-size:13px}
+  .fact b{color:var(--gold)}
+  .grp{margin:8px 0 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--edge)}
+  .notes{margin-top:8px;background:#f4ead3;border:1px solid var(--edge);border-radius:8px;padding:6px 8px;font-size:14px;line-height:1.45}
+  .stat{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .act.off{opacity:.55}
+  .tag{font-size:11px;border-radius:5px;padding:0 5px;background:#e0cda4;color:var(--gold);margin-left:4px}
+  .pips{display:inline-flex;gap:4px;align-items:center}
+  .pip{width:16px;height:16px;border-radius:50%;border:2px solid var(--gold);cursor:pointer;background:transparent}
+  .pip.used{background:var(--gold)}
+  .tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+
+  aside{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:10px;align-self:start;position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto}
+  @media(max-width:1000px){aside{position:static;max-height:none}}
+  .tabs{display:flex;gap:4px;margin-bottom:8px}
+  .tabs button{flex:1}
+  .tabs button.on{background:#7a5216;border-color:var(--gold);color:var(--cream)}
+  h3{margin:10px 0 6px;font-size:14px;color:var(--gold)}
+  .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+  .mon{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#f4ead3;border:1px solid var(--edge);border-radius:8px;padding:6px 8px;margin-bottom:6px}
+  .mon .m{min-width:0}
+  .mon .n{font-weight:700}
+  .mon .s{color:var(--muted);font-size:12px}
+  .log{font-size:13px;display:grid;gap:5px}
+  .log div{background:#f4ead3;border-left:3px solid var(--gold);padding:4px 8px;border-radius:4px}
+  .log .crit{border-left-color:var(--good)} .log .fumble{border-left-color:var(--bad)}
+  .hint{color:var(--muted);font-size:12.5px;line-height:1.4}
+  .drop{border:2px dashed var(--edge);border-radius:10px;padding:12px;text-align:center;color:var(--muted);margin-bottom:8px}
+  .drop.over{border-color:var(--gold);color:var(--gold)}
+  .msg{font-size:13px;margin:6px 0}
+  .msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+  .ava{width:52px;height:52px;padding:0;border-radius:10px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 auto;background:#fffaf0}
+  .ava img{width:100%;height:100%;object-fit:cover;display:block}
+  .name{border-bottom:1px dashed var(--edge)!important}
+  .sug{background:#f4ead3;border:1px solid var(--edge);border-radius:10px;padding:8px;margin-top:8px}
+  .sh{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .sr{display:flex;align-items:center;gap:8px;border-top:1px solid #e0cda4;padding:6px 0}
+  .sr .em{width:34px;height:34px;flex:0 0 34px;border-radius:8px;background:#fffaf0;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden}
+  .sr .em img{width:100%;height:100%;object-fit:cover}
+  .sr .m{flex:1;min-width:0}.sr .n{font-weight:700}.sr .s{color:var(--muted);font-size:12px}
+  .cnt{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .cnt b{min-width:18px;text-align:center}
+  .seg,.tchips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+  .seg button{flex:1 1 auto}
+  .seg button.on,.tchips button.on{background:#7a5216;border-color:var(--gold);color:var(--cream)}
+  .tier{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px;background:#fffaf0;border:1px solid var(--edge)}
+  .t-1{color:var(--muted)}.t0{color:var(--good)}.t1{color:#7f7a12}.t2{color:var(--warn)}.t3{color:var(--bad)}.t4{color:#c2185b}
+  .seg .tb.t0,.seg .tb.t1,.seg .tb.t2,.seg .tb.t3,.seg .tb.t4{font-weight:700}
+  #lb{position:fixed;inset:0;z-index:50;background:rgba(10,7,4,.88);display:flex;align-items:center;justify-content:center;padding:16px}
+  #lb[hidden],#toast[hidden]{display:none}
+  #lb .box{background:var(--panel);color:var(--ink);border:1px solid var(--gold);border-radius:12px;padding:10px;max-width:min(92vw,720px);text-align:center}
+  #lb img{max-width:100%;max-height:70vh;border-radius:8px;display:block;margin:6px auto}
+  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:#fbe1d8;border:1px solid var(--bad);border-radius:8px;padding:8px 12px}
+  .card.ally{border-left-color:var(--good)} .card.object{border-left-color:#8a8a8a} .card.env{border-left-color:#5c7d3c} .card.crowd{border-left-color:#8a5fb5}
+  .card.env .top select,.card.crowd .top select{max-width:150px}
+  .card.env .pri,.card.crowd .pri{margin-top:6px}
+  .evt{margin-top:8px;background:#f4ead3;border:1px solid var(--edge);border-left:4px solid var(--gold);border-radius:8px;padding:6px 8px;font-size:14px;line-height:1.45}
+  .evt.sev0{border-left-color:var(--muted)} .evt.sev1{border-left-color:var(--warn)} .evt.sev2{border-left-color:var(--bad)} .evt.sev3{border-left-color:#c2185b}
+  .tl{font-size:13px;padding:2px 0;border-bottom:1px dotted #e0cda4} .tl.hit{color:var(--gold);font-weight:700}
+  details summary{cursor:pointer;margin-top:8px}
+  .objbar{background:#fbf0cf;border:1px solid var(--gold);border-radius:12px;padding:8px 10px;margin-bottom:8px}
+  .objbar .ot{font-weight:700;color:var(--gold);font-size:17px} .od{font-size:13.5px;line-height:1.45;margin-top:4px}
+  .cd{margin-top:6px;font-weight:700;color:var(--warn)} .cd.hot{color:var(--bad)} .wv{margin-top:4px;font-size:14px}
+  .spg{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:4px 0} .spl{font-size:12px;color:var(--muted);min-width:78px}
+  .spell{font-size:13px} .spell.roll{border-color:#8a6fae;background:#efe5f7} .spell.out{opacity:.4;text-decoration:line-through}
+  .tabs{flex-wrap:wrap} .tabs button{padding:6px 4px;font-size:13.5px}
+  #fab{display:none}
+  #splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px;
+    background:radial-gradient(ellipse at center,#fbf3dc 0%,#eadfc4 55%,#cdb98c 100%);transition:opacity .9s ease}
+  #splash.out{opacity:0;pointer-events:none}
+  #splash .tree{width:min(260px,58vw);animation:glow 3.2s ease-in-out infinite}
+  #splash .tree svg{width:100%;height:auto;filter:drop-shadow(0 0 18px rgba(184,134,43,.55))}
+  @keyframes glow{0%,100%{transform:translateY(0);filter:brightness(1)}50%{transform:translateY(-4px);filter:brightness(1.08)}}
+  #splash h1{font-family:Cinzel,serif;font-weight:700;letter-spacing:.12em;color:#4a3410;margin:6px 0 0;font-size:clamp(24px,6vw,44px);text-shadow:0 1px 0 #fff8e0}
+  #splash p{margin:0;color:#6d5a3b;letter-spacing:.2em;font-size:13px;text-transform:uppercase}
+  #splash .row{justify-content:center;margin-top:14px}
+  #splash button.enter{font-family:Cinzel,serif;font-size:18px;padding:10px 26px;background:#33462a;color:#f2e2b0;border:2px solid #b8913f;border-radius:999px}
+  @media(max-width:700px){header{position:static} #toast{bottom:80px} .card{grid-template-columns:58px minmax(0,1fr);gap:8px} .ini input{width:52px;font-size:19px}
+    #fab{display:flex;position:fixed;right:14px;bottom:14px;z-index:30;gap:6px}
+    #fab button{min-height:48px;padding:8px 14px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+    #fab .r{background:#fffaf0;border:1px solid var(--edge);border-radius:8px;padding:0 10px;display:flex;align-items:center;color:var(--gold);font-weight:700}}
+</style>
+</head>
+<body>
+<div id="splash"><div class="tree"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#7a5a1c" stroke="#7a5a1c" stroke-linecap="round"><circle cx="100" cy="112" r="104" fill="none" stroke-width="3"/>
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg></div><h1>DUNGEON MASTER SERVICE</h1><p>Kampf · Generator · Szene</p>
+  <div class="row"><button class="enter" id="enterSnd">Eintreten</button><button id="enterQuiet" class="sm">ohne Ton</button></div></div>
+<header>
+  <span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span>
+  <span class="round">Runde <span id="roundNo">1</span></span>
+  <button id="prev">&#9664; Zurück</button>
+  <button id="next" class="pri">Nächster &#9654;</button>
+  <button id="rollMon">Initiative würfeln (Monster)</button>
+  <label><input type="checkbox" id="adv"> Vorteil</label>
+  <label><input type="checkbox" id="dis"> Nachteil</label>
+  <label><input type="checkbox" id="skipDown" checked> Besiegte Monster überspringen</label>
+  <button id="toGen">Kampfgenerator</button>
+  <span class="sp"></span>
+  <button id="sndBtn" title="Startmelodie an/aus">🔊</button>
+  <button id="newFight" class="danger">Neuer Kampf</button>
+</header>
+
+<div class="wrap">
+  <main>
+    <div id="objBar"></div>
+    <div id="list"></div>
+  </main>
+  <aside>
+    <div class="tabs">
+      <button data-tab="lib" class="on">Monster</button>
+      <button data-tab="gen">Generator</button>
+      <button data-tab="scene">Szene</button>
+      <button data-tab="party">Helden</button>
+      <button data-tab="log">Protokoll</button>
+    </div>
+    <section id="tab-lib"></section>
+    <section id="tab-gen" hidden></section>
+    <section id="tab-scene" hidden></section>
+    <section id="tab-party" hidden></section>
+    <section id="tab-log" hidden></section>
+  </aside>
+</div>
+
+<div id="lb" hidden><div class="box"><div id="lbTitle" style="font-weight:700;color:var(--gold)"></div><img id="lbImg" alt="">
+  <div class="row" style="justify-content:center"><button id="lbChange">Bild ändern</button><button id="lbDel" class="danger">Bild entfernen</button><button id="lbClose" class="pri">Schließen</button></div></div></div>
+<div id="toast" hidden></div>
+<div id="fab"><span class="r">R <span id="fabRound">1</span></span><button id="fabPrev">◀</button><button id="fabNext" class="pri">Nächster ▶</button></div>
+<input type="file" id="imgFile" accept="image/*" hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+'use strict';
+var KEY='kampftracker_v1';
+var S={round:1,turnId:null,nextId:1,order:1,combatants:[],lib:[],party:[],log:[],tab:'lib',images:{},gen:null,genRes:[]};
+var CONDITIONS=['Blind','Bezaubert','Taub','Verängstigt','Gepackt','Kampfunfähig','Unsichtbar','Gelähmt','Versteinert','Vergiftet','Liegend','Festgesetzt','Betäubt','Bewusstlos','Konzentration'];
+var SAMPLE=[
+ {name:'Sporen-Manifest',type:'Große Pflanze',ac:14,hp:126,bonus:-1,legendary:3,notes:'Anfällig: Feuer. Immun: Gift. Legendäre Resistenz 1/Tag. Phase 2 ab 63 TP: Sporenwolke lädt sofort auf, 2 Sporenlinge.',
+  actions:[
+   {name:'Wurzelranke',kind:'Aktion',atk:'+6',dmg:'2d8+4',dmgType:'Wucht',reach:'3 m',save:'',recharge:'',text:'Ziel ist gepackt (Entkommen SG 14). Mehrfachangriff: 2 Mal.'},
+   {name:'Sporenwolke',kind:'Aktion',atk:'',dmg:'4d6',dmgType:'Gift',reach:'4,5 m Radius',save:'KON 13',recharge:'5-6',text:'Bei Fehlschlag Vergiftet bis Ende des nächsten Zuges. Erfolg: halber Schaden.'},
+   {name:'Sporenaura',kind:'Eigenschaft',atk:'',dmg:'2d6',dmgType:'Gift',reach:'3 m',save:'KON 13',recharge:'',text:'Wer den Zug in 3 m beginnt: Rettungswurf, Erfolg halber Schaden.'},
+   {name:'Sporenling säen',kind:'Legendär',atk:'',dmg:'',dmgType:'',reach:'9 m',save:'',recharge:'',text:'Kosten 1. Ein Sporenling erscheint.'},
+   {name:'Heranziehen',kind:'Legendär',atk:'',dmg:'',dmgType:'',reach:'',save:'',recharge:'',text:'Kosten 1. Gepacktes Ziel 4,5 m heranziehen.'},
+   {name:'Peitschen',kind:'Legendär',atk:'+6',dmg:'2d8+4',dmgType:'Wucht',reach:'3 m',save:'',recharge:'',text:'Kosten 2. Ein Wurzelranken-Angriff.'}]},
+ {name:'Sporenling',type:'Kleine Pflanze',ac:11,hp:9,bonus:0,legendary:0,notes:'Platzt beim Tod: KON SG 11 in 1,5 m, 1d4 Gift.',
+  actions:[{name:'Klauen',kind:'Aktion',atk:'+3',dmg:'1d6+1',dmgType:'Wucht',reach:'1,5 m',save:'',recharge:'',text:''}]}
+];
+var PARTY0=[['Alphonse',28,15,0],['Cassian',28,15,0],['Azrakar',28,15,0],['Franzl',28,15,0],['Indutiomarus',28,15,0]]
+  .map(function(a){return {name:a[0],hp:a[1],ac:a[2],bonus:a[3],level:3};});
+
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); return true; }catch(e){ return false; } }
+function load(){ try{ var r=localStorage.getItem(KEY); if(r){ var o=JSON.parse(r); if(o&&o.combatants){ S=Object.assign(S,o); } } }catch(e){}
+  if(!S.party||!S.party.length) S.party=PARTY0.map(function(p){return Object.assign({},p);});
+  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function $(id){return document.getElementById(id);}
+function d(n){return Math.floor(Math.random()*n)+1;}
+function toInt(v,def){ var m=String(v==null?'':v).match(/-?\d+/); return m?parseInt(m[0],10):(def==null?0:def); }
+function byId(id){ return S.combatants.find(function(c){return c.id===id;}); }
+
+/* ---------- Würfel ---------- */
+function rollExpr(expr,crit){
+  var e=String(expr||''); var par=e.match(/\(([^)]+)\)/); if(par) e=par[1];
+  e=e.replace(/\s+/g,''); if(!e) return null;
+  var terms=e.match(/[+-]?[^+-]+/g); if(!terms) return null;
+  var total=0, parts=[];
+  for(var i=0;i<terms.length;i++){
+    var t=terms[i], sign=t[0]==='-'?-1:1; t=t.replace(/^[+-]/,'');
+    var m=t.match(/^(\d*)d(\d+)$/i);
+    if(m){ var n=(parseInt(m[1]||'1',10))*(crit?2:1), sides=parseInt(m[2],10), rs=[], sum=0;
+      for(var k=0;k<n;k++){ var r=d(sides); rs.push(r); sum+=r; }
+      total+=sign*sum; parts.push((sign<0?'-':'')+n+'d'+sides+'['+rs.join(',')+']'); }
+    else if(/^\d+$/.test(t)){ total+=sign*parseInt(t,10); parts.push((sign<0?'-':'+')+t); }
+    else return null;
+  }
+  return {total:total,text:parts.join(' ')};
+}
+function logAdd(html,cls){ S.log.unshift({html:html,cls:cls||''}); if(S.log.length>80) S.log.length=80; }
+
+/* ---------- Sortierung ---------- */
+function sorted(){
+  return S.combatants.slice().sort(function(a,b){
+    if(b.ini!==a.ini) return b.ini-a.ini;
+    if(b.bonus!==a.bonus) return b.bonus-a.bonus;
+    return a.order-b.order;
+  });
+}
+
+/* ---------- Kampfteilnehmer ---------- */
+function uniqueName(base){
+  var same=S.combatants.filter(function(c){ return c.baseName===base; });
+  return same.length; }
+function addCombatant(o){
+  var c={id:S.nextId++,order:S.order++,name:o.name,baseName:o.baseName||o.name,side:o.side,ini:o.ini||0,bonus:o.bonus||0,
+    hp:o.hp,max:o.hp,ac:o.ac,conditions:[],actions:o.actions||[],ready:{},leg:o.legendary||0,legUsed:0,notes:o.notes||'',type:o.type||'',open:(o.side==='monster'),last:null,t:o.t||'',cr:o.cr||'',xp:(o.xp!=null?o.xp:null),imgKey:o.imgKey||'',spells:o.spells?JSON.parse(JSON.stringify(o.spells)):null,env:o.env||null,crowd:o.crowd||null};
+  S.combatants.push(c); return c;
+}
+function addMonster(m,count,rollIni){
+  var existing=S.combatants.filter(function(c){return c.baseName===m.name;}).length;
+  for(var i=0;i<count;i++){
+    var num=existing+i+1, nm=(count>1||existing>0)?m.name+' '+num:m.name;
+    if(count===1&&existing===0) nm=m.name;
+    if(existing>0&&i===0){ // rename first if unnumbered
+      var first=S.combatants.find(function(c){return c.baseName===m.name&&c.name===m.name;}); if(first) first.name=m.name+' 1'; }
+    addCombatant({name:nm,baseName:m.name,side:'monster',ini:rollIni?d(20)+m.bonus:0,bonus:m.bonus,hp:m.hp,ac:m.ac,
+      actions:JSON.parse(JSON.stringify(m.actions||[])),legendary:m.legendary,notes:m.notes,type:m.type,t:m.t,cr:m.cr,xp:(m.xp!=null?m.xp:(m.cr&&XP[m.cr]!=null?XP[m.cr]:null)),imgKey:m.imgKey||('m:'+norm(m.name)),spells:m.spells||null});
+  }
+}
+
+/* ---------- Render Liste mit FLIP ---------- */
+function avgDmg(expr){
+  var e=String(expr||''); var par=e.match(/\(([^)]+)\)/); if(par) e=par[1]; e=e.replace(/\s+/g,''); var terms=e.match(/[+-]?[^+-]+/g); if(!terms) return null;
+  var tot=0; for(var i=0;i<terms.length;i++){ var t=terms[i],sg=t[0]==='-'?-1:1; t=t.replace(/^[+-]/,''); var m=t.match(/^(\d*)d(\d+)$/i);
+    if(m) tot+=sg*parseInt(m[1]||'1',10)*(parseInt(m[2],10)+1)/2; else if(/^\d+$/.test(t)) tot+=sg*parseInt(t,10); else return null; }
+  return Math.floor(tot);
+}
+function actionHtml(c,a,i){
+  var tags=''; var off=false, rech='';
+  if(a.recharge){ off=c.ready[i]===false; rech='<span class="tag">Aufladung '+esc(a.recharge)+'</span>'+
+    (off?'<button class="sm" data-act="recharge" data-id="'+c.id+'" data-i="'+i+'">Aufladung würfeln</button>':'<span class="tag">bereit</span>'); }
+  var f=[];
+  if(a.atk) f.push('<span class="fact"><b>Angriff</b> '+esc(a.atk)+'</span>');
+  if(a.save) f.push('<span class="fact"><b>Rettungswurf SG</b> '+esc(a.save)+'</span>');
+  if(a.reach) f.push('<span class="fact"><b>Reichweite/Bereich</b> '+esc(a.reach)+'</span>');
+  if(a.dmg){ var av=avgDmg(a.dmg); f.push('<span class="fact"><b>Schaden</b> '+esc(a.dmg)+(av!=null?' (Ø '+av+')':'')+(a.dmgType?' '+esc(a.dmgType):'')+'</span>'); }
+  var canRoll=!!(a.atk||a.dmg);
+  return '<div class="act'+(off?' off':'')+'"><div style="flex:1;min-width:0"><div class="t">'+esc(a.name)+rech+'</div>'+
+    (f.length?'<div class="facts">'+f.join('')+'</div>':'')+
+    (a.text?'<div class="d">'+esc(a.text)+'</div>':'')+'</div>'+
+    (canRoll?'<button class="sm pri" data-act="use" data-id="'+c.id+'" data-i="'+i+'">Würfeln</button>':
+             (a.kind==='Legendär'?'<button class="sm" data-act="use" data-id="'+c.id+'" data-i="'+i+'">Nutzen</button>':''))+'</div>';
+}
+var GROUPS=[['Eigenschaft','Eigenschaften'],['Aktion','Aktionen'],['Bonusaktion','Bonusaktionen'],['Reaktion','Reaktionen'],['Legendär','Legendäre Aktionen']];
+function actionsBlock(c){
+  if(!c.actions||!c.actions.length) return '';
+  var known=GROUPS.map(function(g){return g[0].toLowerCase();}), h='<div class="acts">';
+  GROUPS.forEach(function(g){
+    var items=[]; c.actions.forEach(function(a,i){ var k=String(a.kind||'Aktion').toLowerCase(); if(k===g[0].toLowerCase()||(g[0]==='Aktion'&&known.indexOf(k)<0)) items.push([a,i]); });
+    if(items.length) h+='<div class="grp">'+g[1]+(g[0]==='Legendär'&&c.leg?' ('+c.leg+' pro Runde)':'')+'</div>'+items.map(function(x){return actionHtml(c,x[0],x[1]);}).join('');
+  });
+  return h+'</div>';
+}
+function cardHtml(c){
+  if(c.side==='env'||c.side==='crowd') return sceneCardHtml(c);
+  var pct=Math.max(0,Math.min(100,c.max?Math.round(c.hp/c.max*100):0));
+  var col=pct>50?'var(--good)':pct>25?'var(--warn)':'var(--bad)';
+  var down=c.hp<=0, cur=S.turnId===c.id, open=c.open;
+  var conds=c.conditions.map(function(k){return '<span class="cond" data-act="rmcond" data-id="'+c.id+'" data-k="'+esc(k)+'" title="Entfernen">'+esc(k)+' ✕</span>';}).join('');
+  var pips=''; if(c.leg>0){ pips='<span class="chip">Legendär <span class="pips">'; for(var i=0;i<c.leg;i++) pips+='<span class="pip'+(i<c.legUsed?' used':'')+'" data-act="pip" data-id="'+c.id+'" data-i="'+i+'"></span>'; pips+='</span></span>'; }
+  var last=c.last!=null?'<button class="sm" data-act="applylast" data-id="'+c.id+'" title="Letzten Schaden-Wurf anwenden">Letzter Wurf −'+c.last+'</button>':'';
+  var acts=open?actionsBlock(c)+(c.spells?'<div class="acts">'+spellsBlock(c)+'</div>':''):'';
+  var notes=(open&&c.notes)?'<div class="notes"><b>Eigenschaften/Notizen:</b> '+esc(c.notes)+'</div>':'';
+  return '<div class="card '+c.side+(cur?' current':'')+(down?' down':'')+'" data-id="'+c.id+'">'+
+   '<div class="ini"><span class="lab">INITIATIVE</span><input type="number" data-f="ini" data-id="'+c.id+'" value="'+c.ini+'">'+
+     '<div class="pm"><button class="sm" data-act="ini-" data-id="'+c.id+'">−</button><button class="sm" data-act="ini+" data-id="'+c.id+'">+</button></div></div>'+
+   '<div><div class="top">'+avatarHtml(c)+'<input class="name" data-f="name" data-id="'+c.id+'" value="'+esc(c.name)+'" title="Name ändern">'+
+     (c.cr?'<span class="chip">HG <b>'+esc(c.cr)+'</b></span>':'')+
+     '<span class="chip">RK <input type="number" data-f="ac" data-id="'+c.id+'" value="'+c.ac+'" style="width:52px;padding:0 3px"></span>'+
+     '<span class="chip">INI-Bonus <input type="number" data-f="bonus" data-id="'+c.id+'" value="'+c.bonus+'" style="width:52px;padding:0 3px"></span>'+
+     pips+
+     '<button class="sm" data-act="toggle" data-id="'+c.id+'">'+(open?'Aktionen ▲':'Aktionen ▼')+'</button>'+
+     '<button class="sm" data-act="dup" data-id="'+c.id+'" title="Duplizieren">⧉</button>'+
+     '<button class="sm danger" data-act="del" data-id="'+c.id+'" title="Entfernen">✕</button></div>'+
+   '<div class="hp"><button class="sm" data-act="hp" data-d="-5" data-id="'+c.id+'">−5</button><button class="sm" data-act="hp" data-d="-1" data-id="'+c.id+'">−1</button>'+
+     '<input class="cur" type="number" data-f="hp" data-id="'+c.id+'" value="'+c.hp+'"><span>/</span><input class="max" type="number" data-f="max" data-id="'+c.id+'" value="'+c.max+'">'+
+     '<button class="sm" data-act="hp" data-d="1" data-id="'+c.id+'">+1</button><button class="sm" data-act="hp" data-d="5" data-id="'+c.id+'">+5</button>'+
+     (down?'<span class="chip"><b>0 TP</b></span>':'')+'</div>'+
+   '<div class="bar"><i style="width:'+pct+'%;background:'+col+'"></i></div>'+
+   '<div class="dmg"><input type="number" min="0" placeholder="Menge" data-amt="'+c.id+'"><button class="sm danger" data-act="dmg" data-id="'+c.id+'">Schaden</button><button class="sm" data-act="heal" data-id="'+c.id+'">Heilen</button>'+last+'</div>'+
+   '<div class="conds">'+conds+'<select data-act="addcond" data-id="'+c.id+'"><option value="">+ Zustand</option>'+CONDITIONS.map(function(k){return '<option>'+k+'</option>';}).join('')+'</select></div>'+
+   notes+acts+'</div></div>';
+}
+function render(){
+  $('roundNo').textContent=S.round; $('objBar').innerHTML=objBarHtml(); $('fabRound').textContent=S.round;
+  var list=$('list'), before={};
+  [].forEach.call(list.querySelectorAll('.card'),function(el){ before[el.dataset.id]=el.getBoundingClientRect().top; });
+  var arr=sorted();
+  list.innerHTML=arr.length?arr.map(cardHtml).join(''):'<div class="empty"><b>Willkommen im Dungeon Master Service.</b><br>Noch keine Kämpfer. Füge Helden und Monster hinzu, nutze den Generator oder importiere eine Excel-Datei.</div>';
+  [].forEach.call(list.querySelectorAll('.card'),function(el){
+    var b=before[el.dataset.id]; if(b==null) return;
+    var dy=b-el.getBoundingClientRect().top; if(Math.abs(dy)<2) return;
+    el.style.transition='none'; el.style.transform='translateY('+dy+'px)';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.style.transition='transform .35s ease'; el.style.transform=''; }); });
+  });
+  renderPanel(); save();
+}
+
+/* ---------- Seitenpanel ---------- */
+function renderPanel(){
+  ['lib','gen','scene','party','log'].forEach(function(t){ $('tab-'+t).hidden=(S.tab!==t); });
+  [].forEach.call(document.querySelectorAll('.tabs button'),function(b){ b.classList.toggle('on',b.dataset.tab===S.tab); });
+  if(S.tab==='lib') renderLib(); else if(S.tab==='gen') renderGen(); else if(S.tab==='scene') renderScene(); else if(S.tab==='party') renderParty(); else renderLog();
+}
+var libMsg={t:'',c:''};
+function renderLib(){
+  var h='<div class="drop" id="drop">Excel-Datei (.xlsx) hierher ziehen oder<br><input type="file" id="file" accept=".xlsx,.xls,.csv"></div>'+
+    '<div class="msg '+libMsg.c+'" id="libMsg">'+esc(libMsg.t)+'</div>'+
+    '<div class="row"><button id="sample">Beispiel laden (Raum 5)</button><button id="clearLib" class="danger">Bibliothek leeren</button></div>'+
+    '<div class="row"><label class="hint"><input type="checkbox" id="rollOnAdd" '+(S.rollOnAdd===false?'':'checked')+'> Initiative beim Hinzufügen würfeln</label></div>'+
+    '<h3>Monster ('+S.lib.length+')</h3>';
+  if(!S.lib.length) h+='<div class="hint">Noch leer. Excel importieren oder Beispiel laden.<br>Blätter: <b>Monster</b> und <b>Aktionen</b> (Vorlage separat).</div>';
+  S.lib.forEach(function(m,i){
+    var src=S.images[m.imgKey||('m:'+norm(m.name))];
+    h+='<div class="mon"><span class="ava" style="width:36px;height:36px;font-size:18px" data-act="libimg" data-i="'+i+'" title="Bild">'+(src?'<img src="'+src+'" alt="">':(TYPES[m.t]||[0,'📜'])[1])+'</span>'+
+       '<div class="m" style="flex:1"><input class="name" value="'+esc(m.name)+'" data-lf="name" data-i="'+i+'" title="Name ändern" style="font-size:15px;width:100%"><div class="s">'+(m.cr?'HG '+esc(m.cr)+' · ':'')+'RK '+m.ac+' · TP '+m.hp+' · INI '+(m.bonus>=0?'+':'')+m.bonus+' · '+(m.actions||[]).length+' Aktionen</div></div>'+
+       '<div class="row" style="margin:0"><input type="number" min="1" value="1" style="width:48px" data-qty="'+i+'"><button class="sm pri" data-act="addmon" data-i="'+i+'">Hinzufügen</button></div></div>';
+  });
+  $('tab-lib').innerHTML=h; bindLib();
+}
+function renderParty(){
+  var h='<div class="hint">Standardwerte (TP 28, RK 15) sind Platzhalter, bitte anpassen.</div><h3>Gruppe</h3>';
+  S.party.forEach(function(p,i){
+    h+='<div class="mon"><div class="m"><input value="'+esc(p.name)+'" data-pf="name" data-i="'+i+'" style="width:110px">'+
+      ' St <input type="number" min="1" max="20" value="'+(p.level||3)+'" data-pf="level" data-i="'+i+'" style="width:44px"> TP <input type="number" value="'+p.hp+'" data-pf="hp" data-i="'+i+'" style="width:54px"> RK <input type="number" value="'+p.ac+'" data-pf="ac" data-i="'+i+'" style="width:48px"> INI <input type="number" value="'+p.bonus+'" data-pf="bonus" data-i="'+i+'" style="width:48px"></div>'+
+      '<button class="sm danger" data-act="delparty" data-i="'+i+'">✕</button></div>';
+  });
+  h+='<div class="row"><button id="addParty">+ Held</button><button id="partyToFight" class="pri">Alle in den Kampf</button></div>'+
+     '<div class="row"><label class="hint"><input type="checkbox" id="rollHeroes"> Heldeninitiative würfeln (sonst manuell eintragen)</label></div>';
+  $('tab-party').innerHTML=h;
+}
+function renderLog(){
+  var h='<div class="row"><button id="clearLog">Protokoll leeren</button></div><div class="log">'+
+    (S.log.length?S.log.map(function(l){return '<div class="'+l.cls+'">'+l.html+'</div>';}).join(''):'<div class="hint">Noch keine Würfe.</div>')+'</div>';
+  $('tab-log').innerHTML=h;
+}
+
+/* ---------- Excel-Import ---------- */
+function norm(s){ return String(s||'').toLowerCase().replace(/[^a-zäöüß0-9]/g,''); }
+function pick(row,names){ for(var k in row){ var n=norm(k); if(names.indexOf(n)>=0) return row[k]; } return ''; }
+function importWorkbook(wb){
+  var monSheet=null, actSheet=null;
+  wb.SheetNames.forEach(function(n){ var x=norm(n);
+    if(!monSheet&&(x.indexOf('monster')>=0||x.indexOf('gegner')>=0)) monSheet=n;
+    else if(!actSheet&&(x.indexOf('aktion')>=0||x.indexOf('angriff')>=0)) actSheet=n; });
+  if(!monSheet) monSheet=wb.SheetNames[0];
+  var mrows=XLSX.utils.sheet_to_json(wb.Sheets[monSheet],{defval:''});
+  var arows=actSheet?XLSX.utils.sheet_to_json(wb.Sheets[actSheet],{defval:''}):[];
+  var added=0, acts=0, byName={};
+  mrows.forEach(function(r){
+    var name=String(pick(r,['name','monster','gegner'])).trim(); if(!name) return;
+    var m={name:name,type:String(pick(r,['typ','art','type'])),ac:toInt(pick(r,['rk','ac','rüstungsklasse']),10),hp:toInt(pick(r,['tp','hp','trefferpunkte','leben']),1),
+      bonus:toInt(pick(r,['ini','initiative','inibonus','initiativebonus']),0),legendary:toInt(pick(r,['legendäreaktionen','legendaer','legendary']),0),
+      notes:String(pick(r,['notizen','notiz','bemerkung','eigenschaften','notes'])),actions:[]};
+    var cr=String(pick(r,['hg','cr','herausforderungsgrad','challenge'])).trim().replace(',','.'); cr={'0.125':'1/8','0.25':'1/4','0.5':'1/2'}[cr]||cr.replace(/\.0+$/,''); if(XP.hasOwnProperty(cr)){ m.cr=cr; m.xp=XP[cr]; }
+    var ep=toInt(pick(r,['ep','xp','erfahrung']),0); if(ep) m.xp=ep;
+    byName[norm(name)]=m;
+    var old=S.lib.findIndex(function(x){return norm(x.name)===norm(name);}); if(old>=0) S.lib[old]=m; else S.lib.push(m); added++;
+  });
+  arows.forEach(function(r){
+    var mn=String(pick(r,['monster','name','gegner','kreatur'])).trim(), m=byName[norm(mn)]; if(!m) return;
+    var an=String(pick(r,['aktion','bezeichnung','attacke'])).trim(); if(!an) return;
+    m.actions.push({name:an,kind:String(pick(r,['art','typ','kategorie','kind'])||'Aktion'),atk:String(pick(r,['angriffsbonus','trefferbonus','angriff','treffer','atk'])||'').trim(),
+      dmg:String(pick(r,['schaden','dmg','würfel'])||'').trim(),dmgType:String(pick(r,['schadensart','schadenstyp','dmgtype'])||'').trim(),
+      reach:String(pick(r,['reichweite','bereich','range'])||'').trim(),save:String(pick(r,['sg','rettungswurf','save'])||'').trim(),
+      recharge:String(pick(r,['aufladung','recharge'])||'').trim(),text:String(pick(r,['beschreibung','text','effekt','notiz'])||'').trim()}); acts++;
+  });
+  libMsg={t:added+' Monster und '+acts+' Aktionen importiert.',c:'ok'}; S.tab='lib'; render();
+}
+function handleFile(f){
+  if(!f) return;
+  if(typeof XLSX==='undefined'){ libMsg={t:'Excel-Bibliothek konnte nicht geladen werden (Internet?).',c:'err'}; renderLib(); return; }
+  var rd=new FileReader();
+  rd.onload=function(e){ try{ importWorkbook(XLSX.read(new Uint8Array(e.target.result),{type:'array'})); }catch(err){ libMsg={t:'Fehler beim Lesen: '+err.message,c:'err'}; renderLib(); } };
+  rd.readAsArrayBuffer(f);
+}
+function bindLib(){
+  var f=$('file'); if(f) f.addEventListener('change',function(){ handleFile(f.files[0]); });
+  var dr=$('drop'); if(dr){
+    ['dragenter','dragover'].forEach(function(ev){ dr.addEventListener(ev,function(e){ e.preventDefault(); dr.classList.add('over'); }); });
+    ['dragleave','drop'].forEach(function(ev){ dr.addEventListener(ev,function(e){ e.preventDefault(); dr.classList.remove('over'); }); });
+    dr.addEventListener('drop',function(e){ handleFile(e.dataTransfer.files[0]); }); }
+  var sm=$('sample'); if(sm) sm.addEventListener('click',function(){ SAMPLE.forEach(function(m){ var old=S.lib.findIndex(function(x){return x.name===m.name;}); var c=JSON.parse(JSON.stringify(m)); if(old>=0) S.lib[old]=c; else S.lib.push(c); }); libMsg={t:'Beispielmonster geladen.',c:'ok'}; render(); });
+  var cl=$('clearLib'); if(cl) cl.addEventListener('click',function(){ S.lib=[]; libMsg={t:'',c:''}; render(); });
+  var ro=$('rollOnAdd'); if(ro) ro.addEventListener('change',function(){ S.rollOnAdd=ro.checked; save(); });
+}
+
+/* ---------- Zugreihenfolge ---------- */
+function startTurn(c){
+  if(!c) return; c.legUsed=0;
+  (c.actions||[]).forEach(function(a,i){
+    if(a.recharge&&c.ready[i]===false){
+      var m=String(a.recharge).match(/(\d+)/), th=m?parseInt(m[1],10):6, r=d(6), ok=r>=th;
+      logAdd('<b>'+esc(c.name)+'</b>: Aufladung '+esc(a.name)+' d6('+r+') '+(ok?'→ bereit':'→ nicht aufgeladen'), ok?'crit':'');
+      if(ok) c.ready[i]=true; }
+  });
+}
+function step(dir){
+  var arr=sorted(); if(!arr.length) return;
+  var idx=arr.findIndex(function(c){return c.id===S.turnId;});
+  if(idx<0){ S.turnId=arr[0].id; startTurn(arr[0]); render(); return; }
+  var skip=$('skipDown').checked, n=arr.length, tries=0, i=idx;
+  do{ i+=dir; if(i>=n){ i=0; S.round++; } if(i<0){ i=n-1; S.round=Math.max(1,S.round-1); } tries++; }
+  while(tries<=n&&(arr[i].side==='object'||(skip&&arr[i].side==='monster'&&arr[i].hp<=0)));
+  var rBefore=S.round; S.turnId=arr[i].id; if(dir>0) startTurn(arr[i]); if(S.round!==rBefore&&dir>0) objRoundCheck(); render();
+  var el=document.querySelector('.card.current'); if(el&&el.scrollIntoView) el.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function setHp(c,v){ c.hp=Math.max(0,Math.min(c.max,v)); }
+
+/* ---------- Aktionen ---------- */
+function useAction(c,i){
+  var a=c.actions[i]; if(!a) return;
+  var html='<b>'+esc(c.name)+'</b>: '+esc(a.name), cls='', crit=false;
+  if(a.kind==='Legendär'){ /* Pip belegen */ var cost=1; var cm=String(a.text||'').match(/Kosten\s*(\d)/i); if(cm) cost=parseInt(cm[1],10); c.legUsed=Math.min(c.leg,c.legUsed+cost); html+=' (legendär, '+c.legUsed+'/'+c.leg+')'; }
+  if(a.atk){
+    var bonus=toInt(a.atk,0), adv=$('adv').checked, dis=$('dis').checked, r1=d(20), r2=d(20), r=r1, note='';
+    if(adv&&!dis){ r=Math.max(r1,r2); note=' (Vorteil '+r1+'/'+r2+')'; } else if(dis&&!adv){ r=Math.min(r1,r2); note=' (Nachteil '+r1+'/'+r2+')'; }
+    crit=(r===20); var fumble=(r===1);
+    html+=' → Angriff d20('+r+')'+(bonus>=0?'+':'')+bonus+' = <b>'+(r+bonus)+'</b>'+note+(crit?' KRITISCH':'')+(fumble?' Patzer':'');
+    cls=crit?'crit':(fumble?'fumble':'');
+  } else if(a.save){ html+=' → Rettungswurf SG '+esc(a.save); }
+  if(a.dmg){ var res=rollExpr(a.dmg,crit); if(res){ html+=' | Schaden <b>'+res.total+'</b> '+esc(a.dmgType||'')+' ('+res.text+')'; c.last=Math.max(0,res.total); } }
+  if(a.recharge){ c.ready[i]=false; }
+  logAdd(html,cls); render();
+}
+
+/* ---------- Monsterdaten: SRD 5.1 (CC-BY-4.0, Wizards of the Coast) ---------- */
+var TYPES={A:['Aberration','👁️'],B:['Tier','🐺'],C:['Himmlisch','✨'],D:['Drache','🐉'],E:['Elementar','🔥'],F:['Feenwesen','🧚'],
+  H:['Humanoid','🗡️'],K:['Konstrukt','⚙️'],M:['Monstrosität','🦂'],P:['Pflanze','🌿'],R:['Riese','🗿'],S:['Schlick','🫧'],T:['Untot','💀'],U:['Unhold','😈'],X:['Eigene','📜']};
+var CRS=['0','1/8','1/4','1/2','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30'];
+var XPS=[10,25,50,100,200,450,700,1100,1800,2300,2900,3900,5000,5900,7200,8400,10000,11500,13000,15000,18000,20000,22000,25000,33000,41000,50000,62000,75000,90000,105000,120000,135000,155000];
+var XP={}; CRS.forEach(function(c,i){ XP[c]=XPS[i]; });
+var CRSTAT=[[3,1],[3,3],[3,5],[3,7],[3,11],[3,17],[4,23],[5,29],[6,35],[6,41],[6,47],[7,53],[7,59],[7,65],[8,71],[8,77],[8,83],[8,89],[8,95],[9,101],[10,107],[10,113],[10,119],[10,131],[11,149],[11,167],[11,185],[12,203],[12,221],[12,239],[13,257],[13,275],[13,293],[14,311]];
+/* en|de|HG|Typ|RK|TP|GES-Mod|Legendär|Angriffe (Nx Name +Bonus Würfel Art ; !Name ABL SG Würfel Art Aufladung) */
+var SRD_RAW=`
+Aboleth|Aboleth|10|A|17|135|-1|3|3x Tentakel +9 2d6+5 Wucht;Schwanz +9 3d6+5 Wucht
+Acolyte|Akolyth|1/4|H|10|9|0||Keule +2 1d4 Wucht
+Air Elemental|Luftelementar|5|E|15|90|5||2x Hieb +8 2d8+5 Wucht
+Allosaurus|Allosaurus|2|B|13|51|1||Biss +6 2d10+4 Stich;Klauen +6 1d8+4 Hieb
+Androsphinx|Androsphinx|17|M|17|199|0|3|2x Klaue +12 2d10+6 Hieb
+Animated Armor|Belebte Rüstung|1|K|18|33|0||2x Hieb +4 1d6+2 Wucht
+Ankheg|Ankheg|2|M|14|39|0||Biss +5 2d6+3 Hieb;!Säurestrahl GES 13 3d6 Säure 6
+Ankylosaurus|Ankylosaurus|3|B|15|68|0||Schwanz +7 4d6+4 Wucht
+Ape|Menschenaffe|1/2|B|12|19|2||2x Faust +5 1d6+3 Wucht
+Archmage|Erzmagier|12|H|12|99|2||Dolch +6 1d4+2 Stich
+Assassin|Assassine|8|H|15|78|3||2x Kurzschwert +6 1d6+3 Stich;Leichte Armbrust +6 1d8+3 Stich
+Awakened Shrub|Erweckter Strauch|0|P|9|10|-1||Kratzen +1 1d4-1 Hieb
+Awakened Tree|Erweckter Baum|2|P|13|59|-2||Hieb +6 3d6+4 Wucht
+Axe Beak|Axtschnabel|1/4|B|11|19|1||Schnabel +4 1d8+2 Hieb
+Azer|Azer|2|E|17|39|1||Kriegshammer +5 1d8+3 Wucht
+Baboon|Pavian|0|B|12|3|2||Biss +1 1d4-1 Stich
+Badger|Dachs|0|B|10|3|0||Biss +2 1 Stich
+Balor|Balor|19|U|19|262|2||Langschwert +14 3d8+8 Hieb;Peitsche +14 2d6+8 Hieb
+Bandit|Bandit|1/8|H|12|11|1||Krummsäbel +3 1d6+1 Hieb;Leichte Armbrust +3 1d8+1 Stich
+Bandit Captain|Banditenhauptmann|2|H|15|65|3||2x Krummsäbel +5 1d6+3 Hieb;Dolch +5 1d4+3 Stich
+Barbed Devil|Dornenteufel|5|U|15|110|3||2x Klaue +6 1d6+3 Stich;Schwanz +6 2d6+3 Stich
+Basilisk|Basilisk|3|M|15|52|-1||Biss +5 2d6+3 Stich
+Bat|Fledermaus|0|B|12|1|2||Biss +0 1 Stich
+Bearded Devil|Bartteufel|3|U|13|52|2||Bart +5 1d8+2 Stich;Glefe +5 1d10+3 Hieb
+Behir|Behir|11|M|17|168|3||Biss +10 3d10+6 Stich;Würgen +10 2d10+6 Wucht;!Blitzodem GES 16 12d10 Blitz 5-6
+Berserker|Berserker|2|H|13|67|1||Großaxt +5 1d12+3 Hieb
+Black Bear|Schwarzbär|1/2|B|11|19|0||Biss +3 1d6+2 Stich;Klauen +3 2d4+2 Hieb
+Black Pudding|Schwarzer Pudding|4|S|7|85|-3||Scheinfuß +5 1d6+3 Wucht
+Blink Dog|Blinkhund|1/4|F|13|22|3||Biss +3 1d6+1 Stich
+Blood Hawk|Blutfalke|1/8|B|12|7|2||Schnabel +4 1d4+2 Stich
+Boar|Wildschwein|1/4|B|11|11|0||Hauer +3 1d6+1 Hieb
+Bone Devil|Knochenteufel|9|U|19|142|3||2x Klaue +8 1d8+4 Hieb;Stachel +8 2d8+4 Stich
+Brown Bear|Braunbär|1|B|11|34|0||Biss +6 1d8+4 Stich;Klauen +6 2d6+4 Hieb
+Bugbear|Grottenschrat|1|H|16|27|2||Morgenstern +4 2d8+2 Stich;Speer +4 2d6+2 Stich
+Bulette|Bulette|5|M|17|94|0||Biss +7 4d12+4 Stich
+Camel|Kamel|1/8|B|9|15|-1||Biss +5 1d4 Wucht
+Cat|Katze|0|B|12|2|2||Kratzen +0 1 Hieb
+Centaur|Zentaur|2|M|12|45|2||Pike +6 1d10+4 Stich;Hufe +6 2d6+4 Wucht;Langbogen +4 1d8+2 Stich
+Chain Devil|Kettenteufel|8|U|16|85|2||2x Kette +8 2d6+4 Hieb
+Chimera|Chimäre|6|M|14|114|0||Biss +7 2d6+4 Stich;Hörner +7 1d12+4 Wucht;Klauen +7 2d6+4 Hieb;!Feueratem GES 15 7d8 Feuer 5-6
+Chuul|Chuul|4|A|16|93|0||2x Zange +6 2d6+4 Wucht
+Clay Golem|Lehmgolem|9|K|14|133|-1||2x Hieb +8 2d10+5 Wucht
+Cloaker|Mantler|8|A|14|78|2||Biss +6 2d6+3 Stich;Schwanz +6 1d8+3 Hieb
+Cloud Giant|Wolkenriese|9|R|14|200|0||2x Morgenstern +12 3d8+8 Stich;Felsbrocken +12 4d10+8 Wucht
+Cockatrice|Kokatrix|1/2|M|11|27|1||Biss +3 1d4+1 Stich
+Commoner|Gemeiner|0|H|10|4|0||Keule +2 1d4 Wucht
+Constrictor Snake|Würgeschlange|1/4|B|12|13|2||Biss +4 1d6+2 Stich;Umschlingen +4 1d8+2 Wucht
+Couatl|Couatl|4|C|19|97|5||Biss +8 1d6+5 Stich;Umschlingen +6 2d6+3 Wucht
+Crab|Krabbe|0|B|11|2|0||Zange +0 1 Wucht
+Crocodile|Krokodil|1/2|B|12|19|0||Biss +4 1d10+2 Stich
+Cult Fanatic|Kultfanatiker|2|H|13|33|2||2x Dolch +4 1d4+2 Stich
+Cultist|Kultist|1/8|H|12|9|1||Krummsäbel +3 1d6+1 Hieb
+Darkmantle|Dunkelmantel|1/2|M|11|22|1||Zerquetschen +5 1d6+3 Wucht
+Death Dog|Todeshund|1|M|12|39|2||2x Biss +4 1d6+2 Stich
+Deep Gnome|Tiefengnom|1/2|H|15|16|2||Kriegspicke +4 1d8+2 Stich
+Deer|Hirsch|0|B|13|4|3||Biss +2 1d4 Stich
+Deva|Deva|10|C|17|136|4||2x Streitkolben +8 1d6+4 Wucht
+Dire Wolf|Schreckenswolf|1|B|14|37|2||Biss +5 2d6+3 Stich
+Djinni|Dschinn|11|E|17|161|2||3x Krummsäbel +9 2d6+5 Hieb
+Doppelganger|Doppelgänger|3|M|14|52|4||2x Hieb +6 1d6+4 Wucht
+Draft Horse|Zugpferd|1/4|B|10|19|0||Hufe +6 2d4+4 Wucht
+Dragon Turtle|Drachenschildkröte|17|D|20|341|0||Biss +13 3d12+7 Stich;2x Klaue +13 2d8+7 Hieb;Schwanz +13 3d12+7 Wucht;!Dampfodem KON 18 15d6 Feuer 5-6
+Dretch|Dretch|1/4|U|11|18|0||Biss +2 1d6 Stich;Klauen +2 2d4 Hieb
+Drider|Drider|6|M|19|123|3||3x Langschwert +6 1d8+3 Hieb;Biss +6 1d4 Stich
+Drow|Drow|1/4|H|15|13|2||Kurzschwert +4 1d6+2 Stich;Handarmbrust +4 1d6+2 Stich
+Druid|Druide|2|H|11|27|1||Kampfstab +2 1d6 Wucht
+Dryad|Dryade|1|F|11|22|1||Keule +2 1d4 Wucht
+Duergar|Duergar|1|H|16|26|0||Kriegspicke +4 1d8+2 Stich;Wurfspeer +4 1d6+2 Stich
+Dust Mephit|Staubmephit|1/2|E|12|17|2||Klauen +4 1d4+2 Hieb
+Eagle|Adler|0|B|12|3|2||Krallen +4 1d4+2 Hieb
+Earth Elemental|Erdelementar|5|E|17|126|-1||2x Hieb +8 2d8+5 Wucht
+Efreeti|Efreet|11|E|17|200|1||2x Krummsäbel +10 2d6+6 Hieb
+Elephant|Elefant|4|B|12|76|-1||Stoßzahn +8 3d8+6 Stich;Stampfen +8 3d10+6 Wucht
+Elk|Elch|1/4|B|10|13|0||Rammen +5 1d6+3 Wucht
+Erinyes|Erinnye|12|U|18|153|3||3x Langschwert +8 1d8+4 Hieb;Langbogen +7 1d8+3 Stich
+Ettercap|Ettercap|2|M|13|44|2||Biss +4 1d8+2 Stich;Klauen +4 2d4+2 Hieb
+Ettin|Ettin|4|R|12|85|-1||Streitaxt +7 2d8+5 Hieb;Morgenstern +7 2d8+5 Stich
+Fire Elemental|Feuerelementar|5|E|13|102|3||2x Berührung +6 2d6+3 Feuer
+Fire Giant|Feuerriese|9|R|18|162|-1||2x Großschwert +11 6d6+7 Hieb;Felsbrocken +11 4d10+7 Wucht
+Flesh Golem|Fleischgolem|5|K|9|93|-1||2x Hieb +7 2d8+4 Wucht
+Flying Snake|Flugschlange|1/8|B|14|5|4||Biss +6 1 Stich
+Flying Sword|Fliegendes Schwert|1/4|K|17|17|2||Langschwert +3 1d8+1 Hieb
+Frog|Frosch|0|B|11|1|1||
+Frost Giant|Frostriese|8|R|15|138|-1||2x Großaxt +9 3d12+6 Hieb;Felsbrocken +9 4d10+6 Wucht
+Gargoyle|Gargyl|2|E|15|52|0||Biss +4 1d6+2 Stich;Klauen +4 1d6+2 Hieb
+Gelatinous Cube|Gallertwürfel|2|S|6|84|-4||Scheinfuß +4 3d6 Säure;!Verschlingen GES 12 3d6 Säure
+Ghast|Ghast|2|T|13|36|3||Biss +3 2d8+3 Stich;Klauen +5 2d6+3 Hieb
+Ghost|Geist|4|T|11|45|1||Verdorrende Berührung +5 4d6+3 Nekrotisch
+Ghoul|Ghul|1|T|12|22|2||Biss +2 2d6+2 Stich;Klauen +4 2d4+2 Hieb
+Giant Ape|Riesenaffe|7|B|12|157|2||2x Faust +9 3d10+6 Wucht;Felsbrocken +9 7d6+6 Wucht
+Giant Badger|Riesendachs|1/4|B|10|13|0||Biss +3 1d6+1 Stich;Klauen +3 2d4+1 Hieb
+Giant Bat|Riesenfledermaus|1/4|B|13|22|3||Biss +4 1d6+2 Stich
+Giant Boar|Riesenwildschwein|2|B|12|42|0||Hauer +5 2d6+3 Hieb
+Giant Centipede|Riesentausendfüßler|1/4|B|13|4|2||Biss +4 1d4+2 Stich
+Giant Constrictor Snake|Riesenwürgeschlange|2|B|12|60|2||Biss +6 2d6+4 Stich;Umschlingen +6 2d8+4 Wucht
+Giant Crab|Riesenkrabbe|1/8|B|15|13|2||Zange +3 1d6+1 Wucht
+Giant Crocodile|Riesenkrokodil|5|B|14|85|-1||Biss +8 3d10+5 Stich;Schwanz +8 2d8+5 Wucht
+Giant Eagle|Riesenadler|1|B|13|26|3||Schnabel +5 1d6+3 Stich;Krallen +5 2d6+3 Hieb
+Giant Elk|Riesenelch|2|B|14|42|3||Rammen +6 2d6+4 Wucht;Hufe +6 4d8+4 Wucht
+Giant Fire Beetle|Riesenfeuerkäfer|0|B|13|4|0||Biss +1 1d6-1 Hieb
+Giant Frog|Riesenfrosch|1/4|B|11|18|1||Biss +3 1d6+1 Stich
+Giant Goat|Riesenziege|1/2|B|11|19|1||Rammen +5 2d4+3 Wucht
+Giant Hyena|Riesenhyäne|1|B|12|45|2||Biss +5 2d6+3 Stich
+Giant Lizard|Riesenechse|1/4|B|12|19|1||Biss +4 1d8+2 Stich
+Giant Octopus|Riesenoktopus|1|B|11|52|1||Tentakel +5 2d6+3 Wucht
+Giant Owl|Rieseneule|1/4|B|12|19|2||Krallen +3 2d6+1 Hieb
+Giant Poisonous Snake|Riesengiftschlange|1/4|B|14|11|4||Biss +6 1d4+4 Stich
+Giant Rat|Riesenratte|1/8|B|12|7|2||Biss +4 1d4+2 Stich
+Giant Scorpion|Riesenskorpion|3|B|15|52|1||2x Klaue +4 1d8+2 Wucht;Stachel +4 1d10+2 Stich
+Giant Sea Horse|Riesenseepferdchen|1/2|B|13|16|1||Rammen +3 1d6+1 Wucht
+Giant Shark|Riesenhai|5|B|13|126|0||Biss +9 3d10+6 Stich
+Giant Spider|Riesenspinne|1|B|14|26|3||Biss +5 1d8+3 Stich
+Giant Toad|Riesenkröte|1|B|11|39|1||Biss +4 1d10+2 Stich
+Giant Vulture|Riesengeier|1|B|10|22|0||Schnabel +4 2d4+2 Stich;Krallen +4 2d6+2 Hieb
+Giant Wasp|Riesenwespe|1/2|B|12|13|2||Stachel +4 1d6+2 Stich
+Giant Weasel|Riesenwiesel|1/8|B|13|9|3||Biss +5 1d4+3 Stich
+Giant Wolf Spider|Riesenwolfsspinne|1/4|B|13|11|3||Biss +3 1d6+1 Stich
+Gibbering Mouther|Brabbelnder Schlund|2|A|9|67|-1||Bisse +2 5d6 Stich
+Glabrezu|Glabrezu|9|U|17|157|2||2x Zange +9 2d10+5 Wucht;2x Faust +9 2d4+2 Wucht
+Gladiator|Gladiator|5|H|16|112|2||3x Speer +7 2d6+4 Stich;Schildstoß +7 2d4+4 Wucht
+Gnoll|Gnoll|1/2|H|15|22|1||Biss +4 1d4+2 Stich;Speer +4 1d6+2 Stich;Langbogen +3 1d8+1 Stich
+Goat|Ziege|0|B|10|4|0||Rammen +2 1d4+1 Wucht
+Goblin|Goblin|1/4|H|15|7|2||Krummsäbel +4 1d6+2 Hieb;Kurzbogen +4 1d6+2 Stich
+Gorgon|Gorgone|5|M|19|114|0||Hörner +8 2d12+5 Stich;Hufe +8 2d10+5 Wucht
+Gray Ooze|Grauer Schlick|1/2|S|8|22|-2||Scheinfuß +3 1d6+1 Wucht
+Green Hag|Grüne Vettel|3|F|17|82|1||Klauen +6 2d8+4 Hieb
+Grick|Grick|2|M|14|27|2||Tentakel +4 2d6+2 Hieb;Schnabel +4 1d6+2 Stich
+Griffon|Greif|2|M|12|59|2||Schnabel +6 1d8+4 Stich;Klauen +6 2d6+4 Hieb
+Grimlock|Grimlock|1/4|H|11|11|1||Stachelkeule +5 1d4+3 Wucht
+Guard|Wache|1/8|H|16|11|1||Speer +3 1d6+1 Stich
+Guardian Naga|Wächternaga|10|M|18|127|4||Biss +8 1d8+4 Stich;!Giftspucke KON 15 10d8 Gift
+Gynosphinx|Gynosphinx|11|M|17|136|2|3|2x Klaue +9 2d8+4 Hieb
+Half-Red Dragon Veteran|Halbdrachen-Veteran|5|H|18|65|1||2x Langschwert +5 1d8+3 Hieb;!Feueratem GES 15 7d6 Feuer 5-6
+Harpy|Harpyie|1|M|11|38|1||Klauen +3 2d4+1 Hieb;Keule +3 1d4+1 Wucht
+Hawk|Falke|0|B|13|1|3||Krallen +5 1 Hieb
+Hell Hound|Höllenhund|3|U|15|45|1||Biss +5 1d8+3 Stich;!Feueratem GES 12 6d6 Feuer 5-6
+Hezrou|Hezrou|8|U|16|136|3||Biss +7 2d10+4 Stich;2x Klaue +7 2d6+4 Hieb
+Hill Giant|Hügelriese|5|R|13|105|-1||2x Zweihandknüppel +8 3d8+5 Wucht;Felsbrocken +8 3d10+5 Wucht
+Hippogriff|Hippogreif|1|M|11|19|1||Schnabel +5 1d10+3 Stich;Klauen +5 2d6+3 Hieb
+Hobgoblin|Hobgoblin|1/2|H|18|11|1||Langschwert +3 1d8+1 Hieb;Langbogen +3 1d8+1 Stich
+Homunculus|Homunkulus|0|K|13|5|2||Biss +4 1 Stich
+Horned Devil|Hornteufel|11|U|18|178|3||2x Gabel +10 2d8+6 Stich;Schwanz +10 1d8+6 Stich
+Hunter Shark|Jagdhai|2|B|12|45|1||Biss +6 2d8+4 Stich
+Hydra|Hydra|8|M|15|172|1||5x Biss +8 1d10+5 Stich
+Hyena|Hyäne|0|B|11|5|1||Biss +2 1d6 Stich
+Ice Devil|Eisteufel|14|U|18|180|2||Biss +10 2d6+5 Stich;Klauen +10 2d4+5 Hieb;Schwanz +10 2d6+5 Wucht
+Ice Mephit|Eismephit|1/2|E|11|21|1||Klauen +3 1d4+1 Hieb;!Frostatem GES 10 2d4 Kälte 6
+Imp|Imp|1|U|13|10|3||Stachel +5 1d4+3 Stich
+Invisible Stalker|Unsichtbarer Pirscher|6|E|14|104|4||2x Hieb +6 2d6+3 Wucht
+Iron Golem|Eisengolem|16|K|20|210|-1||2x Hieb +13 3d8+7 Wucht;Schwert +13 3d10+7 Hieb;!Giftatem KON 19 10d8 Gift 6
+Jackal|Schakal|0|B|12|3|2||Biss +1 1d4-1 Stich
+Killer Whale|Schwertwal|3|B|12|90|0||Biss +6 5d6+4 Stich
+Knight|Ritter|3|H|18|52|0||2x Großschwert +5 2d6+3 Hieb;Schwere Armbrust +2 1d10 Stich
+Kobold|Kobold|1/8|H|12|5|2||Dolch +4 1d4+2 Stich;Schleuder +4 1d4+2 Wucht
+Kraken|Kraken|23|M|18|472|0|3|Biss +17 3d8+10 Stich;3x Tentakel +17 3d6+10 Wucht
+Lamia|Lamia|4|M|13|97|1||Klauen +5 2d10+3 Hieb;Dolch +5 1d4+3 Stich
+Lemure|Lemure|0|U|7|13|-3||Faust +3 1d4 Wucht
+Lich|Lich|21|T|17|135|3|3|Lähmende Berührung +12 3d6 Kälte
+Lion|Löwe|1|B|12|26|2||Biss +5 1d8+3 Stich;Klaue +5 1d6+3 Hieb
+Lizard|Echse|0|B|10|2|0||Biss +0 1 Stich
+Lizardfolk|Echsenmensch|1/2|H|15|22|0||Biss +4 1d6+2 Stich;Speer +4 1d6+2 Stich
+Mage|Magier|6|H|12|40|2||Dolch +5 1d4+2 Stich
+Magma Mephit|Magmamephit|1/2|E|11|22|1||Klauen +3 1d4+1 Hieb;!Feueratem GES 11 2d6 Feuer 6
+Magmin|Magmin|1/2|E|14|9|2||Berührung +4 2d6 Feuer
+Mammoth|Mammut|6|B|13|126|-1||Stoßzahn +10 4d8+7 Stich;Stampfen +10 4d10+7 Wucht
+Manticore|Mantikor|3|M|14|68|3||Biss +5 1d8+3 Stich;2x Klaue +5 1d6+3 Hieb;Schwanzstachel +5 1d8+3 Stich
+Marilith|Marilith|16|U|18|189|5||6x Langschwert +9 2d8+4 Hieb;Schwanz +9 2d10+4 Wucht
+Mastiff|Dogge|1/8|B|12|5|2||Biss +3 1d6+1 Stich
+Medusa|Medusa|6|M|15|127|2||Schlangenhaar +5 1d4+2 Stich;2x Kurzschwert +5 1d6+2 Stich;Langbogen +5 1d8+2 Stich
+Merfolk|Meermensch|1/8|H|11|11|1||Speer +2 1d6 Stich
+Merrow|Merrow|2|M|13|45|0||Biss +6 1d8+4 Stich;Harpune +6 2d6+4 Stich
+Mimic|Mimik|2|M|12|58|1||Scheinfuß +5 1d8+3 Wucht;Biss +5 1d8+3 Stich
+Minotaur|Minotaurus|3|M|14|76|0||Großaxt +6 2d12+4 Hieb;Aufspießen +6 2d8+4 Stich
+Minotaur Skeleton|Minotaurusskelett|2|T|12|67|0||Großaxt +6 2d12+4 Hieb
+Mule|Maultier|1/8|B|10|11|0||Hufe +4 1d4+2 Wucht
+Mummy|Mumie|3|T|11|58|-1||Fäulnisfaust +5 2d6+3 Wucht
+Mummy Lord|Mumienfürst|15|T|17|97|0|3|Fäulnisfaust +9 3d6+4 Wucht
+Nalfeshnee|Nalfeshnee|13|U|18|184|0||Biss +10 5d10+5 Stich;2x Klaue +10 3d6+5 Hieb
+Night Hag|Nachtvettel|5|U|17|112|2||Klauen +7 2d8+4 Hieb
+Nightmare|Nachtmahr|3|U|13|68|2||Hufe +6 2d8+4 Wucht
+Noble|Adliger|1/8|H|15|9|1||Rapier +3 1d8+1 Stich
+Ochre Jelly|Ockergallerte|2|S|8|45|-2||Scheinfuß +4 2d6+2 Wucht
+Octopus|Oktopus|0|B|12|3|2||Tentakel +4 1 Wucht
+Ogre|Oger|2|R|11|59|-1||Zweihandknüppel +6 2d8+4 Wucht;Wurfspeer +6 2d6+4 Stich
+Ogre Zombie|Ogerzombie|2|T|8|85|-2||Morgenstern +6 2d8+4 Wucht
+Oni|Oni|7|R|16|110|0||2x Glefe +7 2d10+4 Hieb
+Orc|Ork|1/2|H|13|15|1||Großaxt +5 1d12+3 Hieb;Wurfspeer +5 1d6+3 Stich
+Otyugh|Otyugh|5|A|14|114|0||Biss +6 2d8+3 Stich;2x Tentakel +6 1d8+3 Wucht
+Owl|Eule|0|B|11|1|1||Krallen +3 1 Hieb
+Owlbear|Eulenbär|3|M|13|59|1||Schnabel +7 1d10+5 Stich;Klauen +7 2d8+5 Hieb
+Panther|Panther|1/4|B|12|13|2||Biss +4 1d6+2 Stich;Klaue +4 1d4+2 Hieb
+Pegasus|Pegasus|2|C|12|59|2||Hufe +6 2d6+4 Wucht
+Phase Spider|Phasenspinne|3|M|13|32|2||Biss +4 1d10+2 Stich
+Pit Fiend|Grubenteufel|20|U|19|300|2||Biss +14 4d6+8 Stich;Klaue +14 2d8+8 Hieb;Streitkolben +14 2d6+8 Wucht;Schwanz +14 3d10+8 Wucht
+Planetar|Planetar|16|C|19|200|5||2x Großschwert +12 4d6+7 Hieb
+Plesiosaurus|Plesiosaurus|2|B|13|68|2||Biss +6 3d6+4 Stich
+Poisonous Snake|Giftschlange|1/8|B|13|2|3||Biss +5 1 Stich
+Polar Bear|Eisbär|2|B|12|42|0||Biss +7 1d8+5 Stich;Klauen +7 2d6+5 Hieb
+Pony|Pony|1/8|B|10|11|0||Hufe +4 2d4+2 Wucht
+Priest|Priester|2|H|13|27|0||Streitkolben +2 1d6 Wucht
+Pseudodragon|Pseudodrache|1/4|D|13|7|2||Biss +4 1d4+2 Stich;Stachel +4 1d4+2 Stich
+Pteranodon|Pteranodon|1/4|B|13|13|2||Biss +3 2d4+1 Stich
+Purple Worm|Purpurwurm|15|M|18|247|-2||Biss +9 3d8+9 Stich;Schwanzstachel +9 3d6+9 Stich
+Quasit|Quasit|1|U|13|7|3||Klauen +4 1d4+3 Stich
+Rakshasa|Rakshasa|13|U|16|110|3||2x Klaue +7 2d6+2 Hieb
+Rat|Ratte|0|B|10|1|0||Biss +0 1 Stich
+Raven|Rabe|0|B|12|1|2||Schnabel +4 1 Stich
+Reef Shark|Riffhai|1/2|B|12|22|1||Biss +4 1d8+2 Stich
+Remorhaz|Remorhaz|11|M|17|195|1||Biss +11 6d10+7 Stich
+Rhinoceros|Nashorn|2|B|11|45|-1||Horn +7 2d8+5 Stich
+Riding Horse|Reitpferd|1/4|B|10|13|0||Hufe +5 2d4+3 Wucht
+Roc|Roch|11|M|15|248|0||Schnabel +13 4d8+9 Stich;Krallen +13 4d6+9 Hieb
+Roper|Seiler|5|M|20|93|-1||Biss +7 4d8+4 Stich
+Rug of Smothering|Erstickender Teppich|2|K|12|33|2||Ersticken +5 2d6+3 Wucht
+Rust Monster|Rostmonster|1/2|M|14|27|1||Biss +3 1d8+1 Stich
+Saber-Toothed Tiger|Säbelzahntiger|2|B|12|52|2||Biss +6 1d10+5 Stich;Klaue +6 2d6+5 Hieb
+Sahuagin|Sahuagin|1/2|H|12|22|0||Biss +3 1d4+1 Stich;Speer +3 1d6+1 Stich
+Salamander|Salamander|5|E|15|90|2||Speer +7 2d6+4 Stich;Schwanz +7 2d6+4 Wucht
+Satyr|Satyr|1/2|F|14|31|3||Rammen +3 2d4+1 Wucht;Kurzschwert +5 1d6+3 Stich
+Scorpion|Skorpion|0|B|11|1|0||Stachel +2 1 Stich
+Scout|Kundschafter|1/2|H|13|16|2||2x Langbogen +4 1d8+2 Stich
+Sea Hag|Seevettel|2|F|14|52|1||Klauen +5 2d6+3 Hieb
+Shadow|Schatten|1/2|T|12|16|2||Stärkeentzug +4 2d6+2 Nekrotisch
+Shambling Mound|Schlurfender Hügel|5|P|15|136|-1||2x Hieb +7 2d8+4 Wucht
+Shield Guardian|Schildwächter|7|K|17|142|-1||2x Faust +7 2d6+4 Wucht
+Shrieker|Kreischer|0|P|5|13|-5||
+Skeleton|Skelett|1/4|T|13|13|2||Kurzschwert +4 1d6+2 Stich;Kurzbogen +4 1d6+2 Stich
+Solar|Solar|21|C|21|243|6|3|2x Großschwert +15 4d6+8 Hieb;Langbogen +13 2d8+6 Stich
+Specter|Gespenst|1|T|12|22|2||Lebensentzug +4 3d6 Nekrotisch
+Spider|Spinne|0|B|12|1|2||Biss +4 1 Stich
+Spirit Naga|Geisternaga|8|M|15|75|3||Biss +7 1d6+4 Stich
+Sprite|Sprite|1/4|F|15|2|4||Langschwert +2 1 Hieb;Kurzbogen +6 1 Stich
+Spy|Spion|1|H|12|27|2||2x Kurzschwert +4 1d6+2 Stich;Handarmbrust +4 1d6+2 Stich
+Steam Mephit|Dampfmephit|1/4|E|10|21|0||Klauen +2 1d4 Hieb;!Dampfodem GES 10 1d8 Feuer 6
+Stone Giant|Steinriese|7|R|17|126|2||2x Zweihandknüppel +9 3d8+6 Wucht;Felsbrocken +9 4d10+6 Wucht
+Stone Golem|Steingolem|10|K|17|178|-1||2x Hieb +10 3d8+6 Wucht
+Storm Giant|Sturmriese|13|R|16|230|2||2x Großschwert +14 6d6+9 Hieb;!Blitzschlag GES 17 12d8 Blitz 5-6
+Succubus|Sukkubus/Inkubus|4|U|15|66|3||Klauen +5 1d6+3 Hieb
+Swarm of Bats|Fledermausschwarm|1/4|B|12|22|2||Bisse +4 2d4 Stich
+Swarm of Insects|Insektenschwarm|1/2|B|12|22|1||Bisse +3 4d4 Stich
+Swarm of Poisonous Snakes|Giftschlangenschwarm|2|B|14|36|4||Bisse +6 2d6 Stich
+Swarm of Quippers|Piranhaschwarm|1|B|13|28|3||Bisse +5 4d6 Stich
+Swarm of Rats|Rattenschwarm|1/4|B|10|24|0||Bisse +2 2d6 Stich
+Swarm of Ravens|Rabenschwarm|1/4|B|12|24|2||Schnäbel +4 2d6 Stich
+Tarrasque|Tarrasque|30|M|25|676|0|3|Biss +19 4d12+10 Stich;2x Klaue +19 4d8+10 Hieb;Horn +19 4d10+10 Stich;Schwanz +19 4d6+10 Wucht
+Thug|Schläger|1/2|H|11|32|0||2x Streitkolben +4 1d6+2 Wucht;Schwere Armbrust +2 1d10 Stich
+Tiger|Tiger|1|B|12|37|2||Biss +5 1d10+3 Stich;Klaue +5 1d8+3 Hieb
+Treant|Baumhirte|9|P|16|138|-1||2x Hieb +10 3d6+6 Wucht;Felsbrocken +10 4d10+6 Wucht
+Tribal Warrior|Stammeskrieger|1/8|H|12|11|0||Speer +3 1d6+1 Stich
+Triceratops|Triceratops|5|B|13|95|-1||Horn +9 4d8+6 Stich;Stampfen +9 3d10+6 Wucht
+Troll|Troll|5|R|15|84|1||Biss +7 1d6+4 Stich;2x Klaue +7 2d6+4 Hieb
+Tyrannosaurus Rex|Tyrannosaurus Rex|8|B|13|136|0||Biss +10 4d12+7 Stich;Schwanz +10 3d8+7 Wucht
+Unicorn|Einhorn|5|C|12|67|2|3|Hufe +7 2d6+4 Wucht;Horn +7 1d8+4 Stich
+Vampire|Vampir|13|T|16|144|4|3|Hieb +9 1d8+4 Wucht;Biss +9 1d6+4 Stich
+Vampire Spawn|Vampirbrut|5|T|15|82|3||Klauen +6 2d4+3 Hieb;Biss +6 1d6+3 Stich
+Veteran|Veteran|3|H|17|58|1||2x Langschwert +5 1d8+3 Hieb;Kurzschwert +5 1d6+3 Stich;Schwere Armbrust +3 1d10+1 Stich
+Violet Fungus|Violetter Pilz|1/4|P|5|18|-5||2x Fäulnisberührung +2 1d8 Nekrotisch
+Vrock|Vrock|6|U|15|104|3||Schnabel +6 2d6+3 Stich;Krallen +6 2d10+3 Hieb
+Vulture|Geier|0|B|10|5|0||Schnabel +2 1d4 Stich
+Warhorse|Schlachtross|1/2|B|11|19|1||Hufe +6 2d6+4 Wucht
+Warhorse Skeleton|Schlachtross-Skelett|1/2|T|13|22|1||Hufe +6 2d6+4 Wucht
+Water Elemental|Wasserelementar|5|E|14|114|2||2x Hieb +7 2d8+4 Wucht
+Water Weird|Wasserschemen|3|E|13|58|3||Würgen +5 1d10+3 Wucht
+Weasel|Wiesel|0|B|13|1|3||Biss +5 1 Stich
+Werebear|Werbär|5|H|10|135|0||2x Klaue +7 2d8+4 Hieb;Biss +7 2d10+4 Stich
+Wereboar|Werwildschwein|4|H|10|78|0||2x Hauer +5 2d6+3 Hieb
+Wererat|Werratte|2|H|12|33|2||2x Kurzschwert +4 1d6+2 Stich;Biss +4 1d4+2 Stich
+Weretiger|Wertiger|4|H|12|120|2||2x Krummsäbel +5 1d6+3 Hieb;Biss +5 1d10+3 Stich
+Werewolf|Werwolf|3|H|11|58|1||Biss +4 1d8+2 Stich;Klauen +4 2d4+2 Hieb
+Wight|Grabunhold|3|T|14|45|2||2x Langschwert +4 1d8+2 Hieb;Lebensentzug +4 1d6+2 Nekrotisch
+Will-o'-Wisp|Irrlicht|2|T|19|22|9||Schock +4 2d8 Blitz
+Winter Wolf|Winterwolf|3|M|13|75|1||Biss +6 2d6+4 Stich;!Frostatem GES 12 4d8 Kälte 5-6
+Wolf|Wolf|1/4|B|13|11|2||Biss +4 2d4+2 Stich
+Worg|Worg|1/2|M|13|26|1||Biss +5 2d6+3 Stich
+Wraith|Todesalb|5|T|13|67|3||Lebensentzug +6 4d8+3 Nekrotisch
+Wyvern|Lindwurm|6|D|13|110|0||Biss +7 2d6+4 Stich;Klauen +7 2d8+4 Hieb;Stachel +7 2d6+4 Stich
+Xorn|Xorn|5|E|19|73|0||3x Klaue +6 1d6+3 Hieb;Biss +6 3d6+3 Stich
+Zombie|Zombie|1/4|T|8|22|-2||Hieb +3 1d6+1 Wucht
+*|Söldner|1|H|16|32|1||2x Langschwert +4 1d8+2 Hieb;Leichte Armbrust +3 1d8+1 Stich
+*|Söldnerhauptfrau|4|H|17|75|1||3x Langschwert +6 1d8+3 Hieb
+*|Wachhauptmann|2|H|18|45|1||2x Langschwert +5 1d8+3 Hieb
+*|Armbrustschütze|1/2|H|13|16|2||Schwere Armbrust +4 1d10+2 Stich;Kurzschwert +4 1d6+2 Stich
+*|Schmuggler|1/4|H|13|13|2||Kurzschwert +4 1d6+2 Stich;Dolch +4 1d4+2 Stich
+*|Wilderer|1/2|H|13|19|3||2x Langbogen +5 1d8+3 Stich;Jagdmesser +5 1d4+3 Stich
+*|Räuberhauptmann|2|H|15|58|2||2x Säbel +5 1d6+3 Hieb
+*|Kultführer|5|H|14|78|2||2x Opferdolch +6 1d4+3 Stich;!Nekrotischer Fluch WEI 14 4d8 Nekrotisch 5-6
+*|Feuermagier-Lehrling|1|H|12|22|2||Feuerstrahl +4 1d10 Feuer;!Brennende Hände GES 12 3d6 Feuer 5-6
+*|Moorhexe|3|F|13|52|1||Fluchklaue +5 2d6+3 Hieb;!Fluchwort WEI 13 3d8 Psychisch 5-6
+*|Goblin-Anführer|1|H|17|21|2||2x Krummsäbel +4 1d6+2 Hieb
+*|Goblin-Schamane|1/2|H|12|15|2||Knochenstab +4 1d6+2 Wucht;!Giftwolke KON 11 2d6 Gift 6
+*|Kobold-Fallensteller|1/4|H|12|9|2||Schleuder +4 1d4+2 Wucht;!Fallenauslöser GES 11 2d6 Stich 6
+*|Gnoll-Rudelführer|2|H|15|49|1||2x Speer +5 1d8+3 Stich;Biss +5 1d4+3 Stich
+*|Hobgoblin-Hauptmann|3|H|18|52|2||2x Großschwert +5 2d6+3 Hieb
+*|Grottenschrat-Häuptling|3|H|17|65|2||2x Morgenstern +5 2d8+3 Stich
+*|Ork-Kriegsanführer|4|H|16|93|1||2x Großaxt +6 1d12+4 Hieb
+*|Drachenblut-Krieger|2|H|15|45|0||2x Klaue +5 1d8+3 Hieb;!Odem GES 12 3d6 Feuer 5-6
+*|Skelett-Bogenschütze|1/2|T|13|16|3||2x Kurzbogen +5 1d6+3 Stich
+*|Zombie-Koloss|3|T|9|95|-2||2x Hieb +6 2d8+4 Wucht
+*|Grabwächter|4|T|18|76|0||2x Langschwert +6 1d8+4 Hieb
+*|Klagegeist|4|T|12|58|2||Kalte Berührung +5 3d6 Kälte;!Wehklagen KON 13 3d6 Psychisch 5-6
+*|Ghul-Rudelführer|2|T|13|45|2||Biss +5 2d6+3 Stich;Klauen +5 2d4+3 Hieb
+*|Knochenschwarm|2|T|13|52|2||Bisse +5 3d6 Hieb
+*|Gefallener Paladin|6|T|18|110|0||3x Langschwert +7 1d8+4 Hieb;!Höllenfeuer GES 14 6d6 Feuer 5-6
+*|Höhlenbär|2|B|12|42|0||Biss +6 1d8+4 Stich;Klauen +6 2d6+4 Hieb
+*|Alphawolf|1|B|14|37|2||Biss +5 2d6+3 Stich
+*|Keiler|1|B|12|34|0||Hauer +5 2d6+3 Hieb
+*|Spinnenkönigin|4|B|15|75|3||2x Biss +6 2d8+3 Stich;!Netzschuss GES 13 2d6 Gift 5-6
+*|Hornissenschwarm|1|B|12|27|3||Stiche +5 4d4 Gift
+*|Dornenranker|1/2|P|12|22|1||2x Ranke +4 1d6+2 Stich
+*|Pilzwandler|2|P|13|45|0||2x Hieb +5 1d8+3 Wucht;!Sporenwolke KON 12 2d6 Gift 5-6
+*|Felswürger|4|M|16|85|0||2x Fangarm +6 2d8+4 Wucht
+*|Stachelechse|2|M|15|45|1||Biss +5 2d6+3 Stich;Schwanzstachel +5 1d8+3 Stich
+*|Sandwurm-Junges|6|M|16|115|-1||Biss +8 3d10+5 Stich
+*|Gebirgs-Oger|2|R|12|68|-1||Steinkeule +6 2d8+4 Wucht;Felsbrocken +6 2d10+4 Wucht
+*|Glutling|1/2|E|13|18|2||Glutberührung +4 2d4 Feuer
+*|Steinwächter|3|K|17|60|-1||2x Faust +5 2d6+3 Wucht
+*|Dornenfee|1/4|F|14|10|4||Dorn +6 1d4+4 Stich
+*|Waldschrat|3|F|14|60|0||2x Knorrenhieb +5 2d6+3 Wucht
+*|Lichtwächter|3|C|16|52|2||2x Glanzklinge +5 1d8+3 Gleißend
+*|Schattenpirscher|3|U|14|45|4||2x Schattenklinge +6 1d6+4 Nekrotisch
+*|Schwefelteufelchen|1/2|U|13|14|3||Krallen +5 1d4+3 Feuer;!Schwefelatem KON 11 2d6 Feuer 6
+`;
+var SRD=[];
+SRD_RAW.trim().split('\n').forEach(function(l){ var hb=l[0]==='*'; if(hb) l=l.slice(1); var p=l.split('|'); if(p.length<8||!XP.hasOwnProperty(p[2])) return;
+  SRD.push({en:p[0],de:p[1],cr:p[2],t:p[3],ac:+p[4],hp:+p[5],dex:+p[6],leg:+(p[7]||0),spec:p[8]||'',hb:hb}); });
+/* Drachen (Nestling, jung, ausgewachsen, uralt): HG, RK, TP, Angriff, Mod, Odem-SG, Odem-Würfel */
+[['Black','schwarzer','Schwarzer',0,'Säure','GES',2,[[2,17,33,4,2,11,'5d8'],[7,18,127,7,4,14,'11d8'],[14,19,195,11,6,18,'12d8'],[21,22,367,15,8,22,'15d8']]],
+ ['Blue','blauer','Blauer',0,'Blitz','GES',0,[[3,17,52,5,3,12,'4d10'],[9,18,152,9,5,16,'10d10'],[16,19,225,12,7,19,'12d10'],[23,22,481,16,9,23,'16d10']]],
+ ['Green','grüner','Grüner',0,'Gift','KON',1,[[2,17,38,4,2,11,'6d6'],[8,18,136,7,4,14,'12d6'],[15,19,207,11,6,18,'16d6'],[22,21,385,15,8,22,'22d6']]],
+ ['Red','roter','Roter',0,'Feuer','GES',0,[[4,17,75,6,4,13,'7d6'],[10,18,178,10,6,17,'16d6'],[17,19,256,14,8,21,'18d6'],[24,22,546,17,10,24,'26d6']]],
+ ['White','weißer','Weißer',0,'Kälte','KON',0,[[2,16,32,4,2,12,'5d8'],[6,17,133,7,4,15,'10d8'],[13,18,200,11,6,19,'12d8'],[20,20,333,14,8,22,'16d8']]],
+ ['Brass','Messing','Messing',1,'Feuer','GES',0,[[1,16,16,4,2,11,'4d6'],[6,17,110,7,4,14,'12d6'],[13,18,172,11,6,18,'13d6'],[20,20,297,14,8,21,'16d6']]],
+ ['Bronze','Bronze','Bronze',1,'Blitz','GES',0,[[2,17,32,5,3,12,'3d10'],[8,18,142,8,5,15,'10d10'],[15,19,212,12,7,19,'12d10'],[22,22,444,16,9,23,'16d10']]],
+ ['Copper','Kupfer','Kupfer',1,'Säure','GES',1,[[1,16,22,4,2,11,'4d8'],[7,17,119,7,4,14,'9d8'],[14,18,184,11,6,18,'12d8'],[21,21,350,15,8,22,'14d8']]],
+ ['Gold','Gold','Gold',1,'Feuer','GES',2,[[3,17,60,6,4,13,'4d10'],[10,18,178,10,6,17,'10d10'],[17,19,256,14,8,21,'12d10'],[24,22,546,17,10,24,'13d10']]],
+ ['Silver','Silber','Silber',1,'Kälte','KON',0,[[2,17,45,6,4,13,'4d8'],[9,18,168,10,6,17,'12d8'],[16,19,243,13,8,20,'13d8'],[23,22,487,17,10,24,'15d8']]]
+].forEach(function(c){
+  var AGE=[['Wyrmling','nest'],['Young','Junger '],['Adult','Ausgewachsener '],['Ancient','Uralter ']];
+  c[7].forEach(function(s,i){
+    var de=c[3]?(i===0?c[1]+'drachennestling':AGE[i][1]+c[1]+'drache'):(i===0?c[2]+' Drachennestling':AGE[i][1]+c[1]+' Drache');
+    var en=(i===0?c[0]+' Dragon Wyrmling':AGE[i][0]+' '+c[0]+' Dragon');
+    var bite='Biss +'+s[3]+' '+(i===0?'1d10':'2d10')+'+'+s[4]+' Stich', claw=i?';2x Klaue +'+s[3]+' 2d6+'+s[4]+' Hieb':'';
+    SRD.push({en:en,de:de,cr:String(s[0]),t:'D',ac:s[1],hp:s[2],dex:c[6],leg:i>=2?3:0,spec:bite+claw+';!Odem '+c[5]+' '+s[5]+' '+s[6]+' '+c[4]+' 5-6'});
+  });
+});
+SRD.sort(function(a,b){ return a.de.localeCompare(b.de,'de'); });
+
+/* ---------- Schwierigkeit (DMG 2014) ---------- */
+var THR=[null,[25,50,75,100],[50,100,150,200],[75,150,225,400],[125,250,375,500],[250,500,750,1100],[300,600,900,1400],[350,750,1100,1700],
+  [450,900,1400,2100],[550,1100,1600,2400],[600,1200,1900,2800],[800,1600,2400,3600],[1000,2000,3000,4500],[1100,2200,3400,5100],[1250,2500,3800,5700],
+  [1400,2800,4300,6400],[1600,3200,4800,7200],[2000,3900,5900,8800],[2100,4200,6300,9500],[2400,4900,7300,10900],[2800,5700,8500,12700]];
+var TIERS=['Einfach','Normal','Schwer','Tödlich','Sicher tödlich'];
+function multFor(n,heroes){ var st=[0.5,1,1.5,2,2.5,3,4,5], i=n<=1?1:n===2?2:n<=6?3:n<=10?4:n<=14?5:6; if(heroes<3) i++; else if(heroes>=6) i--; return st[Math.max(0,Math.min(7,i))]; }
+function bands(g){ var t=THR[Math.max(1,Math.min(20,g.level))], n=g.heroes, e=t[0]*n, m=t[1]*n, h=t[2]*n, dd=t[3]*n;
+  return [[e,m],[m,h],[h,dd],[dd,Math.round(dd*1.5)],[Math.round(dd*1.5),Math.round(dd*2.5)]]; }
+function tierOf(adj,g){ var b=bands(g); if(adj<b[0][0]) return -1; for(var i=4;i>=0;i--) if(adj>=b[i][0]) return i; return -1; }
+function tierName(i){ return i<0?'Trivial':TIERS[i]; }
+function monXp(m){ return m.xp!=null?m.xp:(XP[m.cr]||0); }
+function evalEnc(groups,g,f){ var raw=0,n=0; groups.forEach(function(x){ raw+=monXp(x.m)*x.n; n+=x.n; }); raw=Math.round(raw*(f||1));
+  var mult=multFor(n,g.heroes), adj=Math.round(raw*mult); return {raw:raw,n:n,mult:mult,adj:adj,tier:tierOf(adj,g)}; }
+function fmt(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+
+/* ---------- Aktionen aus Kurzdaten ---------- */
+function genericActions(cr){
+  var s=CRSTAT[Math.max(0,CRS.indexOf(cr))], dpr=s[1], n=dpr<=10?1:dpr<=45?2:3, per=dpr/n, dmg;
+  if(per<4) dmg=per<2?'1':'1d4'; else { var mod=Math.min(10,Math.round(per*0.35)), dice=Math.max(1,Math.round((per-mod)/4.5)); dmg=dice+'d8+'+mod; }
+  return [{name:'Angriff (Richtwert)',kind:'Aktion',atk:'+'+s[0],dmg:dmg,dmgType:'',reach:'',save:'',recharge:'',
+    text:(n>1?'Mehrfachangriff: '+n+'×. ':'')+'Richtwert nach Herausforderungsgrad, keine Originalwerte.'}];
+}
+function specActions(m){
+  var acts=[], multi=[], total=0, plain=0;
+  String(m.spec||'').split(';').forEach(function(it){ it=it.trim(); if(!it) return; var s;
+    if(it[0]==='!'){ s=it.slice(1).match(/^(.+?) (STÄ|GES|KON|INT|WEI|CHA) (\d+) (\S+) (\S+)(?: (\S+))?$/);
+      if(s) acts.push({name:s[1],kind:'Aktion',atk:'',dmg:s[4],dmgType:s[5],reach:'',save:s[2]+' '+s[3],recharge:s[6]||'',text:'Bei Erfolg halber Schaden.'}); return; }
+    s=it.match(/^(?:(\d+)x )?(.+?) ([+-]\d+) (\S+) (\S+)$/); if(!s) return; var n=parseInt(s[1]||'1',10); total+=n; plain++;
+    multi.push((n>1?n+'× ':'')+s[2]); acts.push({name:s[2],kind:'Aktion',atk:s[3],dmg:s[4],dmgType:s[5],reach:'',save:'',recharge:'',text:''}); });
+  if(!plain&&!acts.length) return genericActions(m.cr);
+  if(total>1) acts.unshift({name:'Mehrfachangriff',kind:'Aktion',atk:'',dmg:'',dmgType:'',reach:'',save:'',recharge:'',text:multi.join(', ')+' (Kurzfassung, ggf. Alternativen).'});
+  if(m.leg){ var first=acts.find(function(a){return a.atk;}); if(first) acts.push({name:first.name+' (legendär)',kind:'Legendär',atk:first.atk,dmg:first.dmg,dmgType:first.dmgType,reach:'',save:'',recharge:'',text:'Kosten 1. Ein Angriff am Ende eines anderen Zuges.'}); }
+  return acts;
+}
+function addFlat(dm,k){ var mm=String(dm).match(/^(.*\d[dD]\d+)([+-]\d+)$/);
+  if(mm){ var v=parseInt(mm[2],10)+k; return mm[1]+(v>0?'+'+v:v<0?String(v):''); } return dm+(k>0?'+'+k:String(k)); }
+function scaleMon(mon,f){
+  if(!f||f===1) return mon; mon.hp=Math.max(1,Math.round(mon.hp*f));
+  (mon.actions||[]).forEach(function(a){ if(a.dmg){ var av=avgDmg(a.dmg); if(av!=null&&av>0){ var k=Math.round(av*(f-1)); if(k) a.dmg=addFlat(a.dmg,k); } } });
+  mon.xp=Math.round(monXp(mon)*f); mon.notes=(mon.notes?mon.notes+' ':'')+'Angepasst auf '+Math.round(f*100)+' % (TP und Schaden).'; return mon;
+}
+function srdToMon(m,f){
+  var mon;
+  if(m.lib!=null){ var L=S.lib.find(function(z){return z.name===m.de;}); if(L) mon=JSON.parse(JSON.stringify(L)); }
+  if(!mon) mon={name:m.de,type:TYPES[m.t][0]+' · HG '+m.cr,ac:m.ac,hp:m.hp,bonus:m.dex,legendary:m.leg,cr:m.cr,xp:XP[m.cr],t:m.t,
+    notes:(m.hb?'Eigenkreation (V), noch nicht getestet':'SRD 5.1 ('+m.en+')')+', HG '+m.cr+', '+fmt(XP[m.cr])+' XP.',actions:specActions(m)};
+  if(!mon.spells&&m.en&&SPELLS[m.en]) mon.spells=buildSpells(SPELLS[m.en]);
+  mon.imgKey='m:'+norm(mon.name); if(!mon.t) mon.t=m.t;
+  return scaleMon(mon,f||1);
+}
+
+/* ---------- Generator ---------- */
+function genDefaults(){
+  var lv=S.party.length?Math.round(S.party.reduce(function(s,p){return s+(p.level||3);},0)/S.party.length):3;
+  return {heroes:S.party.length||5,level:lv,tier:1,count:'auto',mode:'auto',types:[],cr0:false,fit:true,lib:true,hb:true};
+}
+function libPool(){ return S.lib.filter(function(m){ return m.cr&&XP.hasOwnProperty(m.cr); }).map(function(m,i){
+  return {en:'',de:m.name,cr:m.cr,t:m.t||'X',ac:m.ac,hp:m.hp,dex:m.bonus,leg:m.legendary||0,lib:i}; }); }
+var HARMLESS=['Warhorse','Pony','Camel','Mule','Draft Horse','Riding Horse','Noble','Commoner','Deer','Goat','Shrieker','Frog','Giant Sea Horse','Giant Fire Beetle','Cat','Crab','Lizard','Owl','Rat','Raven','Bat','Hawk','Weasel','Spider','Badger','Elk','Vulture','Jackal','Eagle','Baboon','Scorpion','Octopus'];
+function genPool(g){
+  var p=SRD.filter(function(m){ return HARMLESS.indexOf(m.en)<0; }); if(g.lib) p=libPool().concat(p);
+  return p.filter(function(m){ if(!g.cr0&&m.cr==='0') return false; if(g.hb===false&&m.hb) return false; if(g.types.length&&g.types.indexOf(m.t)<0) return false; return true; });
+}
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function crMap(p,sub){ var o={}; p.forEach(function(m){ (o[m.cr]=o[m.cr]||[]).push(m); });
+  if(!sub){ var t={}; p.forEach(function(m){ (t[m.t]=t[m.t]||[]).push(m); }); Object.defineProperty(o,'__t',{value:{},enumerable:false}); Object.keys(t).forEach(function(k){ o.__t[k]=crMap(t[k],true); }); } return o; }
+function nearestCr(xp,map,maxIdx){ var best=null,bd=1e9; Object.keys(map).forEach(function(cr){ if(maxIdx!=null&&CRS.indexOf(cr)>maxIdx) return;
+  var dd=Math.abs(Math.log(XP[cr]/Math.max(1,xp))); if(dd<bd){ bd=dd; best=cr; } }); return best; }
+function attempt(g,map,target){
+  var N=g.count==='auto'?rnd([1,2,2,3,3,4,4,5,6,8]):parseInt(g.count,10), mode=g.mode==='auto'?rnd(['gleich','anf','anf','misch']):g.mode;
+  if(N===1) mode='gleich'; if(mode==='misch'&&N<2) mode='gleich';
+  var B=target/multFor(N,g.heroes)*(0.85+Math.random()*0.3), groups=[], theme=null;
+  function add(xp,cnt,maxIdx,excl){ var mp=map;
+    if(theme){ var tm=map.__t[theme]; if(tm&&nearestCr(xp,tm,maxIdx)!=null) mp=tm; }
+    var cr=nearestCr(xp,mp,maxIdx); if(cr==null&&maxIdx!=null) cr=nearestCr(xp,mp,null); if(cr==null) return null;
+    var c=mp[cr].filter(function(m){return !excl||excl.indexOf(m)<0;}); if(!c.length) c=map[cr]; var m=rnd(c); groups.push({m:m,n:cnt}); if(!theme) theme=m.t; return m; }
+  if(mode==='gleich') add(B/N,N);
+  else if(mode==='anf'){ var sh=0.4+Math.random()*0.3, L=add(B*sh,1); if(!L) return null; add(B*(1-sh)/(N-1),N-1,CRS.indexOf(L.cr)-1,[L]); }
+  else { var k=N>=4?rnd([2,3]):2, counts=[], rest=N;
+    for(var i=0;i<k;i++){ var c=i===k-1?rest:Math.max(1,Math.min(rest-(k-1-i),Math.round(rest/(k-i)*(0.6+Math.random()*0.8)))); counts.push(c); rest-=c; }
+    var w=counts.map(function(){return 0.5+Math.random();}), ws=w.reduce(function(a,b){return a+b;},0), used=[];
+    counts.forEach(function(c,j){ var m=add(B*w[j]/ws/c,c,null,used); if(m) used.push(m); }); }
+  var merged=[]; groups.forEach(function(x){ var o=merged.find(function(y){return y.m===x.m;}); if(o) o.n+=x.n; else merged.push(x); });
+  return merged.length?{groups:merged,mode:mode}:null;
+}
+function fitStrength(s,g){ var b=bands(g)[g.tier], target=(b[0]+b[1])/2, e=evalEnc(s.groups,g,1);
+  if(!e.adj){ s.f=1; return; } var f=Math.max(0.6,Math.min(1.5,Math.round(target/e.adj*20)/20)); s.f=Math.abs(f-1)<0.05?1:f; }
+var genMsg='';
+function generate(){
+  var g=S.gen, p=genPool(g); genMsg='';
+  if(!p.length){ S.genRes=[]; genMsg='Keine Monster passen zu den Filtern.'; return; }
+  var map=crMap(p), b=bands(g)[g.tier], target=(b[0]+b[1])/2, c=[];
+  for(var i=0;i<500;i++){ var a=attempt(g,map,target); if(!a) continue; var e=evalEnc(a.groups,g,1), inR=e.adj>=b[0]&&e.adj<b[1];
+    a.score=Math.abs(e.adj-target)/target+(inR?0:1)+Math.random()*0.3;
+    a.key=a.groups.map(function(x){return x.m.de+'#'+x.n;}).sort().join('|'); c.push(a); }
+  c.sort(function(x,y){return x.score-y.score;});
+  var out=[],seen={}; for(var j=0;j<c.length&&out.length<3;j++){ if(seen[c[j].key]) continue; seen[c[j].key]=1; out.push(c[j]); }
+  out.forEach(function(s){ s.f=1; if(g.fit) fitStrength(s,g); delete s.score; });
+  S.genRes=out.map(function(s){ return {f:s.f,groups:s.groups.map(function(x){return {m:x.m,n:x.n};})}; });
+}
+function swapGroup(s,gi){
+  var x=s.groups[gi], p=genPool(S.gen), same=p.filter(function(m){return m.cr===x.m.cr&&m.de!==x.m.de;});
+  if(!same.length){ var idx=CRS.indexOf(x.m.cr); same=p.filter(function(m){ var k=CRS.indexOf(m.cr); return Math.abs(k-idx)===1; }); }
+  if(same.length) x.m=rnd(same);
+}
+function curEncounter(){ var groups=[]; S.combatants.forEach(function(c){ if(c.side!=='monster') return; var xp=c.xp!=null?c.xp:(XP[c.cr]||null); if(xp==null) return; groups.push({m:{xp:xp},n:1}); }); return groups; }
+
+/* ---------- Bilder ---------- */
+function keyOf(c){ return c.imgKey||((c.side==='hero'?'h:':'m:')+norm(c.baseName||c.name)); }
+function emojiOf(c){ if(c.side==='ally') return '🧑'; if(c.side==='object') return '🎯'; return c.side==='hero'?'🛡️':((TYPES[c.t]||[0,'👾'])[1]); }
+function avatarHtml(c){ var src=S.images[keyOf(c)];
+  return '<button class="ava" data-act="ava" data-id="'+c.id+'" title="Bild anzeigen oder ändern">'+(src?'<img src="'+src+'" alt="">':'<span>'+emojiOf(c)+'</span>')+'</button>'; }
+var imgTarget=null;
+function pickImage(key){ imgTarget=key; var f=$('imgFile'); f.value=''; f.click(); }
+function loadImage(file){
+  if(!file||!imgTarget) return; var key=imgTarget, rd=new FileReader();
+  rd.onload=function(){ var im=new Image(); im.onload=function(){
+      var mx=320, sc=Math.min(1,mx/Math.max(im.width,im.height)), cv=document.createElement('canvas');
+      cv.width=Math.round(im.width*sc); cv.height=Math.round(im.height*sc); cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+      S.images[key]=cv.toDataURL('image/jpeg',0.82);
+      if(!save()){ delete S.images[key]; toast('Speicher voll: Bild konnte nicht gespeichert werden.'); }
+      closeLb(); render(); };
+    im.onerror=function(){ toast('Diese Datei ließ sich nicht als Bild lesen.'); }; im.src=rd.result; };
+  rd.readAsDataURL(file);
+}
+var lbKey=null;
+function openLb(key,title){ lbKey=key; $('lbImg').src=S.images[key]||''; $('lbTitle').textContent=title||''; $('lb').hidden=false; }
+function closeLb(){ $('lb').hidden=true; lbKey=null; }
+function toast(t){ var el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(function(){ el.hidden=true; },3500); }
+
+/* ---------- Generator-Panel ---------- */
+function monRowHtml(m,extra){
+  var key='m:'+norm(m.de), src=S.images[key];
+  return '<div class="sr"><span class="em">'+(src?'<img src="'+src+'" alt="">':(TYPES[m.t]||[0,'👾'])[1])+'</span><div class="m"><div class="n">'+esc(m.de)+
+    (m.hb?' <span class="tag">Eigenkreation</span>':(m.en&&m.en!==m.de?' <span class="hint">'+esc(m.en)+'</span>':''))+(m.en&&SPELLS[m.en]?' <span class="tag">Zauber</span>':'')+'</div><div class="s">HG '+m.cr+' · '+fmt(XP[m.cr]||0)+' XP · RK '+m.ac+' · TP '+m.hp+' · '+(TYPES[m.t]||['?'])[0]+'</div></div>'+extra+'</div>';
+}
+function sugHtml(s,si){
+  var g=S.gen, e=evalEnc(s.groups,g,s.f), b=bands(g)[g.tier];
+  var rows=s.groups.map(function(x,gi){ var m=x.m;
+    return monRowHtml(m,'<div class="cnt"><button class="sm" data-act="gn" data-s="'+si+'" data-g="'+gi+'" data-d="-1">−</button><b>'+x.n+'</b>'+
+      '<button class="sm" data-act="gn" data-s="'+si+'" data-g="'+gi+'" data-d="1">+</button><button class="sm" data-act="gswap" data-s="'+si+'" data-g="'+gi+'" title="Anderes Monster mit gleichem HG">↻</button>'+
+      '<button class="sm danger" data-act="grm" data-s="'+si+'" data-g="'+gi+'">✕</button></div>'); }).join('');
+  return '<div class="sug"><div class="sh"><b>Vorschlag '+(si+1)+'</b> <span class="tier t'+e.tier+'" id="sugT'+si+'">'+tierName(e.tier)+'</span></div>'+
+    '<div class="hint" id="sugE'+si+'">'+evalText(e)+'</div>'+rows+
+    '<div class="row" style="margin-top:6px"><label class="hint" style="flex:1">Stärke <input type="range" min="60" max="150" step="5" value="'+Math.round(s.f*100)+'" data-gf="'+si+'" style="width:100%"></label><b id="sugF'+si+'">'+Math.round(s.f*100)+' %</b></div>'+
+    '<div class="row"><button class="sm pri" data-act="gfight" data-s="'+si+'">In den Kampf</button><button class="sm" data-act="glib" data-s="'+si+'">In Bibliothek</button></div></div>';
+}
+function evalText(e){ return e.n+' Monster · '+fmt(e.raw)+' XP × '+String(e.mult).replace('.',',')+' = <b>'+fmt(e.adj)+'</b> angepasste XP'; }
+function renderGen(){
+  var g=S.gen, b=bands(g);
+  var h='<h3>Kampfgenerator</h3><div class="row"><label class="hint">Helden <input type="number" min="1" max="12" value="'+g.heroes+'" data-g="heroes" style="width:52px"></label>'+
+    '<label class="hint">Stufe <input type="number" min="1" max="20" value="'+g.level+'" data-g="level" style="width:52px"></label><button class="sm" id="genParty">aus Heldenliste</button></div>'+
+    '<div class="seg">'+TIERS.map(function(t,i){ return '<button class="sm'+(g.tier===i?' on':'')+' tb t'+i+'" data-act="gtier" data-i="'+i+'">'+t+'</button>'; }).join('')+'</div>'+
+    '<div class="hint">Ziel: '+fmt(b[g.tier][0])+' bis '+fmt(b[g.tier][1])+' angepasste XP</div>'+
+    '<div class="row" style="margin-top:6px"><label class="hint">Anzahl <select data-g="count"><option value="auto">Auto</option>'+
+      [1,2,3,4,5,6,7,8,9,10,12,15].map(function(n){return '<option'+(String(g.count)===String(n)?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label>'+
+    '<label class="hint">Aufbau <select data-g="mode">'+[['auto','Zufall'],['gleich','Alle gleich'],['anf','Anführer + Gefolge'],['misch','Gemischt']].map(function(o){return '<option value="'+o[0]+'"'+(g.mode===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label></div>'+
+    '<div class="tchips">'+Object.keys(TYPES).filter(function(k){return k!=='X';}).map(function(k){ return '<button class="sm'+(g.types.indexOf(k)>=0?' on':'')+'" data-act="gtype" data-t="'+k+'">'+TYPES[k][1]+' '+TYPES[k][0]+'</button>'; }).join('')+'</div>'+
+    '<div class="hint">Keine Auswahl = alle Kreaturtypen.</div>'+
+    '<div class="row" style="margin-top:6px"><label class="hint"><input type="checkbox" data-g="fit"'+(g.fit?' checked':'')+'> Stärke automatisch anpassen</label>'+
+    '<label class="hint"><input type="checkbox" data-g="lib"'+(g.lib?' checked':'')+'> Eigene Monster (mit HG)</label><label class="hint"><input type="checkbox" data-g="hb"'+(g.hb!==false?' checked':'')+'> Eigenkreationen</label><label class="hint"><input type="checkbox" data-g="cr0"'+(g.cr0?' checked':'')+'> HG 0</label></div>'+
+    '<button class="pri" id="genGo" style="width:100%">Vorschläge generieren</button>'+(genMsg?'<div class="msg err">'+esc(genMsg)+'</div>':'')+
+    '<div id="genRes">'+(S.genRes||[]).map(sugHtml).join('')+'</div>';
+  var cur=curEncounter();
+  if(cur.length){ var e=evalEnc(cur,g,1); h+='<h3>Aktueller Kampf</h3><div class="hint">'+evalText(e)+' → <span class="tier t'+e.tier+'">'+tierName(e.tier)+'</span></div>'; }
+  h+='<h3>Monsterbuch ('+SRD.length+' Monster)</h3><div class="row"><input id="bookQ" placeholder="Suchen (deutsch oder englisch)" value="'+esc(bookQ)+'" style="flex:1;min-width:0">'+
+    '<select id="bookCr"><option value="">HG alle</option>'+CRS.map(function(c){return '<option'+(bookCr===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div><div id="bookList"></div>'+
+    '<div class="hint" style="margin-top:8px">Monsterwerte aus dem SRD 5.1 (Lizenz CC-BY-4.0, Wizards of the Coast), Angriffe in Kurzfassung. Mit „Eigenkreation“ markierte Monster sind ungetestete Entwürfe. Schwierigkeit nach DMG 2014.</div>';
+  $('tab-gen').innerHTML=h; renderBook();
+}
+var bookQ='', bookCr='';
+function renderBook(){
+  var el=$('bookList'); if(!el) return; var q=norm(bookQ), types=S.gen.types;
+  var list=SRD.filter(function(m){ if(bookCr&&m.cr!==bookCr) return false; if(types.length&&types.indexOf(m.t)<0) return false; return !q||norm(m.de+' '+m.en).indexOf(q)>=0; });
+  list.sort(function(a,b){ return CRS.indexOf(a.cr)-CRS.indexOf(b.cr)||a.de.localeCompare(b.de,'de'); });
+  var shown=list.slice(0,40);
+  el.innerHTML=shown.map(function(m){ var i=SRD.indexOf(m);
+    return monRowHtml(m,'<div class="cnt"><button class="sm pri" data-act="bfight" data-i="'+i+'" title="In den Kampf">+ Kampf</button><button class="sm" data-act="blib" data-i="'+i+'" title="In die Bibliothek">+ Bib</button></div>'); }).join('')+
+    (list.length>shown.length?'<div class="hint">… '+(list.length-shown.length)+' weitere. Suche oder HG eingrenzen.</div>':'')+(list.length?'':'<div class="hint">Nichts gefunden.</div>');
+}
+function toLib(mon){ var old=S.lib.findIndex(function(x){return x.name===mon.name;}); if(old>=0) S.lib[old]=mon; else S.lib.push(mon); }
+
+/* ---------- Zauber ---------- */
+var SPELLDB={
+ 'Heilige Flamme':{a:'save',s:'GES',t:'Gleißend',x:'Keine Deckung gegen den Rettungswurf.'},
+ 'Feuerpfeil':{a:'atk',t:'Feuer'},'Froststrahl':{a:'atk',t:'Kälte',x:'Bewegungsrate des Ziels −3 m.'},
+ 'Schockgriff':{a:'atk',t:'Blitz',x:'Vorteil gegen Metallrüstung, Ziel hat keine Reaktion.'},'Flamme erzeugen':{a:'atk',d:'1d8',t:'Feuer'},
+ 'Spott':{a:'save',s:'WEI',d:'1d4',t:'Psychisch',x:'Nachteil auf den nächsten Angriff.'},
+ 'Magisches Geschoss':{a:'auto',d:'3d4+3',t:'Energie',x:'3 Geschosse, treffen automatisch.'},
+ 'Lenkendes Geschoss':{a:'atk',d:'4d6',t:'Gleißend',x:'Nächster Angriff gegen das Ziel mit Vorteil.'},
+ 'Wunden verursachen':{a:'atk',d:'3d10',t:'Nekrotisch'},'Wunden heilen':{a:'heal',d:'1d8+3'},
+ 'Donnerwoge':{a:'save',s:'KON',d:'2d8',t:'Donner',x:'Würfel 4,5 m, Fehlschlag: 3 m weggestoßen. Erfolg halber Schaden.'},
+ 'Spirituelle Waffe':{a:'atk',d:'1d8+3',t:'Energie',x:'Bonusaktion, 1 Minute.'},
+ 'Spirituelle Wächter':{a:'save',s:'WEI',d:'3d8',t:'Gleißend',x:'Radius 4,5 m, Konzentration. Erfolg halber Schaden.',k:1},
+ 'Feuerball':{a:'save',s:'GES',d:'8d6',t:'Feuer',x:'Radius 6 m. Erfolg halber Schaden.'},
+ 'Blitz':{a:'save',s:'GES',d:'8d6',t:'Blitz',x:'Linie 30 m. Erfolg halber Schaden.'},
+ 'Eissturm':{a:'save',s:'GES',d:'2d8+4d6',t:'Wucht/Kälte',x:'Zylinder Radius 6 m, danach schwieriges Gelände.'},
+ 'Kältekegel':{a:'save',s:'KON',d:'8d8',t:'Kälte',x:'Kegel 18 m. Erfolg halber Schaden.'},
+ 'Flammenschlag':{a:'save',s:'GES',d:'8d6',t:'Feuer/Gleißend',x:'Säule Radius 3 m.'},
+ 'Melfs Säurepfeil':{a:'atk',d:'4d4',t:'Säure',x:'Am Ende des nächsten Zuges +2d4 Säure.'},
+ 'Plage':{a:'save',s:'KON',d:'8d8',t:'Nekrotisch'},'Todeswolke':{a:'save',s:'KON',d:'5d8',t:'Gift',x:'Kugel Radius 6 m, Konzentration.',k:1},
+ 'Auflösung':{a:'save',s:'GES',d:'10d6+40',t:'Energie',x:'Bei 0 TP zu Staub zerfallen.'},
+ 'Finger des Todes':{a:'save',s:'KON',d:'7d8+30',t:'Nekrotisch',x:'Humanoide, die sterben, erheben sich als Zombie.'},
+ 'Insektenplage':{a:'save',s:'KON',d:'4d10',t:'Stich',x:'Radius 6 m, Konzentration.',k:1},
+ 'Leid':{a:'save',s:'KON',d:'14d6',t:'Nekrotisch',x:'Kann TP nicht unter 1 senken.'},
+ 'Flammenwand':{a:'save',s:'GES',d:'5d8',t:'Feuer',x:'Konzentration.',k:1},'Klingenbarriere':{a:'save',s:'GES',d:'6d10',t:'Hieb',x:'Konzentration.',k:1},
+ 'Wächter des Glaubens':{a:'save',s:'GES',d:'20',t:'Gleißend',x:'Wächter verursacht insgesamt höchstens 60 Schaden.'},
+ 'Strahl der Schwächung':{a:'atk',x:'Ziel macht mit Stärke-Waffen halben Schaden. Konzentration.',k:1},
+ 'Person festhalten':{a:'save',s:'WEI',x:'Gelähmt, Wiederholung am Zugende. Konzentration.',k:1},
+ 'Monster festhalten':{a:'save',s:'WEI',x:'Gelähmt, Wiederholung am Zugende. Konzentration.',k:1},
+ 'Schlaf':{a:'none',d:'5d8',t:'TP-Pool',x:'Wesen mit den wenigsten TP schlafen zuerst ein.'},
+ 'Befehl':{a:'save',s:'WEI',x:'Befehl aus einem Wort.'},'Verbannung':{a:'save',s:'CHA',x:'Konzentration.',k:1},
+ 'Verstricken':{a:'save',s:'STÄ',x:'Quadrat 6 m: festgesetzt. Konzentration.',k:1},'Person bezaubern':{a:'save',s:'WEI'},
+ 'Person beherrschen':{a:'save',s:'WEI',x:'Konzentration.',k:1},'Monster beherrschen':{a:'save',s:'WEI',x:'Konzentration.',k:1},
+ 'Machtwort Betäubung':{x:'Ziel mit höchstens 150 TP ist betäubt.'},'Machtwort Tod':{x:'Ziel mit höchstens 100 TP stirbt.'},
+ 'Gegenzauber':{x:'Reaktion: Zauber bis 3. Grad endet automatisch, höher: Probe.'},'Schild':{x:'Reaktion: +5 RK bis zum nächsten Zug.'},
+ 'Nebelschritt':{x:'Bonusaktion: bis 9 m teleportieren.'},'Fluch':{a:'save',s:'WEI',x:'Konzentration.',k:1},'Einflüsterung':{a:'save',s:'WEI',x:'Konzentration.',k:1},
+ 'Schild des Glaubens':{x:'+2 RK. Konzentration.',k:1},'Segen':{x:'Bis zu 3 Ziele: +1d4 auf Angriffe und Rettungswürfe. Konzentration.',k:1},
+ 'Zeitstopp':{x:'1d4+1 zusätzliche Züge am Stück.'},'Magie bannen':{x:'Zauber bis 3. Grad enden, höher: Probe SG 10 + Grad.'},
+ 'Fliegen':{x:'Flugbewegung 18 m. Konzentration.',k:1},'Mächtige Unsichtbarkeit':{x:'Unsichtbar, auch beim Angreifen. Konzentration.',k:1},
+ 'Unsichtbarkeit':{x:'Endet bei Angriff oder Zauber. Konzentration.',k:1},'Dimensionstür':{x:'Bis 150 m teleportieren, eine Person mitnehmen.'},
+ 'Spiegelbilder':{x:'3 Trugbilder lenken Angriffe ab.'},'Feuerschild':{x:'Nahkampftreffer gegen ihn: Angreifer nimmt 2d8 Feuer oder Kälte.'},
+ 'Steinhaut':{x:'Resistenz gegen nichtmagische Waffen. Konzentration.',k:1},'Tote beleben':{x:'Erschafft ein Skelett oder einen Zombie.'},
+ 'Dunkelheit':{x:'Kugel 4,5 m magische Dunkelheit. Konzentration.',k:1},'Feenfeuer':{a:'save',s:'GES',x:'Angriffe gegen Betroffene mit Vorteil. Konzentration.',k:1},
+ 'Verschwimmen':{x:'Angriffe gegen ihn mit Nachteil. Konzentration.',k:1},'Rindenhaut':{x:'RK mindestens 16. Konzentration.',k:1}
+};
+var SPELLS={
+ 'Acolyte':['WEI',12,4,[['Zaubertricks',0,'Licht, Heilige Flamme[1d8], Thaumaturgie'],['1. Grad',3,'Segen, Wunden heilen[1d8+2], Heiligtum']]],
+ 'Priest':['WEI',13,5,[['Zaubertricks',0,'Licht, Heilige Flamme[2d8], Thaumaturgie'],['1. Grad',4,'Wunden heilen[1d8+3], Lenkendes Geschoss, Heiligtum'],['2. Grad',3,'Schwache Genesung, Spirituelle Waffe[1d8+3]'],['3. Grad',2,'Magie bannen, Spirituelle Wächter']]],
+ 'Druid':['WEI',12,4,[['Zaubertricks',0,'Druidenkunst, Flamme erzeugen, Shillelagh'],['1. Grad',4,'Verstricken, Lange Schritte, Mit Tieren sprechen, Donnerwoge'],['2. Grad',3,'Tierbote, Rindenhaut']]],
+ 'Cult Fanatic':['WEI',11,3,[['Zaubertricks',0,'Licht, Heilige Flamme[1d8], Thaumaturgie'],['1. Grad',4,'Befehl, Wunden verursachen, Schild des Glaubens'],['2. Grad',3,'Person festhalten, Spirituelle Waffe[1d8+2]']]],
+ 'Mage':['INT',14,6,[['Zaubertricks',0,'Feuerpfeil[2d10], Licht, Magierhand, Taschenspielerei'],['1. Grad',4,'Magie entdecken, Magierrüstung, Magisches Geschoss, Schild'],['2. Grad',3,'Nebelschritt, Einflüsterung'],['3. Grad',3,'Gegenzauber, Feuerball, Fliegen'],['4. Grad',3,'Mächtige Unsichtbarkeit, Eissturm'],['5. Grad',1,'Kältekegel']]],
+ 'Archmage':['INT',17,9,[['Zaubertricks',0,'Feuerpfeil[4d10], Licht, Magierhand, Taschenspielerei, Schockgriff[4d8]'],['1. Grad',4,'Magie entdecken, Identifizieren, Magierrüstung, Magisches Geschoss'],['2. Grad',3,'Gedanken wahrnehmen, Spiegelbilder, Nebelschritt'],['3. Grad',3,'Gegenzauber, Fliegen, Blitz'],['4. Grad',3,'Verbannung, Feuerschild, Steinhaut'],['5. Grad',3,'Kältekegel, Ausspähung, Energiewand'],['6. Grad',1,'Kugel der Unverwundbarkeit'],['7. Grad',1,'Teleportieren'],['8. Grad',1,'Gedankenleere'],['9. Grad',1,'Zeitstopp']]],
+ 'Lich':['INT',20,12,[['Zaubertricks',0,'Magierhand, Taschenspielerei, Froststrahl[4d8]'],['1. Grad',4,'Magie entdecken, Magisches Geschoss, Schild, Donnerwoge'],['2. Grad',3,'Gedanken wahrnehmen, Unsichtbarkeit, Melfs Säurepfeil'],['3. Grad',3,'Tote beleben, Gegenzauber, Magie bannen, Feuerball'],['4. Grad',3,'Plage, Dimensionstür'],['5. Grad',3,'Todeswolke, Ausspähung'],['6. Grad',1,'Auflösung, Kugel der Unverwundbarkeit'],['7. Grad',1,'Finger des Todes, Ebenenwechsel'],['8. Grad',1,'Monster beherrschen, Machtwort Betäubung'],['9. Grad',1,'Machtwort Tod']]],
+ 'Guardian Naga':['WEI',16,8,[['Zaubertricks',0,'Ausbessern, Heilige Flamme[3d8], Thaumaturgie'],['1. Grad',4,'Befehl, Wunden heilen[1d8+4], Schild des Glaubens'],['2. Grad',3,'Gemüter beruhigen, Person festhalten'],['3. Grad',3,'Fluch, Hellsehen'],['4. Grad',3,'Verbannung, Bewegungsfreiheit'],['5. Grad',2,'Flammenschlag, Auftrag'],['6. Grad',1,'Wahrer Blick']]],
+ 'Spirit Naga':['INT',14,6,[['Zaubertricks',0,'Magierhand, Taschenspielerei, Froststrahl[2d8]'],['1. Grad',4,'Person bezaubern, Magie entdecken, Schlaf'],['2. Grad',3,'Gedanken wahrnehmen, Person festhalten'],['3. Grad',3,'Blitz, Wasseratmung'],['4. Grad',3,'Plage, Dimensionstür'],['5. Grad',2,'Person beherrschen']]],
+ 'Mummy Lord':['WEI',17,9,[['Zaubertricks',0,'Heilige Flamme[3d8], Thaumaturgie'],['1. Grad',4,'Befehl, Lenkendes Geschoss, Schild des Glaubens'],['2. Grad',3,'Person festhalten, Stille, Spirituelle Waffe[1d8+4]'],['3. Grad',3,'Tote beleben, Magie bannen'],['4. Grad',3,'Weissagung, Wächter des Glaubens'],['5. Grad',2,'Ansteckung, Insektenplage'],['6. Grad',1,'Leid']]],
+ 'Gynosphinx':['INT',16,8,[['Zaubertricks',0,'Magierhand, Kleine Illusion, Taschenspielerei'],['1. Grad',4,'Magie entdecken, Identifizieren, Schild'],['2. Grad',3,'Dunkelheit, Gegenstand aufspüren, Einflüsterung'],['3. Grad',3,'Magie bannen, Zungen'],['4. Grad',3,'Verbannung, Mächtige Unsichtbarkeit'],['5. Grad',1,'Sagenkunde']]],
+ 'Androsphinx':['WEI',18,10,[['Zaubertricks',0,'Heilige Flamme[3d8], Verschonung der Sterbenden, Thaumaturgie'],['1. Grad',4,'Befehl, Gut und Böse entdecken, Magie entdecken'],['2. Grad',3,'Schwache Genesung, Zone der Wahrheit'],['3. Grad',3,'Magie bannen, Zungen'],['4. Grad',3,'Verbannung, Bewegungsfreiheit'],['5. Grad',2,'Flammenschlag, Mächtige Genesung'],['6. Grad',1,'Heldenmahl']]],
+ 'Drow':['CHA',11,0,[['Nach Belieben',0,'Tanzende Lichter'],['1/Tag je',1,'Dunkelheit, Feenfeuer',1]]],
+ 'Deep Gnome':['INT',11,0,[['Nach Belieben',0,'Unauffindbarkeit'],['1/Tag je',1,'Blindheit/Taubheit, Verschwimmen, Selbstverkleidung',1]]],
+ 'Lamia':['CHA',13,0,[['Nach Belieben',0,'Selbstverkleidung, Größeres Abbild'],['3/Tag je',3,'Person bezaubern, Spiegelbilder, Ausspähung, Einflüsterung',1],['1/Tag',1,'Auftrag']]],
+ 'Green Hag':['WEI',12,0,[['Nach Belieben',0,'Tanzende Lichter, Kleine Illusion, Spott']]],
+ 'Night Hag':['CHA',14,0,[['Nach Belieben',0,'Magie entdecken, Magisches Geschoss'],['2/Tag je',2,'Ebenenwechsel, Strahl der Schwächung, Schlaf',1]]],
+ 'Oni':['CHA',13,0,[['Nach Belieben',0,'Dunkelheit, Unsichtbarkeit'],['1/Tag je',1,'Person bezaubern, Kältekegel, Gasförmige Gestalt, Schlaf',1]]],
+ 'Rakshasa':['CHA',18,0,[['Nach Belieben',0,'Gedanken wahrnehmen, Selbstverkleidung, Magierhand, Kleine Illusion'],['3/Tag je',3,'Person bezaubern, Magie entdecken, Unsichtbarkeit, Größeres Abbild, Einflüsterung',1],['1/Tag je',1,'Person beherrschen, Fliegen, Ebenenwechsel, Wahrer Blick',1]]],
+ 'Djinni':['CHA',17,0,[['Nach Belieben',0,'Gut und Böse entdecken, Magie entdecken, Donnerwoge'],['3/Tag je',3,'Zungen, Windwandeln',1],['1/Tag je',1,'Elementar beschwören, Gasförmige Gestalt, Unsichtbarkeit, Größeres Abbild, Ebenenwechsel',1]]],
+ 'Efreeti':['CHA',15,0,[['Nach Belieben',0,'Magie entdecken'],['3/Tag je',3,'Vergrößern/Verkleinern, Zungen',1],['1/Tag je',1,'Elementar beschwören, Gasförmige Gestalt, Unsichtbarkeit, Größeres Abbild, Ebenenwechsel, Flammenwand',1]]],
+ 'Couatl':['CHA',14,0,[['Nach Belieben',0,'Gut und Böse entdecken, Magie entdecken, Gedanken wahrnehmen'],['3/Tag je',3,'Segen, Wunden heilen[1d8+5], Schwache Genesung, Heiligtum, Schild',1],['1/Tag je',1,'Traum, Mächtige Genesung, Ausspähung',1]]],
+ 'Planetar':['CHA',20,0,[['Nach Belieben',0,'Gut und Böse entdecken, Unsichtbarkeit'],['3/Tag je',3,'Klingenbarriere, Flammenschlag, Tote erwecken',1],['1/Tag je',1,'Insektenplage, Wetterkontrolle',1]]],
+ 'Solar':['CHA',25,0,[['Nach Belieben',0,'Gut und Böse entdecken, Unsichtbarkeit'],['3/Tag je',3,'Klingenbarriere, Auferstehung',1],['1/Tag je',1,'Wetterkontrolle',1]]],
+ 'Cloud Giant':['CHA',15,0,[['Nach Belieben',0,'Magie entdecken, Nebelwolke, Licht'],['3/Tag je',3,'Federfall, Fliegen, Nebelschritt, Telekinese',1],['1/Tag je',1,'Wetterkontrolle, Gasförmige Gestalt',1]]],
+ 'Storm Giant':['CHA',17,0,[['Nach Belieben',0,'Magie entdecken, Federfall, Schweben, Licht'],['3/Tag je',3,'Wetterkontrolle, Wasseratmung',1]]],
+ 'Unicorn':['CHA',14,0,[['Nach Belieben',0,'Gut und Böse entdecken, Druidenkunst, Spurloses Gehen'],['1/Tag je',1,'Gemüter beruhigen, Verstricken',1]]],
+ 'Pit Fiend':['CHA',21,0,[['Nach Belieben',0,'Magie entdecken, Feuerball'],['3/Tag je',3,'Monster festhalten, Flammenwand',1]]],
+ 'Glabrezu':['INT',16,0,[['Nach Belieben',0,'Dunkelheit, Magie entdecken, Magie bannen'],['1/Tag je',1,'Verwirrung, Fliegen, Machtwort Betäubung',1]]]
+};
+function buildSpells(def){ return {abl:def[0],dc:def[1],atk:def[2],groups:def[3].map(function(g){
+  return {lab:g[0],max:g[1],each:!!g[3],used:0,usedBy:{},list:g[2].split(', ').map(function(s){ var m=s.match(/^(.+?)\[(.+)\]$/); return m?{n:m[1],d:m[2]}:{n:s}; })}; })}; }
+function spellsBlock(c){
+  var sp=c.spells; if(!sp) return '';
+  var h='<div class="grp">Zauber ('+esc(sp.abl)+', SG '+sp.dc+(sp.atk?', Angriff +'+sp.atk:'')+') <button class="sm" data-act="spreset" data-id="'+c.id+'" style="min-height:22px;padding:0 6px;font-size:11px">Rast: zurücksetzen</button></div>';
+  sp.groups.forEach(function(G,gi){
+    var pips=''; if(G.max&&!G.each) for(var i=0;i<G.max;i++) pips+='<span class="pip'+(i<G.used?' used':'')+'" data-act="spip" data-id="'+c.id+'" data-g="'+gi+'" data-i="'+i+'" title="Zauberplatz"></span>';
+    h+='<div class="spg"><span class="spl">'+esc(G.lab)+'</span>'+(pips?'<span class="pips">'+pips+'</span>':'')+
+      G.list.map(function(s,si){ var db=SPELLDB[s.n]||{}, u=G.usedBy[s.n]||0, out=G.max&&(G.each?u>=G.max:G.used>=G.max), roll=!!(s.d||db.d||db.a==='atk');
+        return '<button class="sm spell'+(roll?' roll':'')+(out?' out':'')+'" data-act="cast" data-id="'+c.id+'" data-g="'+gi+'" data-s="'+si+'" title="'+esc(db.x||'')+'">'+esc(s.n)+
+          (G.each&&G.max?' <small>'+(G.max-u)+'/'+G.max+'</small>':'')+'</button>'; }).join('')+'</div>';
+  });
+  return h;
+}
+function castSpell(c,gi,si){
+  var sp=c.spells, G=sp.groups[gi], s=G.list[si], db=SPELLDB[s.n]||{};
+  if(G.max){ if(G.each){ var u=G.usedBy[s.n]||0; if(u>=G.max){ toast(s.n+': heute schon verbraucht.'); return; } G.usedBy[s.n]=u+1; }
+    else { if(G.used>=G.max){ toast('Keine Zauberplätze mehr ('+G.lab+').'); return; } G.used++; } }
+  var html='<b>'+esc(c.name)+'</b> wirkt '+esc(s.n)+' <span class="hint">('+esc(G.lab)+')</span>', cls='', crit=false, dice=s.d||db.d;
+  if(db.a==='atk'){ var adv=$('adv').checked, dis=$('dis').checked, r1=d(20), r2=d(20), r=r1, note='';
+    if(adv&&!dis){ r=Math.max(r1,r2); note=' (Vorteil '+r1+'/'+r2+')'; } else if(dis&&!adv){ r=Math.min(r1,r2); note=' (Nachteil '+r1+'/'+r2+')'; }
+    crit=r===20; html+=' → Zauberangriff d20('+r+')+'+sp.atk+' = <b>'+(r+sp.atk)+'</b>'+note+(crit?' KRITISCH':'')+(r===1?' Patzer':''); cls=crit?'crit':(r===1?'fumble':''); }
+  else if(db.a==='save') html+=' → Rettungswurf '+db.s+' SG '+sp.dc;
+  if(dice){ var res=rollExpr(dice,crit); if(res){ html+=' | '+(db.a==='heal'?'Heilung':(db.a==='none'?db.t:'Schaden'))+' <b>'+res.total+'</b> '+(db.a==='heal'||db.a==='none'?'':esc(db.t||''))+' ('+res.text+')'; if(db.a!=='heal'&&db.a!=='none') c.last=res.total; } }
+  if(db.x) html+=' · '+esc(db.x);
+  if(db.k&&c.conditions.indexOf('Konzentration')<0) c.conditions.push('Konzentration');
+  logAdd(html,cls); render();
+}
+
+/* ---------- Kampfgründe ---------- */
+var OBJECTIVES=[
+ {k:'ritual',t:'Ritual unterbrechen',d:'Die Gegner vollziehen ein Ritual. Ein Ritualist hält im Kreis die Konzentration, ein Ritualstein bündelt die Macht.',win:'Ritualist kampfunfähig, seine Konzentration gebrochen oder der Ritualstein zerstört.',lose:'Das Ritual gelingt: Eine stärkere Macht erscheint (Welle) oder ein Fluch liegt fortan auf der Gegend.',cd:[3,5],cdl:'Ritual vollendet',obj:{n:'Ritualstein',ac:15,hp:[10,6]}},
+ {k:'eskorte',t:'Eskorte',d:'Eine schutzbedürftige Person muss lebend zum Ausgang, etwa 30 m entfernt. Die Gegner haben es gezielt auf sie abgesehen.',win:'Die Person erreicht den Ausgang.',lose:'Die Person fällt auf 0 TP oder wird verschleppt.',cd:[4,6],cdl:'Ausgang erreicht',ally:{n:'Schutzbefohlene Person',ac:11,hp:[8,3]}},
+ {k:'halten',t:'Stellung halten',d:'Die Helden verteidigen einen Punkt (Tor, Brücke, Engpass), bis Hilfe eintrifft.',win:'Bei Ablauf des Countdowns steht noch ein Held auf dem Punkt.',lose:'Die Gegner halten den Punkt eine volle Runde lang.',cd:[4,6],cdl:'Verstärkung trifft ein',waves:[2]},
+ {k:'wellen',t:'Wellenverteidigung',d:'Die Gegner kommen in Wellen. Zwischen den Wellen bleibt kaum Zeit zum Durchatmen.',win:'Alle Wellen zurückgeschlagen.',lose:'Die Linie bricht und Gegner erreichen das Schutzziel.',cd:0,waves:[2,4]},
+ {k:'bergen',t:'Objekt sichern',d:'Ein Gegenstand (Truhe, Artefakt, Dokument) liegt mitten im Kampffeld. Ihn zu lösen kostet eine Aktion, wer ihn trägt, hat halbe Bewegung.',win:'Ein Held bringt das Objekt aus dem Kampffeld.',lose:'Ein Gegner flieht mit dem Objekt.',cd:[5,6],cdl:'Gegner entkommen mit dem Objekt'},
+ {k:'flucht',t:'Flucht',d:'Der Ort bricht zusammen (Einsturz, Flut, Feuer). Die Gegner versuchen, die Helden aufzuhalten.',win:'Alle Helden verlassen das Gebiet.',lose:'Wer bei Ablauf noch drin ist, wird verschüttet (Umweltereignis „dramatisch“).',cd:[4,5],cdl:'Einsturz'},
+ {k:'gefangene',t:'Gefangene befreien',d:'Zwei bis vier Gefangene sind gefesselt und werden bewacht. Die Wachen drohen, sie zu töten.',win:'Gefangene befreit (Fesseln lösen: Aktion oder STÄ SG 12).',lose:'Nach Ablauf tötet eine Wache in jedem ihrer Züge einen Gefangenen, statt anzugreifen.',cd:[2,3],cdl:'Hinrichtungen beginnen'},
+ {k:'portal',t:'Portal zerstören',d:'Ein Portal oder Beschwörungskreis bringt laufend Verstärkung.',win:'Das Portal fällt auf 0 TP.',lose:'Solange es steht, kommt alle zwei Runden Verstärkung.',cd:0,waves:[2,4,6],obj:{n:'Portal',ac:15,hp:[10,8]}},
+ {k:'alarm',t:'Alarm verhindern',d:'Ein Gegner rennt zur Glocke oder zum Signalfeuer.',win:'Der Läufer wird aufgehalten, bevor der Countdown abläuft.',lose:'Alarm: Eine Welle Verstärkung trifft ein.',cd:[2,3],cdl:'Alarm ausgelöst',waves:[3]},
+ {k:'lebend',t:'Lebend fangen',d:'Der Anführer der Gegner wird lebend gebraucht: als Zeuge, für ein Kopfgeld oder einen Austausch.',win:'Anführer kampfunfähig, aber am Leben (Nahkampf kann nichttödlich sein).',lose:'Der Anführer stirbt oder flieht unter 25 % TP.',cd:0},
+ {k:'bote',t:'Boten abfangen',d:'Ein Bote mit einer wichtigen Nachricht will entkommen, während seine Begleiter die Helden binden.',win:'Der Bote wird gestoppt.',lose:'Der Bote entkommt, die Nachricht erreicht den Feind.',cd:[3,4],cdl:'Bote außer Reichweite'},
+ {k:'zivil',t:'Zivilisten retten',d:'Unbeteiligte stecken mitten im Kampf (brennendes Gebäude, eingestürzte Mauer). Jede Runde gerät einer in Lebensgefahr.',win:'Mindestens die Hälfte der Zivilisten gerettet.',lose:'Wer zwei Runden in Gefahr bleibt, stirbt.',cd:[5,6],cdl:'Gebäude stürzt ein'},
+ {k:'sabotage',t:'Sabotage',d:'Eine Maschine (Belagerungsgerät, Schleuse, Ritualapparat) hat drei Schwachstellen an verschiedenen Orten. Jede braucht eine Aktion und eine Probe (GES oder STÄ SG 13).',win:'Alle drei Schwachstellen ausgeschaltet.',lose:'Die Maschine wird aktiviert.',cd:[4,6],cdl:'Maschine aktiv'},
+ {k:'hinterhalt',t:'Hinterhalt überleben',d:'Die Gegner greifen aus dem Verborgenen an. Ein Teil erscheint erst in Runde 2.',win:'Die Helden schlagen die Angreifer in die Flucht (Gegner fliehen bei halber Truppenstärke).',lose:'Die Helden werden eingekesselt.',cd:0,waves:[1]},
+ {k:'duell',t:'Ehrenduell',d:'Ein Gegner fordert einen Helden zum Zweikampf. Die übrigen Gegner halten sich zurück, solange niemand eingreift.',win:'Der Herausforderer wird besiegt oder gibt auf.',lose:'Greift jemand ein, stürzen sich alle in den Kampf.',cd:0}
+];
+function lvlNow(){ return (S.gen&&S.gen.level)||3; }
+function rollObjective(k){
+  var tp=k?OBJECTIVES.find(function(o){return o.k===k;}):rnd(OBJECTIVES), o=JSON.parse(JSON.stringify(tp));
+  if(o.cd) o.cd=o.cd[0]+Math.floor(Math.random()*(o.cd[1]-o.cd[0]+1));
+  var L=lvlNow(); if(o.obj) o.obj.hp=o.obj.hp[0]+o.obj.hp[1]*L; if(o.ally) o.ally.hp=o.ally.hp[0]+o.ally.hp[1]*L;
+  o.waves=o.waves||[]; o.wd=o.waves.map(function(){return false;}); return o;
+}
+function acceptObjective(o){
+  o.start=S.round; o.warned=false; S.obj=o;
+  if(o.obj) addCombatant({name:o.obj.n,side:'object',ini:0,bonus:-99,hp:o.obj.hp,ac:o.obj.ac,notes:'Ziel des Kampfes.'});
+  if(o.ally) addCombatant({name:o.ally.n,side:'ally',ini:d(20),bonus:0,hp:o.ally.hp,ac:o.ally.ac,notes:'Muss beschützt werden.'});
+  logAdd('🎯 Kampfgrund: <b>'+esc(o.t)+'</b>'+(o.cd?' · Countdown '+o.cd+' Runden':''));
+}
+function objBarHtml(){
+  var o=S.obj; if(!o) return '';
+  var h='<div class="objbar"><div class="ot">🎯 '+esc(o.t)+'</div><div class="od">'+esc(o.d)+'</div><div class="od"><b>Sieg:</b> '+esc(o.win)+'<br><b>Scheitern:</b> '+esc(o.lose)+'</div>';
+  if(o.cd){ var D=o.start+o.cd-1, rem=D-S.round+1;
+    h+='<div class="cd'+(rem<=1?' hot':'')+'">'+(rem>0?'⏳ '+esc(o.cdl)+': noch '+rem+' Runde'+(rem>1?'n':'')+' (Ende von Runde '+D+')':'⌛ '+esc(o.cdl)+'! Die Zeit ist abgelaufen.')+'</div>'; }
+  o.waves.forEach(function(w,i){ var R=o.start+w;
+    h+='<div class="wv">'+(o.wd[i]?'✔':'⚔')+' Welle '+(i+2)+' ab Runde '+R+(o.wd[i]?' (eingetroffen)':(S.round>=R?' <button class="sm pri" data-act="wave" data-i="'+i+'">Welle anrücken lassen</button>':''))+'</div>'; });
+  return h+'<div class="row" style="margin:6px 0 0"><button class="sm" data-act="objdone">Ziel erledigt</button><button class="sm danger" data-act="objdel">Entfernen</button></div></div>';
+}
+function bestGroups(target){
+  var g=Object.assign({},S.gen,{count:'auto',mode:'auto'}), p=genPool(g); if(!p.length) return null;
+  var map=crMap(p), best=null, bs=1e9;
+  for(var i=0;i<250;i++){ var a=attempt(g,map,target); if(!a) continue; var e=evalEnc(a.groups,g,1), sc=Math.abs(e.adj-target)/target+Math.random()*0.15; if(sc<bs){ bs=sc; best=a.groups; } }
+  return best;
+}
+function spawnWave(i){
+  var o=S.obj, b=bands(S.gen)[S.gen.tier], groups=bestGroups((b[0]+b[1])/2*0.5);
+  if(!groups){ toast('Keine passenden Monster für die Welle.'); return; }
+  groups.forEach(function(x){ addMonster(srdToMon(x.m,1),x.n,true); });
+  o.wd[i]=true; logAdd('⚔ Welle '+(i+2)+': '+groups.map(function(x){return x.n+'× '+esc(x.m.de);}).join(', '),'fumble');
+  toast('Welle '+(i+2)+' trifft ein!');
+}
+function objRoundCheck(){
+  var o=S.obj; if(!o) return;
+  if(o.cd){ var D=o.start+o.cd-1; if(S.round>D&&!o.warned){ o.warned=true; logAdd('⌛ <b>'+esc(o.cdl)+'</b>: '+esc(o.lose),'fumble'); toast(o.cdl+'!'); } }
+  o.waves.forEach(function(w,i){ if(!o.wd[i]&&S.round===o.start+w) toast('Welle '+(i+2)+' ist bereit (oben im Zielbanner).'); });
+}
+
+/* ---------- Umwelt ---------- */
+/* Stufe|Rettungswurf|Schadensart|Text|Monster(englisch*Anzahl) — Stufe 0 Atmosphäre, 1 Rückschlag, 2 gefährlich, 3 dramatisch */
+var ENV={
+ wald:['Wald',`0|||Äste knarren, Vögel flattern auf.|
+0|||Nebel zieht zwischen den Stämmen auf: Bereich leicht verdeckt bis zum nächsten Umweltzug.|
+0|||Ein Reh bricht durchs Unterholz und verschwindet.|
+1|GES|Wucht|Ein morscher Ast bricht ab und fällt auf einen zufälligen Kämpfer.|
+1|STÄ||Wurzeln und Ranken: 3-m-Feld wird schwieriges Gelände, bei Fehlschlag festgesetzt (Aktion zum Befreien).|
+1|||Ein aufgescheuchtes Wildschwein stürmt auf den nächsten Kämpfer los.|Boar
+1|KON|Gift|Ein Insektenschwarm quillt aus einem hohlen Baum: alle in 3 m.|Swarm of Insects
+2|GES|Wucht|Ein Baum stürzt um: Linie 9 m, bei Fehlschlag zusätzlich liegend.|
+2|||Ein Braunbär, angelockt vom Lärm, greift das nächste Wesen an.|Brown Bear
+2|GES|Feuer|Funkenflug entzündet trockenes Laub: 3-m-Feld brennt bis Kampfende (Schaden beim Betreten).|
+3|GES|Feuer|Waldbrand springt über: Feuerwand 9 m breit, rückt jede Runde 3 m vor.|
+3|||Eine Riesenspinne lässt sich aus dem Blätterdach herab und packt ein Ziel.|Giant Spider`],
+ gebirge:['Gebirge',`0|||Der Wind heult, Steinchen rieseln.|
+0|||Wolken ziehen auf: Sicht auf 18 m begrenzt.|
+0|||Ein Adler kreist über dem Kampf.|
+1|GES|Wucht|Steinschlag auf einen zufälligen Kämpfer.|
+1|STÄ||Windböe: Fliegende und alle an Kanten werden bei Fehlschlag 3 m verschoben.|
+1|||Eine Riesenziege verteidigt ihr Revier und rammt den Nächsten.|Giant Goat
+1|GES||Geröll rutscht: 6-m-Bereich wird schwieriges Gelände, bei Fehlschlag liegend.|
+2|GES|Wucht|Erdrutsch: 6 m breite Geröllwelle, bei Fehlschlag liegend und 3 m mitgerissen.|
+2|||Ein Riesenadler stößt herab und versucht, ein kleines Wesen zu packen.|Giant Eagle
+2|GES|Wucht|Ein Felsvorsprung bricht ab: Wer darauf steht, stürzt.|
+3|GES|Wucht|Lawine: 12-m-Linie, bei Fehlschlag verschüttet (festgesetzt, erstickt nach KON-Mod Runden).|
+3|KON|Kälte|Ein Eissturm zieht auf: alle ungeschützten Kämpfer.|`],
+ hoehle:['Höhle/Dungeon',`0|||Tropfen hallen, irgendwo knirscht Stein.|
+0|||Eine Fackel erlischt: Bereich wird dämmrig.|
+0|||Fernes Grollen aus der Tiefe.|
+1|GES|Wucht|Ein Stalaktit löst sich über einem zufälligen Kämpfer.|
+1|||Ein Fledermausschwarm stiebt auf: leicht verdeckt, greift den Nächsten an.|Swarm of Bats
+1|KON|Gift|Eine Gasblase entweicht: Radius 3 m, bei Fehlschlag vergiftet.|
+1|GES||Rutschiger Boden: zufälliger Kämpfer, bei Fehlschlag liegend.|
+2|GES|Wucht|Teileinsturz: Radius 4,5 m, danach schwieriges Gelände.|
+2|||Ein Nest Riesentausendfüßler bricht auf.|Giant Centipede*2
+2|GES|Säure|Säure tropft aus einem Spalt: Linie 6 m.|
+3|GES|Wucht|Die Decke bricht ein: Radius 6 m, bei Fehlschlag verschüttet (festgesetzt).|
+3|GES|Wucht|Der Boden gibt nach: 6 m tiefe Grube unter einem zufälligen Kämpfer und allen Nachbarn.|`],
+ sumpf:['Sumpf',`0|||Blasen steigen auf, es stinkt nach Fäulnis.|
+0|||Lichter tanzen in der Ferne über dem Wasser.|
+0|||Nebelschwaden: Bereich leicht verdeckt.|
+1|STÄ||Morast: zufälliger Kämpfer sinkt ein, bei Fehlschlag festgesetzt.|
+1|KON|Gift|Sumpfgas: Radius 3 m, bei Fehlschlag vergiftet bis Ende des nächsten Zuges.|
+1|||Ein Riesenfrosch schnellt aus dem Wasser.|Giant Frog
+1|||Stechmücken fallen über die Kämpfer her.|Swarm of Insects
+2|||Ein Krokodil packt den nächsten Kämpfer am Wasserrand.|Crocodile
+2|STÄ||Treibsand: 3-m-Feld, bei Fehlschlag festgesetzt, sinkt jede Runde tiefer.|
+2|||Ein Giftschlangenschwarm gleitet aus dem Schilf.|Swarm of Poisonous Snakes
+3|GES|Feuer|Sumpfgas entzündet sich: Explosion Radius 6 m.|
+3|STÄ||Ein Strudel zieht ein Ziel unter Wasser (ertrinkt nach KON-Mod Runden).|`],
+ wueste:['Wüste',`0|||Hitze flimmert, eine Fata Morgana am Horizont.|
+0|||Sand knirscht zwischen den Zähnen.|
+0|||Geier kreisen.|
+1|KON||Gluthitze: ein zufälliger Kämpfer in schwerer Rüstung, bei Fehlschlag 1 Stufe Erschöpfung.|
+1|GES||Sandböe: leicht verdeckt, Fernkampf mit Nachteil bis zum nächsten Umweltzug.|
+1|||Eine Riesenechse fühlt sich gestört.|Giant Lizard
+1|GES||Eine Düne rutscht: zufälliger Kämpfer, bei Fehlschlag liegend.|
+2|KON|Wucht|Sandsturm: alle ohne Deckung, Sicht danach 3 m.|
+2|||Ein Riesengeier stößt auf den Kämpfer mit den wenigsten TP.|Giant Vulture
+2|STÄ||Treibsand: 3-m-Feld, bei Fehlschlag festgesetzt.|
+3|||Ein Riesenskorpion bricht aus dem Sand.|Giant Scorpion
+3|GES|Wucht|Eine Düne bricht ein: 9-m-Bereich verschüttet.|`],
+ arktis:['Arktis/Schnee',`0|||Der Schnee fällt dichter.|
+0|||Eis knackt unter den Füßen.|
+0|||Der Atem gefriert, Fackeln flackern.|
+1|GES||Glatteis: zufälliger Kämpfer, bei Fehlschlag liegend.|
+1|KON|Kälte|Eisiger Wind: alle ohne warme Kleidung.|
+1|||Ein hungriger Wolf schleicht heran.|Wolf
+1|KON||Schneeblendung: zufälliger Kämpfer blind bis zum nächsten Umweltzug.|
+2|GES|Kälte|Das Eis bricht: zufälliger Kämpfer fällt ins Wasser (festgesetzt, bis er sich mit einer Aktion befreit).|
+2|||Ein Eisbär greift an.|Polar Bear
+2|GES|Wucht|Eiszapfen stürzen herab: Radius 4,5 m.|
+3|GES|Wucht|Lawine: 12-m-Linie, bei Fehlschlag verschüttet.|
+3|KON|Kälte|Blizzard: alle, Sicht 1,5 m, schwieriges Gelände.|`],
+ kueste:['Küste/Schiff',`0|||Gischt spritzt, Möwen kreischen.|
+0|||Deck und Felsen sind nass und glitschig.|
+0|||Eine Welle rollt an, ohne Folgen.|
+1|GES||Eine Welle überspült: zufälliger Kämpfer, bei Fehlschlag liegend.|
+1|STÄ||Das Schiff krängt: alle rutschen bei Fehlschlag 1,5 m zur Reling.|
+1|||Eine Riesenkrabbe kriecht aus der Brandung.|Giant Crab
+1|GES|Wucht|Ein Tau reißt, eine Rah schwingt herum.|
+2|STÄ|Wucht|Ein Brecher: Linie 9 m, bei Fehlschlag über Bord.|
+2|||Ein Riffhai umkreist alle im Wasser.|Reef Shark
+2|||Ein Schwarm Raubfische wird von Blut angelockt.|Swarm of Quippers
+3|GES|Wucht|Der Mast bricht: Linie 12 m.|
+3|STÄ|Wucht|Eine Sturmflut fegt über alle hinweg.|`],
+ stadt:['Stadt',`0|||Fensterläden schlagen zu, Hunde bellen.|
+0|||Ein Wagen rumpelt vorbei.|
+0|||Glocken läuten in der Ferne.|
+1|GES|Wucht|Ein Dachziegel löst sich über einem zufälligen Kämpfer.|
+1|||Ein Rattenschwarm quillt aus der Gosse.|Swarm of Rats
+1|||Ein Kettenhund reißt sich los.|Mastiff
+1|GES||Marktstände und Wäscheleinen: 3 m schwieriges Gelände, bei Fehlschlag liegend.|
+2|GES|Wucht|Ein durchgehendes Pferdegespann: Linie 12 m.|
+2|GES|Feuer|Eine Laterne setzt ein Strohdach in Brand: 3 m brennen, das Feuer breitet sich aus.|
+2|||Die Stadtwache trifft ein und hält sich an den, der zuletzt angegriffen hat.|Guard*2
+3|GES|Wucht|Ein Balkon oder eine Hauswand stürzt ein.|
+3|GES|Feuer|Feuersbrunst: Die ganze Straßenseite brennt.|`],
+ ruine:['Ruine',`0|||Staub rieselt, Geröll knirscht.|
+0|||Eine alte Inschrift leuchtet kurz auf.|
+0|||Wind pfeift durch leere Fensterhöhlen.|
+1|GES|Wucht|Ein Mauerstück bricht heraus.|
+1|GES||Morscher Boden: zufälliger Kämpfer bricht ein (Bein steckt fest: festgesetzt).|
+1|||Riesenratten kommen aus dem Gewölbe.|Giant Rat*2
+1|||Ein Fledermausschwarm wird aufgeschreckt.|Swarm of Bats
+2|GES|Wucht|Eine Säule stürzt: Linie 9 m.|
+2|||Eine Riesenspinne lauert im Gebälk.|Giant Spider
+2|GES|Energie|Eine alte Schutzrune flammt auf: Radius 3 m.|
+3|GES|Wucht|Das Gewölbe bricht ein.|
+3|GES|Hieb|Eine uralte Falle wird ausgelöst: Pendelklinge oder Grube.|`],
+ ebene:['Ebene/Grasland',`0|||Das Gras wogt im Wind.|
+0|||Krähen erheben sich.|
+0|||Wolkenschatten ziehen vorbei.|
+1|GES||Ein Kaninchenbau: zufälliger Kämpfer stolpert, bei Fehlschlag liegend.|
+1|||Ein Rabenschwarm stürzt sich auf Verwundete.|Swarm of Ravens
+1|||Ein Axtschnabel fühlt sich bedroht.|Axe Beak
+1|GES||Regen weicht den Boden auf: schwieriges Gelände.|
+2|||Eine Riesenhyäne wittert Blut.|Giant Hyena
+2|GES|Blitz|Gewitter: Blitzeinschlag beim Kämpfer in der schwersten Metallrüstung.|
+2|GES|Wucht|Stampede: Eine Herde quert das Feld, Linie 12 m.|
+3|GES|Feuer|Steppenbrand rollt heran.|
+3|GES|Blitz|Unwetter: zwei Blitzeinschläge pro Runde bis Kampfende.|`]
+};
+Object.keys(ENV).forEach(function(k){ ENV[k][1]=ENV[k][1].trim().split('\n').map(function(l){ var p=l.split('|'); return {sev:+p[0],save:p[1],art:p[2],t:p[3],mon:p[4]||''}; }); });
+var SEVN=['Atmosphäre','Rückschlag','Gefährlich','Dramatisch'];
+var INTN=[['Ruhig',-4],['Normal',0],['Wild',4]];
+function sevOfRoll(r){ return r<=8?0:r<=14?1:r<=18?2:3; }
+function envDmg(sev){ var L=lvlNow(), ti=L<=4?0:L<=10?1:L<=16?2:3, T=[['1d10','2d10','4d10'],['2d10','4d10','10d10'],['4d10','10d10','18d10'],['10d10','18d10','24d10']];
+  return {d:T[ti][sev-1],dc:[11,13,16][sev-1]+(ti>=2?1:0)}; }
+function rollEnv(c){
+  var e=c.env, mod=INTN[e.int][1], r0=d(20), r=Math.max(1,Math.min(20,r0+mod)), sev=sevOfRoll(r), list=ENV[e.terr][1].filter(function(x){return x.sev===sev;}), ev=rnd(list);
+  var o={r0:r0,r:r,sev:sev,t:ev.t,save:ev.save,art:ev.art,mon:ev.mon};
+  if(sev>0){ var dm=envDmg(sev); o.dc=dm.dc; if(ev.art) o.d=dm.d; }
+  e.last=o; logAdd('🌲 <b>'+esc(c.name)+'</b>: d20('+r0+')'+(mod?(mod>0?'+':'')+mod:'')+' = '+r+' → '+SEVN[sev]+': '+esc(ev.t), sev>=2?'fumble':'');
+}
+/* ---------- Menschenmenge ---------- */
+var CROWDS={markt:['Markt','Händler, Kundschaft und Gaukler drängen sich zwischen den Ständen.',0],taverne:['Taverne','Zecher, Spieler und eine Schankmagd, die Krüge in Sicherheit bringt.',0],
+  fest:['Fest','Feiernde, Musikanten und Betrunkene, die alles für eine Vorstellung halten.',1],hafen:['Hafen','Hafenarbeiter, Matrosen und Fischweiber zwischen Kisten und Netzen.',0],
+  tempel:['Tempel','Gläubige, Novizen und Bettler vor dem Altar.',0],arena:['Arena','Johlende Zuschauer, Wettbuden und Ordner.',1],treck:['Flüchtlingstreck','Erschöpfte Familien mit Karren und Vieh.',1],
+  panik:['Panische Menge','Menschen fliehen kopflos. In ihrem Zug bewegt sich die Menge 9 m in Fluchtrichtung: Wer im Weg steht, GES SG 12 oder liegend. Ihr Bereich ist schwieriges Gelände.',0]};
+var MOODS_P=['Verängstigt','Panisch','Stampede'];
+var CROWD_P=[
+ {t:'Die Menge drängt geschlossen Richtung Ausgang. Ihr Bereich bleibt schwieriges Gelände.'},
+ {t:'Schreie übertönen alles: Verständigung ist nur auf 3 m möglich.'},
+ {t:'Ein Elternteil sucht verzweifelt sein Kind und klammert sich an den nächsten Helden (gepackt, Entkommen SG 10).'},
+ {t:'Fliehende verstopfen einen Durchgang: Ein Engpass ist bis zum nächsten Zug der Menge blockiert.'},
+ {t:'Jemand stolpert direkt vor einem Helden und wird niedergetrampelt, wenn ihn niemand mit einer Aktion aufhebt.'},
+ {t:'Die Menge reißt einen zufälligen Kämpfer mit: 3 m in Fluchtrichtung verschoben.',s:'STÄ',dc:12},
+ {t:'Plünderer nutzen das Chaos: Alles, was am Boden liegt, verschwindet.'},
+ {t:'Ein Fliehender hält einen Helden für einen Angreifer und schlägt in Todesangst zu.',mon:'Commoner'},
+ {t:'Fässer, Kisten und Karren werden umgerissen: 6-m-Bereich wird schwieriges Gelände.'},
+ {t:'Die Fluchtrichtung dreht: Die Menge strömt jetzt auf eine der beiden Seiten zu.'},
+ {t:'Gedränge an einer Wand: alle in 3 m der Menge werden eingequetscht.',s:'KON',dc:12,d:'1d6',a:'Wucht'},
+ {t:'Stampede: Linie 9 m, bei Fehlschlag liegend.',s:'GES',dc:12,d:'2d6',a:'Wucht',m:1},
+ {t:'Ein Gegner nutzt die Menge als Schild: Dreivierteldeckung bis zu seinem nächsten Zug.'},
+ {t:'Jemand wird in Wasser, Feuer oder einen Abgrund gedrängt. Ein Held kann mit seiner Reaktion eingreifen.'},
+ {t:'Die Menge bricht durch eine Absperrung oder ein Geländer: alle dahinter.',s:'GES',dc:13,d:'2d6',a:'Wucht'},
+ {t:'Ein Kind wird niedergetrampelt und bleibt bewusstlos liegen.',m:1},
+ {t:'Massenpanik: Jeder Kämpfer im Bereich der Menge, bei Fehlschlag liegend.',s:'GES',dc:14,d:'2d8',a:'Wucht',m:1},
+ {t:'Der Fluchtweg ist blockiert, die Menge staut sich: alle in ihrer Nähe festgesetzt bis Ende des nächsten Zuges.',s:'STÄ',dc:14},
+ {t:'Brücke, Treppe oder Steg gibt unter dem Gewicht nach: alle darauf stürzen.',s:'GES',dc:15,d:'3d6',a:'Wucht',m:2},
+ {t:'Todesgedränge: Mehrere Unbeteiligte sterben. Jeder Kämpfer im Bereich festgesetzt. Das wird Folgen haben.',s:'STÄ',dc:15,d:'3d6',a:'Wucht',m:2}
+];
+/* W100-Chaostabelle (Vorlage des Spielleiters). Ziel: zufällige Figur in der Menge oder wer gerade am Zug ist. */
+var CHAOS=[
+ [1,3,'Umgerannt!','Eine panische Gruppe rennt die Figur über den Haufen. Bei Misslingen liegend.','STÄ',13,'1d3','Wucht'],
+ [4,6,'Mitgezogen','Jemand packt die Figur verzweifelt am Arm. Bei Misslingen 3 m in eine zufällige Richtung gezogen.','GES',12],
+ [7,9,'Dichter Rauch & Staub','Ein Karren kippt, Mehl- oder Zementsäcke platzen: 3 m Radius um die Figur sind 1 Runde stark verhüllt.'],
+ [10,12,'Blinde Panik-Attacke','Ein flüchtender Wächter oder Bürger schlägt wild um sich: Nahkampfangriff mit Nachteil.','','','1d4','Wucht','+2',1],
+ [13,15,'Menschliches Schild','Eine panische Person drängt sich hinter die Figur: +2 RK, aber halbe Bewegung für 1 Runde.'],
+ [16,18,'Gegenstand entglitten','Jemand prallt heftig gegen den Arm. Bei Misslingen fällt der gehaltene Gegenstand oder die Waffe zu Boden.','GES',12],
+ [19,21,'Verzweifelte Umarmung','Jemand klammert sich schreiend an die Beine: festgesetzt, bis die Figur sich mit Bonusaktion oder Aktion befreit (Athletik/Akrobatik SG 11 oder Überreden).'],
+ [22,24,'Stolpernde Masse','Über ein Hindernis am Boden gestolpert. Bei Misslingen liegend.','GES',12],
+ [25,27,'Ohrenbetäubender Schrei','Jemand brüllt der Figur in Todesangst ins Ohr. Bei Misslingen bis zum nächsten Zug irritiert: Nachteil auf den nächsten Angriff.','KON',12],
+ [28,30,'Menschliche Barrikade','Die Menge staut sich: Das Feld der Figur und alle angrenzenden Felder sind 1 Runde schwieriges Gelände.'],
+ [31,33,'Querschläger','Ein Holzstuhl oder Krug fliegt durch die Luft: Fernkampfangriff auf die Figur.','','','1d4','Wucht','+3'],
+ [34,36,'Ablenkender Sturz','Jemand stürzt direkt vor dem Gegner der Figur: Vorteil auf ihren nächsten Angriff gegen ihn.'],
+ [37,39,'Kollateral-Stoß','Die Masse drückt den nächsten Gegner überraschend in Nahkampfreichweite der Figur.'],
+ [40,42,'Diebische Finger','Im Getümmel greift jemand nach Gürtel oder Beutel. Passive Wahrnehmung unter 13: Ein kleiner Gegenstand oder Beutel ist weg.'],
+ [43,45,'Feuer bricht aus','Ein Stand oder eine Fackel gerät in Brand: alle im 3-m-Radius.','GES',12,'1d6','Feuer'],
+ [46,48,'Umgestürzter Karren','Ein Marktstand bricht zusammen und blockiert Sicht und Weg: ein neues Hindernis mit Deckung.'],
+ [49,51,'Gassenschlupf','Die Menge teilt sich kurz: Die Figur darf sich sofort 1,5 bis 3 m bewegen, ohne Gelegenheitsangriffe auszulösen.'],
+ [52,54,'Wachen-Ansturm','Formierte Wachen drängen durch die Menge: Alle auf der Linie werden bei Misslingen 3 m zur Seite gestoßen.','STÄ',13],
+ [55,57,'Blinder Passant hilft','Ein Bürger hält den Gegner für den Angreifer und wirft einen Stein oder Knüppel nach ihm (Schaden am Gegner).','','','1d4','Wucht'],
+ [58,60,'Trampelwelle','Die Masse wogt geschlossen nach vorn: Alle in der Zone werden bei Misslingen 3 m zurückgeschoben.','STÄ',13],
+ [61,63,'Rettender Schubs','Ein Schubs aus der Menge stößt die Figur aus Angriffs- oder Sichtbereich eines Gegners.'],
+ [64,66,'Tierische Panik','Ein freigelaufenes Reittier oder ein Hund rennt durch die Menge und stößt eine zufällige Kreatur um (liegend).'],
+ [67,69,'Sichtblockade','Ein zerfetztes Tuch oder Banner weht einer Figur ins Gesicht: blind bis zum Ende ihres Zuges.'],
+ [70,72,'Schrei nach Hilfe','Ein Kind oder Verletzter liegt am Boden. Wer eine Aktion zum Helfen aufwendet, erhält Vorteil oder einen Gefallen; sonst bleibt es liegen.'],
+ [73,75,'Rutschen auf Blut oder Öl','Der Boden ist glatt. Bei Misslingen gerät das Ziel ins Rutschen und verliert die Hälfte seiner Bewegung.','GES',13],
+ [76,78,'Bruch einer Absperrung','Ein Zaun oder Holzgerüst bricht unter der Last der Menge zusammen: alle im 6-m-Radius bei Misslingen 1 Runde taub.','KON',11],
+ [79,81,'Spontaner Schutzwall','Flüchtende werfen Kisten und Tische um: volle Deckung gegen Fernkampf aus einer Richtung.'],
+ [82,84,'Fälschliche Verwechslung','Eine Wache hält die Figur für einen Amokläufer und versucht sie festzuhalten (Athletik gegen Athletik oder Akrobatik).','','','','','','','Guard'],
+ [85,87,'Druckwelle der Masse','Der Gegner wird von flüchtenden Leibern eingekesselt und hat bis zu seinem nächsten Zug keine Reaktionen.'],
+ [88,90,'Rüstungshaken','Waffe oder Kleidung verfängt sich an einem Flüchtenden. Bei Misslingen festgehalten.','STÄ',11],
+ [91,93,'Waffengrab','Ein flüchtender Söldner lässt Schwert oder Speer fallen: Am Boden liegt eine einsatzbereite Waffe.'],
+ [94,96,'Fehlgeleiteter Fernkampf','Ein Fernkampfangriff eines Gegners verfehlt die Figur und trifft stattdessen einen Zivilisten.'],
+ [97,98,'Massen-Sog','Alle Kreaturen auf dem Feld werden 1,5 m in die Hauptfluchtrichtung geschoben.'],
+ [99,100,'Heldenmoment','Die Menge erfasst den Hauptgegner und wirft ihn zu Boden: 1 Runde handlungsunfähig oder schwerer Schaden (Wahl des Spielleiters).']
+].map(function(a){ return {lo:a[0],hi:a[1],n:a[2],t:a[3],s:a[4]||'',dc:a[5]||'',d:a[6]||'',a:a[7]||'',atk:a[8]||'',dis:!!a[9],mon:a[10]||''}; });
+function rollChaos(c){ var r=d(100), ev=CHAOS.find(function(x){return r>=x.lo&&r<=x.hi;}), o=Object.assign({r:r,w100:true},ev); o.t=ev.n+': '+ev.t;
+  c.crowd.last=o; logAdd('👥 <b>'+esc(c.name)+'</b>: W100('+r+') → <b>'+esc(ev.n)+'</b>: '+esc(ev.t), r>=99?'crit':''); }
+function chaosTableHtml(last){ return CHAOS.map(function(x){ var hit=last&&last.w100&&last.r>=x.lo&&last.r<=x.hi;
+  return '<div class="tl'+(hit?' hit':'')+'"><b>'+String(x.lo).padStart(2,'0')+'–'+String(x.hi).padStart(2,'0')+'</b> '+esc(x.n)+': '+esc(x.t)+(x.s?' <i>('+x.s+' SG '+x.dc+')</i>':'')+'</div>'; }).join(''); }
+function crowdTable(k){ return k==='panik'?CROWD_P:CROWD_T; }
+function moodNames(k){ return k==='panik'?MOODS_P:MOODS; }
+var MOODS=['Ruhig','Unruhig','Panik'];
+var CROWD_T=[
+ {t:'Die Menge weicht zurück und beobachtet gebannt.'},
+ {t:'Ein Händler ruft Wetten auf den Ausgang aus.'},
+ {t:'Schaulustige bilden einen Kreis: Fernkampf durch die Menge hat halbe Deckung.'},
+ {t:'Ein Kind huscht zwischen den Kämpfenden hindurch. Wer in seiner Nähe angreift, riskiert es zu treffen.'},
+ {t:'Jemand ruft nach der Wache. Sie trifft in 1d4+1 Runden ein.'},
+ {t:'Ein Taschendieb nutzt das Chaos: Ein zufälliger Held verliert 1d10 GM, wenn er die Probe nicht schafft.',s:'WEI',dc:13},
+ {t:'Faules Obst fliegt aus der Menge: Der nächste Angriff eines zufälligen Kämpfers hat Nachteil.'},
+ {t:'Ein Mutiger aus der Menge greift ein und hilft der Seite, die gerade gewinnt.',mon:'Thug'},
+ {t:'Gedränge: 3 m rund um die Menge werden schwieriges Gelände.'},
+ {t:'Die Stimmung kippt, die Menge wird lauter und unberechenbar.',m:1},
+ {t:'Ein Unbeteiligter wird getroffen und schreit. Ein Held kann ihn mit seiner Aktion in Sicherheit bringen.'},
+ {t:'Ein Stand oder Wagen kippt um: ein zufälliger Kämpfer in der Nähe, bei Fehlschlag liegend.',s:'GES',dc:12,d:'2d6',a:'Wucht'},
+ {t:'Die Menge drängt nach vorn: Alle in 3 m werden bei Fehlschlag 1,5 m verschoben.',s:'STÄ',dc:12},
+ {t:'Zwei Wachen treffen ein und halten alle Bewaffneten für schuldig.',mon:'Guard*2'},
+ {t:'Panik! Alle im Bereich der Menge: bei Fehlschlag liegend.',s:'GES',dc:13,d:'1d6',a:'Wucht',m:1},
+ {t:'Ein Gegner reißt eine Geisel aus der Menge an sich.'},
+ {t:'Eine Laterne oder ein Herdfeuer kippt: 3-m-Feld brennt (Schaden beim Betreten).',d:'2d6',a:'Feuer'},
+ {t:'Massenflucht in eine Richtung: Linie 9 m, bei Fehlschlag liegend und 3 m mitgerissen.',s:'STÄ',dc:14,d:'2d6',a:'Wucht',m:1},
+ {t:'Ein Unbeteiligter stirbt vor aller Augen. Das wird Folgen haben (Gerede, Wache, Familie).',m:2},
+ {t:'Totales Chaos: Die Menge stürmt durchs Kampffeld. Jeder Kämpfer: bei Fehlschlag liegend, Sicht leicht verdeckt bis zum nächsten Zug der Menge.',s:'GES',dc:15,d:'3d6',a:'Wucht',m:2}
+];
+function rollCrowd(c){
+  var cr=c.crowd, mod=cr.mood*3, r0=d(20), r=Math.min(20,r0+mod), ev=crowdTable(cr.kind)[r-1], o=Object.assign({r0:r0,r:r},ev);
+  cr.last=o; var before=cr.mood; if(ev.m) cr.mood=Math.min(2,Math.max(cr.mood,ev.m===2?2:cr.mood+1));
+  logAdd('👥 <b>'+esc(c.name)+'</b>: d20('+r0+')'+(mod?'+'+mod:'')+' = '+r+' → '+esc(ev.t)+(cr.mood!==before?' · Stimmung: '+moodNames(cr.kind)[cr.mood]:''), r>=15?'fumble':'');
+}
+function effectHtml(c,o){
+  var parts=[];
+  if(o.atk) parts.push('<span class="fact"><b>Angriff</b> '+o.atk+(o.dis?' mit Nachteil':'')+'</span>');
+  if(o.save) parts.push('<span class="fact"><b>Rettungswurf</b> '+o.save+(o.dc?' SG '+o.dc:'')+'</span>');
+  if(o.d) parts.push('<span class="fact"><b>Schaden</b> '+o.d+' '+esc(o.art||o.a||'')+(o.save?' (Erfolg: halb)':'')+'</span>');
+  var btn=''; if(o.d) btn+='<button class="sm pri" data-act="evdmg" data-id="'+c.id+'">'+(o.atk?'Angriff + Schaden würfeln':'Schaden würfeln')+'</button>';
+  if(o.mon){ var mp=o.mon.split('*'), m=SRD.find(function(x){return x.en===mp[0];}); if(m) btn+='<button class="sm" data-act="evmon" data-id="'+c.id+'">+ '+(mp[1]?mp[1]+'× ':'')+esc(m.de)+' in die Initiative</button>'; }
+  return (parts.length?'<div class="facts">'+parts.join('')+'</div>':'')+(btn?'<div class="row" style="margin:6px 0 0">'+btn+'</div>':'')+(o.dmgRes!=null?'<div class="hint">Gewürfelt: <b>'+o.dmgRes+'</b> (halb: '+Math.floor(o.dmgRes/2)+')</div>':'');
+}
+function sceneCardHtml(c){
+  var cur=S.turnId===c.id, isEnv=c.side==='env', h='';
+  var head='<div class="ini"><span class="lab">INITIATIVE</span><input type="number" data-f="ini" data-id="'+c.id+'" value="'+c.ini+'">'+
+     '<div class="pm"><button class="sm" data-act="ini-" data-id="'+c.id+'">−</button><button class="sm" data-act="ini+" data-id="'+c.id+'">+</button></div></div>';
+  if(isEnv){ var e=c.env, L=e.last;
+    h='<div class="top"><span class="ava"><span>'+(e.terr==='stadt'?'🏘️':e.terr==='kueste'?'🌊':e.terr==='arktis'?'❄️':e.terr==='wueste'?'🏜️':e.terr==='gebirge'?'⛰️':e.terr==='sumpf'?'🪷':e.terr==='hoehle'?'🕳️':e.terr==='ruine'?'🏛️':e.terr==='ebene'?'🌾':'🌲')+'</span></span>'+
+      '<input class="name" data-f="name" data-id="'+c.id+'" value="'+esc(c.name)+'"><select data-envf="terr" data-id="'+c.id+'">'+Object.keys(ENV).map(function(k){return '<option value="'+k+'"'+(e.terr===k?' selected':'')+'>'+ENV[k][0]+'</option>';}).join('')+'</select>'+
+      '<button class="sm danger" data-act="del" data-id="'+c.id+'">✕</button></div>'+
+      '<div class="seg">'+INTN.map(function(x,i){return '<button class="sm'+(e.int===i?' on':'')+'" data-act="envint" data-id="'+c.id+'" data-i="'+i+'">'+x[0]+' ('+(x[1]>0?'+':'')+x[1]+')</button>';}).join('')+'</div>'+
+      '<button class="pri" data-act="envroll" data-id="'+c.id+'">Umweltereignis würfeln (d20'+(INTN[e.int][1]?(INTN[e.int][1]>0?'+':'')+INTN[e.int][1]:'')+')</button>'+
+      (L?'<div class="evt sev'+L.sev+'"><b>'+L.r+' · '+SEVN[L.sev]+':</b> '+esc(L.t)+effectHtml(c,L)+'</div>':'')+
+      '<details><summary class="hint">Tabelle: 1–8 Atmosphäre · 9–14 Rückschlag · 15–18 gefährlich · 19–20 dramatisch</summary>'+
+      [0,1,2,3].map(function(s){ return '<div class="grp">'+SEVN[s]+'</div>'+ENV[e.terr][1].filter(function(x){return x.sev===s;}).map(function(x){return '<div class="tl">'+esc(x.t)+(x.save?' <i>('+x.save+')</i>':'')+'</div>';}).join(''); }).join('')+'</details>';
+  } else { var cw=c.crowd, L2=cw.last;
+    h='<div class="top"><span class="ava"><span>👥</span></span><input class="name" data-f="name" data-id="'+c.id+'" value="'+esc(c.name)+'">'+
+      '<select data-crf="kind" data-id="'+c.id+'">'+Object.keys(CROWDS).map(function(k){return '<option value="'+k+'"'+(cw.kind===k?' selected':'')+'>'+CROWDS[k][0]+'</option>';}).join('')+'</select>'+
+      '<button class="sm danger" data-act="del" data-id="'+c.id+'">✕</button></div><div class="hint" style="margin:4px 0">'+esc(CROWDS[cw.kind][1])+'</div>'+
+      '<div class="seg">'+moodNames(cw.kind).map(function(m,i){return '<button class="sm'+(cw.mood===i?' on':'')+'" data-act="crmood" data-id="'+c.id+'" data-i="'+i+'">'+m+' (+'+i*3+')</button>';}).join('')+'</div>'+
+      '<button class="pri" data-act="crroll" data-id="'+c.id+'">'+(cw.kind==='panik'?'Gedränge':'Menge')+' würfeln (d20+'+cw.mood*3+')</button>'+(cw.kind==='panik'?' <button class="pri" data-act="chaos" data-id="'+c.id+'">Chaos-Tabelle (W100)</button>':'')+
+      (L2?'<div class="evt'+(L2.w100?' sev1':(L2.r>=15?' sev2':' sev1'))+'"><b>'+(L2.w100?'W100 ':'')+L2.r+':</b> '+esc(L2.t)+effectHtml(c,{save:L2.s,dc:L2.dc,d:L2.d,a:L2.a,mon:L2.mon,dmgRes:L2.dmgRes,atk:L2.atk,dis:L2.dis})+'</div>':'')+
+      '<details><summary class="hint">Zufallstabelle (d20 + Stimmung)</summary>'+crowdTable(cw.kind).map(function(x,i){return '<div class="tl'+(L2&&!L2.w100&&L2.r===i+1?' hit':'')+'"><b>'+(i+1)+'</b> '+esc(x.t)+'</div>';}).join('')+'</details>'+
+      (cw.kind==='panik'?'<details><summary class="hint">Chaos-Tabelle (W100), Ziel: eine Figur in der Menge</summary>'+chaosTableHtml(L2)+'</details>':'');
+  }
+  return '<div class="card '+c.side+(cur?' current':'')+'" data-id="'+c.id+'">'+head+'<div>'+h+'</div></div>';
+}
+function renderScene(){
+  var sc=S.scene, p=sc.prop;
+  var h='<h3>Kampfgrund (optional)</h3><div class="hint">Jeder Kampf braucht einen Grund. Würfle ein Ziel oder wähle eins aus.</div>'+
+    '<div class="row" style="margin-top:6px"><select id="objPick" style="flex:1;min-width:0"><option value="">Zufall</option>'+OBJECTIVES.map(function(o){return '<option value="'+o.k+'"'+(sc.pick===o.k?' selected':'')+'>'+esc(o.t)+'</option>';}).join('')+'</select><button class="pri" id="objRoll">Grund würfeln</button></div>';
+  if(p) h+='<div class="sug"><div class="sh"><b>'+esc(p.t)+'</b></div><div class="od">'+esc(p.d)+'</div><div class="od"><b>Sieg:</b> '+esc(p.win)+'<br><b>Scheitern:</b> '+esc(p.lose)+'</div>'+
+    '<div class="facts">'+(p.cd?'<span class="fact"><b>Countdown</b> '+p.cd+' Runden</span>':'')+(p.waves.length?'<span class="fact"><b>Wellen</b> '+p.waves.length+' (je ca. halbe Stärke)</span>':'')+
+    (p.obj?'<span class="fact"><b>'+esc(p.obj.n)+'</b> RK '+p.obj.ac+', '+p.obj.hp+' TP</span>':'')+(p.ally?'<span class="fact"><b>'+esc(p.ally.n)+'</b> RK '+p.ally.ac+', '+p.ally.hp+' TP</span>':'')+'</div>'+
+    '<div class="row" style="margin-top:6px"><button class="sm pri" id="objAcc">Übernehmen</button><button class="sm" id="objRoll2">Neu würfeln</button></div></div>';
+  if(S.obj) h+='<div class="hint" style="margin-top:6px">Aktiv: <b>'+esc(S.obj.t)+'</b> (Banner über der Kampfliste)</div>';
+  h+='<h3>Umwelt in der Initiative</h3><div class="hint">Die Umwelt handelt bei Initiative 20 (verliert Gleichstände) und würfelt auf eine Ereignistabelle. Schaden und SG richten sich nach der Heldenstufe im Generator.</div>'+
+    '<div class="row" style="margin-top:6px"><select id="envTerr">'+Object.keys(ENV).map(function(k){return '<option value="'+k+'"'+(sc.terr===k?' selected':'')+'>'+ENV[k][0]+'</option>';}).join('')+'</select>'+
+    '<select id="envInt">'+INTN.map(function(x,i){return '<option value="'+i+'"'+(sc.int===i?' selected':'')+'>'+x[0]+'</option>';}).join('')+'</select><button class="pri" id="envAdd">+ Umwelt</button></div>'+
+    '<h3>Menschenmenge in der Initiative</h3><div class="hint">Die Menge handelt bei Initiative 10. Je unruhiger sie ist, desto höher der Wurf auf der Zufallstabelle.</div>'+
+    '<div class="row" style="margin-top:6px"><select id="crKind">'+Object.keys(CROWDS).map(function(k){return '<option value="'+k+'"'+(sc.crowd===k?' selected':'')+'>'+CROWDS[k][0]+'</option>';}).join('')+'</select><button class="pri" id="crAdd">+ Menschenmenge</button></div>'+
+    '<details style="margin-top:6px"><summary class="hint">Zufallstabelle '+CROWDS[sc.crowd][0]+' ansehen</summary>'+crowdTable(sc.crowd).map(function(x,i){return '<div class="tl"><b>'+(i+1)+'</b> '+esc(x.t)+'</div>';}).join('')+'</details>'+
+    (sc.crowd==='panik'?'<details><summary class="hint">Chaos-Tabelle Panische Menge (W100) ansehen</summary>'+chaosTableHtml(null)+'</details>':'');
+  $('tab-scene').innerHTML=h;
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act],[data-tab]'); if(!t) return;
+  if(t.dataset.tab){ S.tab=t.dataset.tab; renderPanel(); save(); return; }
+  var act=t.dataset.act, id=t.dataset.id?parseInt(t.dataset.id,10):null, c=id?byId(id):null;
+  switch(act){
+    case 'ini+': c.ini++; render(); break;
+    case 'ini-': c.ini--; render(); break;
+    case 'hp': setHp(c,c.hp+parseInt(t.dataset.d,10)); render(); break;
+    case 'dmg': case 'heal': {
+      var inp=document.querySelector('[data-amt="'+id+'"]'); var v=parseInt(inp&&inp.value,10); if(!v) break;
+      setHp(c,c.hp+(act==='dmg'?-v:v)); logAdd('<b>'+esc(c.name)+'</b>: '+(act==='dmg'?'−':'+')+v+' TP → '+c.hp+'/'+c.max); render(); break; }
+    case 'applylast': setHp(c,c.hp-c.last); logAdd('<b>'+esc(c.name)+'</b>: −'+c.last+' TP → '+c.hp+'/'+c.max); c.last=null; render(); break;
+    case 'toggle': c.open=!c.open; render(); break;
+    case 'dup': { var n=JSON.parse(JSON.stringify(c)); n.id=S.nextId++; n.order=S.order++; n.name=c.name+' (Kopie)'; n.open=false; S.combatants.push(n); render(); break; }
+    case 'del': S.combatants=S.combatants.filter(function(x){return x.id!==id;}); if(S.turnId===id) S.turnId=null; render(); break;
+    case 'rmcond': c.conditions=c.conditions.filter(function(k){return k!==t.dataset.k;}); render(); break;
+    case 'pip': { var i=parseInt(t.dataset.i,10); c.legUsed=(c.legUsed>i)?i:i+1; render(); break; }
+    case 'use': useAction(c,parseInt(t.dataset.i,10)); break;
+    case 'recharge': { var ai=parseInt(t.dataset.i,10), a=c.actions[ai], m=String(a.recharge).match(/(\d+)/), th=m?parseInt(m[1],10):6, r=d(6);
+      logAdd('<b>'+esc(c.name)+'</b>: Aufladung '+esc(a.name)+' d6('+r+') '+(r>=th?'→ bereit':'→ nicht aufgeladen'),r>=th?'crit':''); if(r>=th) c.ready[ai]=true; render(); break; }
+    case 'addmon': { var i2=parseInt(t.dataset.i,10), q=document.querySelector('[data-qty="'+i2+'"]'), cnt=Math.max(1,parseInt(q&&q.value,10)||1);
+      addMonster(S.lib[i2],cnt,$('rollOnAdd')?$('rollOnAdd').checked:true); render(); break; }
+    case 'delparty': S.party.splice(parseInt(t.dataset.i,10),1); render(); break;
+    case 'ava': { var k=keyOf(c); if(S.images[k]) openLb(k,c.name); else pickImage(k); break; }
+    case 'libimg': { var lm=S.lib[parseInt(t.dataset.i,10)], lk=lm.imgKey||('m:'+norm(lm.name)); if(S.images[lk]) openLb(lk,lm.name); else pickImage(lk); break; }
+    case 'gtier': S.gen.tier=parseInt(t.dataset.i,10); renderGen(); save(); break;
+    case 'gtype': { var ty=t.dataset.t, ix=S.gen.types.indexOf(ty); if(ix>=0) S.gen.types.splice(ix,1); else S.gen.types.push(ty); renderGen(); save(); break; }
+    case 'gn': case 'gswap': case 'grm': case 'gfight': case 'glib': {
+      var s=S.genRes[parseInt(t.dataset.s,10)]; if(!s) break; var gi=parseInt(t.dataset.g,10);
+      if(act==='gn'){ s.groups[gi].n=Math.max(1,s.groups[gi].n+parseInt(t.dataset.d,10)); }
+      else if(act==='gswap') swapGroup(s,gi);
+      else if(act==='grm'){ s.groups.splice(gi,1); if(!s.groups.length) S.genRes.splice(S.genRes.indexOf(s),1); }
+      else if(act==='gfight'){ s.groups.forEach(function(x){ addMonster(srdToMon(x.m,s.f),x.n,S.rollOnAdd!==false); }); toast(s.groups.reduce(function(a,x){return a+x.n;},0)+' Monster zum Kampf hinzugefügt.'); }
+      else { s.groups.forEach(function(x){ toLib(srdToMon(x.m,s.f)); }); toast('In die Bibliothek übernommen.'); }
+      render(); break; }
+    case 'cast': castSpell(c,parseInt(t.dataset.g,10),parseInt(t.dataset.s,10)); break;
+    case 'spip': { var SG=c.spells.groups[parseInt(t.dataset.g,10)], pi=parseInt(t.dataset.i,10); SG.used=(SG.used>pi)?pi:pi+1; render(); break; }
+    case 'spreset': c.spells.groups.forEach(function(G){ G.used=0; G.usedBy={}; }); logAdd('<b>'+esc(c.name)+'</b>: Zauber nach Rast zurückgesetzt.'); render(); break;
+    case 'wave': spawnWave(parseInt(t.dataset.i,10)); render(); break;
+    case 'objdone': logAdd('🎯 Ziel erreicht: <b>'+esc(S.obj.t)+'</b>','crit'); S.obj=null; render(); break;
+    case 'objdel': S.obj=null; render(); break;
+    case 'envroll': rollEnv(c); render(); break;
+    case 'envint': c.env.int=parseInt(t.dataset.i,10); render(); break;
+    case 'crroll': rollCrowd(c); render(); break;
+    case 'chaos': rollChaos(c); render(); break;
+    case 'crmood': c.crowd.mood=parseInt(t.dataset.i,10); render(); break;
+    case 'evdmg': { var L=(c.env||c.crowd).last, rr=rollExpr(L.d), at='';
+      if(L.atk){ var b1=d(20), b2=d(20), rv=L.dis?Math.min(b1,b2):b1; at='Angriff d20('+(L.dis?b1+'/'+b2+' Nachteil → '+rv:rv)+')'+L.atk+' = <b>'+(rv+toInt(L.atk,0))+'</b>, '; }
+      if(rr){ L.dmgRes=rr.total; logAdd('<b>'+esc(c.name)+'</b>: '+at+'Schaden '+rr.total+' '+esc(L.art||L.a||'')+' ('+rr.text+')'+(L.s||L.save?', bei Erfolg '+Math.floor(rr.total/2):'')); } render(); break; }
+    case 'evmon': { var L2=(c.env||c.crowd).last, mp=L2.mon.split('*'), em=SRD.find(function(x){return x.en===mp[0];}); if(em){ addMonster(srdToMon(em,1),parseInt(mp[1]||'1',10),true); toast(em.de+' tritt dem Kampf bei.'); } render(); break; }
+    case 'bfight': { addMonster(srdToMon(SRD[parseInt(t.dataset.i,10)],1),1,S.rollOnAdd!==false); toast(SRD[parseInt(t.dataset.i,10)].de+' zum Kampf hinzugefügt.'); render(); break; }
+    case 'blib': { var bm=SRD[parseInt(t.dataset.i,10)]; toLib(srdToMon(bm,1)); toast(bm.de+' in der Bibliothek.'); render(); break; }
+  }
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.dataset.f){ var c=byId(parseInt(t.dataset.id,10)); if(!c) return; var f=t.dataset.f;
+    if(f==='name') c.name=t.value; else if(f==='hp'){ c.hp=Math.max(0,parseInt(t.value,10)||0); if(c.hp>c.max) c.max=c.hp; }
+    else c[f]=parseInt(t.value,10)||0;
+    if(f==='max'&&c.hp>c.max) c.hp=c.max;
+    render(); return; }
+  if(t.dataset.act==='addcond'){ var c2=byId(parseInt(t.dataset.id,10)); if(t.value&&c2.conditions.indexOf(t.value)<0) c2.conditions.push(t.value); render(); return; }
+  if(t.dataset.pf){ var p=S.party[parseInt(t.dataset.i,10)]; var k=t.dataset.pf; p[k]=(k==='name')?t.value:(parseInt(t.value,10)||0); save(); }
+  if(t.dataset.lf){ var lm=S.lib[parseInt(t.dataset.i,10)], ok=lm.imgKey||('m:'+norm(lm.name)), nv=t.value.trim(); if(!nv) return;
+    lm.name=nv; var nk='m:'+norm(nv); if(S.images[ok]&&!S.images[nk]){ S.images[nk]=S.images[ok]; } lm.imgKey=nk; render(); return; }
+  if(t.dataset.g){ var gk=t.dataset.g; if(t.type==='checkbox') S.gen[gk]=t.checked; else if(gk==='heroes') S.gen.heroes=Math.max(1,Math.min(12,parseInt(t.value,10)||1));
+    else if(gk==='level') S.gen.level=Math.max(1,Math.min(20,parseInt(t.value,10)||1)); else S.gen[gk]=t.value; renderGen(); save(); return; }
+  if(t.dataset.gf!=null){ render(); return; }
+  if(t.id==='bookCr'){ bookCr=t.value; renderBook(); return; }
+  if(t.dataset.envf){ var ce=byId(parseInt(t.dataset.id,10)); ce.env.terr=t.value; ce.env.last=null; ce.name='Umwelt: '+ENV[t.value][0]; render(); return; }
+  if(t.dataset.crf){ var cc=byId(parseInt(t.dataset.id,10)); cc.crowd.kind=t.value; cc.crowd.last=null; cc.name='Menge: '+CROWDS[t.value][0]; render(); return; }
+  if(t.id==='objPick'){ S.scene.pick=t.value; save(); return; }
+  if(t.id==='envTerr'){ S.scene.terr=t.value; save(); return; }
+  if(t.id==='envInt'){ S.scene.int=parseInt(t.value,10); save(); return; }
+  if(t.id==='crKind'){ S.scene.crowd=t.value; renderScene(); save(); return; }
+  if(t.id==='imgFile'){ loadImage(t.files[0]); return; }
+});
+document.addEventListener('click',function(e){
+  if(e.target.id==='addParty'){ S.party.push({name:'Neuer Held',hp:28,ac:15,bonus:0}); renderParty(); save(); }
+  if(e.target.id==='partyToFight'){ var roll=$('rollHeroes').checked;
+    S.party.forEach(function(p){ if(S.combatants.some(function(c){return c.side==='hero'&&c.name===p.name;})) return;
+      addCombatant({name:p.name,side:'hero',ini:roll?d(20)+p.bonus:0,bonus:p.bonus,hp:p.hp,ac:p.ac,imgKey:'h:'+norm(p.name)}); }); render(); }
+  if(e.target.id==='clearLog'){ S.log=[]; render(); }
+  if(e.target.id==='objRoll'||e.target.id==='objRoll2'){ S.scene.prop=rollObjective(S.scene.pick); renderScene(); save(); }
+  if(e.target.id==='objAcc'&&S.scene.prop){ acceptObjective(S.scene.prop); S.scene.prop=null; render(); toast('Kampfgrund übernommen.'); }
+  if(e.target.id==='envAdd'){ addCombatant({name:'Umwelt: '+ENV[S.scene.terr][0],side:'env',ini:20,bonus:-99,hp:1,ac:0,env:{terr:S.scene.terr,int:S.scene.int,last:null}}); render(); toast('Umwelt steht bei Initiative 20.'); }
+  if(e.target.id==='crAdd'){ var ck=S.scene.crowd; addCombatant({name:'Menge: '+CROWDS[ck][0],side:'crowd',ini:10,bonus:-98,hp:1,ac:0,crowd:{kind:ck,mood:CROWDS[ck][2],last:null}}); render(); toast('Menschenmenge steht bei Initiative 10.'); }
+  if(e.target.id==='genGo'){ generate(); renderGen(); save(); }
+  if(e.target.id==='genParty'){ var gd=genDefaults(); S.gen.heroes=gd.heroes; S.gen.level=gd.level; renderGen(); save(); }
+  if(e.target.id==='toGen'){ S.tab='gen'; renderPanel(); save(); var as=document.querySelector('aside'); if(as&&as.scrollIntoView) as.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if(e.target.id==='lbClose'||e.target.id==='lb') closeLb();
+  if(e.target.id==='lbChange'&&lbKey) pickImage(lbKey);
+  if(e.target.id==='lbDel'&&lbKey){ delete S.images[lbKey]; closeLb(); render(); }
+});
+document.addEventListener('input',function(e){ var t=e.target;
+  if(t.id==='bookQ'){ bookQ=t.value; renderBook(); }
+  if(t.dataset.gf!=null){ var si=parseInt(t.dataset.gf,10), s=S.genRes[si]; if(!s) return; s.f=parseInt(t.value,10)/100;
+    var ev=evalEnc(s.groups,S.gen,s.f); $('sugF'+si).textContent=Math.round(s.f*100)+' %'; $('sugE'+si).innerHTML=evalText(ev);
+    var te=$('sugT'+si); te.textContent=tierName(ev.tier); te.className='tier t'+ev.tier; save(); }
+});
+$('next').addEventListener('click',function(){ step(1); });
+$('fabNext').addEventListener('click',function(){ step(1); }); $('fabPrev').addEventListener('click',function(){ step(-1); });
+$('prev').addEventListener('click',function(){ step(-1); });
+$('rollMon').addEventListener('click',function(){
+  S.combatants.forEach(function(c){ if(c.side==='monster'){ var r=d(20); c.ini=r+c.bonus; logAdd('<b>'+esc(c.name)+'</b>: Initiative d20('+r+')'+(c.bonus>=0?'+':'')+c.bonus+' = '+c.ini); } });
+  render(); });
+$('newFight').addEventListener('click',function(){
+  if(!S.confirmNew){ S.confirmNew=true; $('newFight').textContent='Wirklich? Nochmal klicken'; setTimeout(function(){ S.confirmNew=false; $('newFight').textContent='Neuer Kampf'; },3000); return; }
+  S.confirmNew=false; $('newFight').textContent='Neuer Kampf'; S.combatants=[]; S.round=1; S.turnId=null; S.log=[]; S.obj=null; render(); });
+$('adv').addEventListener('change',function(){ if($('adv').checked) $('dis').checked=false; });
+$('dis').addEventListener('change',function(){ if($('dis').checked) $('adv').checked=false; });
+
+function playMelody(){
+  try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; var ac=new AC(), t0=ac.currentTime+0.06;
+    var master=ac.createGain(); master.gain.value=0.32; master.connect(ac.destination);
+    var dl=ac.createDelay(1); dl.delayTime.value=0.36; var fb=ac.createGain(); fb.gain.value=0.42; var lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
+    dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(master);
+    function tone(f,t,dur,type,vol,att){ var o=ac.createOscillator(), g=ac.createGain(); o.type=type; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vol,t+(att||0.03)); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g); g.connect(master); g.connect(dl); o.start(t); o.stop(t+dur+0.05); }
+    [146.83,220,329.63,349.23].forEach(function(f){ tone(f,t0,6.2,'sine',0.05,1.4); tone(f*1.003,t0,6.2,'sine',0.03,1.6); });
+    [[440,0,1.1],[587.33,0.45,1.1],[659.25,0.9,1.1],[698.46,1.35,1.2],[880,1.8,1.9],[783.99,2.55,0.9],[659.25,2.95,0.9],[587.33,3.4,2.6]].forEach(function(n){
+      tone(n[0],t0+n[1],n[2],'triangle',0.16); tone(n[0]*2,t0+n[1],n[2]*0.7,'sine',0.04); });
+    setTimeout(function(){ try{ ac.close(); }catch(e){} },9000);
+  }catch(e){}
+}
+function sndIcon(){ $('sndBtn').textContent=S.sound===false?'🔇':'🔊'; }
+function enter(withSound){ var sp=$('splash'); if(withSound){ S.sound=true; playMelody(); } else S.sound=false; save(); sndIcon(); sp.classList.add('out'); setTimeout(function(){ sp.style.display='none'; },950); }
+$('enterSnd').addEventListener('click',function(){ enter(true); });
+$('enterQuiet').addEventListener('click',function(){ enter(false); });
+$('sndBtn').addEventListener('click',function(){ S.sound=S.sound===false; if(S.sound) playMelody(); sndIcon(); save(); });
+load(); render(); sndIcon(); if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
+window.__kt={state:function(){return S;},sorted:sorted};
+})();
+</script>
+</body>
+</html>
