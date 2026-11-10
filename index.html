@@ -1744,35 +1744,60 @@ var MOTIVE_KID=['will unbedingt ein echtes Schwert halten','sucht die entlaufene
 var QUIRK=['zählt alles, was in Dreiergruppen vorkommt, laut mit','redet mit einem Löffel namens „Herr Rührwerk“','niest jedes Mal, wenn jemand lügt','kann jedes Tier am Geruch erkennen','sammelt Zähne und weigert sich zu sagen, von wem','spricht rückwärts, sobald es brenzlig wird','hat panische Angst vor Schmetterlingen','summt immer dieselbe Melodie, die niemand kennt','bespricht wichtige Entscheidungen mit einem Kieselstein','kann im Dunkeln etwas besser sehen, seit einem Blitzschlag','schläft grundsätzlich im Stehen','hat ein Gedächtnis für jedes Gesicht, aber keinen einzigen Namen','glaubt fest, in einem früheren Leben eine Ziege gewesen zu sein','isst nur Dinge, die rund sind','schreibt jedem Gast ein kurzes Gedicht','spricht fließend eine Sprache, die es nicht mehr gibt','sieht im Spiegel manchmal eine andere Person','bewahrt einen getrockneten Finger in einer Dose auf','kann Wetteränderungen in den Knien spüren, auf die Stunde genau','vergibt jedem Gegenstand einen Namen','lacht bei Beerdigungen und weint bei Hochzeiten','riecht immer leicht nach Gewitter','hat nie geschlafen, soweit sich jemand erinnern kann','besitzt eine Katze, die angeblich sprechen kann (sie tut es nur nicht vor Zeugen)','spricht über sich nur in der dritten Person','trägt immer Handschuhe, auch im Hochsommer','hat ein unheimliches Talent, verlorene Dinge zu finden','kann jeden Akzent perfekt nachmachen','weigert sich, über Brücken zu gehen','beginnt jede Unterhaltung mit einer Wettervorhersage','hat einen Schatten, der manchmal einen Moment zu spät folgt','sammelt Abschiedsbriefe von Fremden','bekommt beim Lügen knallrote Ohren','pfeift beim Nachdenken ein Lied der Gärtner','hat Angst vor dem eigenen Spiegelbild','trinkt Tee aus einem polierten Totenschädel','hört angeblich die Bäume flüstern','führt ein Tagebuch über jeden Fremden, der vorbeikommt','kann sich an jedes Gespräch wörtlich erinnern','verschenkt jedem neuen Bekannten eine Münze aus fremden Ländern'];
 var QUIRK_KID=['hat einen unsichtbaren Freund, der angeblich ein Drache ist','sammelt Käfer in einer Streichholzschachtel','kennt jeden Schleichweg der Stadt','kann beeindruckend laut pfeifen','glaubt, alle Erwachsenen seien verkleidete Gnome'];
 var AGEADJ={kind:'Kind',jung:'Jung',alt:'Alt'};
+var CLASSES=[['arm','Arm (Bettler, Tagelöhner)'],['einfach','Einfaches Volk'],['buerger','Bürgertum (Handwerk, Handel)'],['reich','Wohlhabend'],['adel','Adel'],['unterwelt','Unterwelt']];
+var JOBC={
+ arm:{kind:['bettelt am Stadttor','fängt Ratten für ein paar Kupferstücke','schläft unter der Brücke und stiehlt Brot','sammelt Lumpen für den Lumpenhändler'],
+  jung:['schuftet als Tagelöhner am Hafen','bettelt mit einer erfundenen Kriegsverletzung','leert Nachttöpfe für ein Kupferstück','schläft in einem Stall und hofft auf Arbeit'],
+  alt:['bettelt seit Jahrzehnten am selben Brunnen','sammelt Pilze und verkauft sie billig','erzählt Geschichten gegen eine warme Suppe','lebt in einer Bretterhütte am Stadtrand']},
+ einfach:{kind:['hütet die Ziegen am Dorfrand','hilft in der Backstube','trägt Wasser vom Brunnen','sammelt Kräuter für die Heilerin'],
+  jung:['arbeitet auf den Feldern','dient in der Stadtwache','bringt mit der Fähre Reisende über den Fluss','jagt im Wald und verkauft Felle'],
+  alt:['fährt seit fünfzig Jahren zum Fischen hinaus','bestellt einen kleinen Hof','flickt Netze am Hafen','sitzt im Ältestenrat des Dorfes']},
+ buerger:{kind:['geht in der Schmiede in die Lehre','läuft Botengänge für die Händler am Markt','lernt bei einem Schreiber das Lesen','hilft im Laden der Eltern'],
+  jung:['arbeitet in der Schmiede','verkauft Kräuter auf dem Markt','führt die Bücher einer Weberei','zieht als Händler mit einem Eselskarren umher'],
+  alt:['führt seit Jahrzehnten eine kleine Taverne','führt einen Kramladen voller merkwürdiger Dinge','braut das beste Bier der Gegend','leitet die Zunft der Gerber mit strenger Hand']},
+ reich:{kind:['wird von einem Hauslehrer in Etikette gequält','sammelt seltene Käfer in Glasdosen','langweilt sich in einem großen Stadthaus','darf zum ersten Mal mit auf eine Handelsreise'],
+  jung:['handelt mit Gewürzen aus fernen Ländern','studiert an einer Akademie','verleiht Geld zu hohen Zinsen','finanziert Expeditionen und erwartet Gewinn'],
+  alt:['besitzt die halbe Hafenstraße','sammelt alte Karten und Artefakte','sitzt im Stadtrat und zieht Fäden','lebt vom Erbe und gibt rauschende Feste']},
+ adel:{kind:['soll bald verheiratet werden und hasst es','übt heimlich mit dem Schwert','reitet auf einem viel zu großen Pony','wird von einer Leibwache überallhin begleitet'],
+  jung:['reist inkognito, um die Welt zu sehen','sucht Verbündete für einen Erbstreit','führt die Ländereien der kranken Eltern','will sich bei Hofe einen Namen machen'],
+  alt:['regiert ein kleines Lehen mit strenger Hand','plant die Nachfolge im Haus','hält eisern an alten Bräuchen fest','verliert langsam den Familienbesitz an die Gläubiger']},
+ unterwelt:{kind:['stiehlt in den Gassen, was nicht festgenagelt ist','späht für die Diebesgilde','verkauft gestohlene Äpfel','trägt Nachrichten zwischen Hehlern hin und her'],
+  jung:['schmuggelt Waren am Zoll vorbei','fälscht Siegel und Briefe','treibt Schulden für die Gilde ein','betreibt ein illegales Würfelspiel'],
+  alt:['kauft als Hehler alles, ohne Fragen zu stellen','kennt jedes Geheimnis der Stadt und verkauft es','führt eine Bande mit eiserner Hand','hat sich aus dem Geschäft zurückgezogen, offiziell']}};
+var CLOTH={arm:['trägt zerlumpte, geflickte Kleidung','läuft barfuß','hat schmutzige, rissige Hände'],einfach:['trägt einfache Leinenkleidung','hat schwielige Hände','trägt eine abgewetzte Schürze'],
+ buerger:['trägt eine saubere Weste mit Zunftabzeichen','hat einen prallen Geldbeutel fest am Gürtel','trägt solide, gut gepflegte Lederschuhe'],reich:['trägt Samt und Silberschmuck','duftet nach teurem Parfum','trägt Ringe an mehreren Fingern'],
+ adel:['trägt das Familienwappen auf der Brust','hat eine stolze, aufrechte Haltung','trägt einen schweren Siegelring'],unterwelt:['trägt einen Mantel mit vielen verborgenen Taschen','hat eine Narbe über der Augenbraue','schaut sich ständig nach allen Seiten um']};
+function className(k){ return (CLASSES.find(function(c){return c[0]===k;})||[0,''])[1].split(' (')[0]; }
 function rndOf(a){ return a[Math.floor(Math.random()*a.length)]; }
 function npcName(race,g){
   var src=race==='halbelf'?(Math.random()<0.5?'mensch':'elf'):race, N=NAMES[src], pool=N[g]&&N[g].length?N[g]:N[Math.random()<0.5?'m':'w'];
   if(g==='d'&&Math.random()<0.4) pool=N[Math.random()<0.5?'m':'w'];
   var first=rndOf(pool), sur=rndOf(NAMES[race==='halbelf'?rndOf(['mensch','elf']):race].s).trim();
   if(race==='tiefling'&&g!=='d'&&Math.random()<0.5) first=rndOf(N.d);
+  if(arguments[2]==='adel'&&Math.random()<0.75) return first+' von '+rndOf(['Rabenstein','Eichenwacht','Silbertal','Krähenfurt','Hohenfels','Dornwiesen','Falkenhorst','Weidenau']);
   return sur?(sur.indexOf('vom ')===0?first+' '+sur:first+' '+sur):first;
 }
 function npcDesc(n){
-  var first=n.name.split(' ')[0], f1=rndOf(RFEAT[n.race]), f2=rndOf(FEAT.filter(function(x){return x!==f1;}));
-  var job=rndOf(JOB[n.age]), dem=rndOf(DEMEANOR), mot=rndOf(n.age==='kind'?MOTIVE_KID.concat(MOTIVE.slice(0,4)):MOTIVE);
+  var first=n.name.split(' ')[0], f1=rndOf(RFEAT[n.race]), f2=(n.cls&&CLOTH[n.cls]&&Math.random()<0.75)?rndOf(CLOTH[n.cls]):rndOf(FEAT.filter(function(x){return x!==f1;}));
+  var job=rndOf(n.cls&&JOBC[n.cls]?JOBC[n.cls][n.age]:JOB[n.age]), dem=rndOf(DEMEANOR), mot=rndOf(n.age==='kind'?MOTIVE_KID.concat(MOTIVE.slice(0,4)):MOTIVE);
   if(f2.split(' ')[0]===f1.split(' ')[0]) f2=f2.split(' ').slice(1).join(' ');
-  var mw=mot.split(' '), verb=mw.shift();
-  return first+' '+f1+' und '+f2+'. '+first+' '+job+' und '+dem+'. Insgeheim '+verb+' '+first+' '+mw.join(' ')+'.';
+  var mw=mot.split(' '), verb=mw.shift(), cm=''; if(/,$/.test(verb)){ verb=verb.slice(0,-1); cm=','; }
+  return first+' '+f1+' und '+f2+'. '+first+' '+job+' und '+dem+'. Insgeheim '+verb+' '+first+cm+' '+mw.join(' ')+'.';
 }
 function npcQuirk(n){ return rndOf(n.age==='kind'?QUIRK.concat(QUIRK_KID,QUIRK_KID):QUIRK); }
 function genNpc(){
-  var f=S.npcF, race=f.race==='zufall'?rndOf(RACES)[0]:f.race, age=f.age==='zufall'?rndOf(AGES)[0]:f.age;
-  var n={id:'n'+Date.now()+Math.floor(Math.random()*999),g:f.g,race:race,age:age}; n.name=npcName(race,f.g); n.desc=npcDesc(n); n.quirk=npcQuirk(n); n.notes='';
+  var f=S.npcF, race=f.race==='zufall'?rndOf(RACES)[0]:f.race, age=f.age==='zufall'?rndOf(AGES)[0]:f.age, cls=(!f.cls||f.cls==='zufall')?rndOf(CLASSES)[0]:f.cls;
+  var n={id:'n'+Date.now()+Math.floor(Math.random()*999),g:f.g,race:race,age:age,cls:cls}; n.name=npcName(race,f.g,cls); n.desc=npcDesc(n); n.quirk=npcQuirk(n); n.notes='';
   S.npcCur=n; save(); renderNpc();
 }
 function raceName(k){ return (RACES.find(function(r){return r[0]===k;})||[0,k])[1]; }
 function genderName(k){ return (GENDERS.find(function(r){return r[0]===k;})||[0,k])[1]; }
-function npcText(n){ return n.name+' ('+raceName(n.race)+', '+AGEADJ[n.age]+', '+genderName(n.g)+')\n'+n.desc+'\nEigenart: '+n.quirk+(n.notes?'\nNotizen: '+n.notes:''); }
+function npcText(n){ return n.name+' ('+raceName(n.race)+', '+AGEADJ[n.age]+', '+genderName(n.g)+(n.cls?', '+className(n.cls):'')+')\n'+n.desc+'\nEigenart: '+n.quirk+(n.notes?'\nNotizen: '+n.notes:''); }
 function npcCardHtml(n,saved){
   var key='n:'+n.id, src=S.images[key];
   return '<div class="npc'+(saved?' saved':'')+'" data-nid="'+n.id+'"><div class="npchead"><button class="ava big" data-act="npcimg" data-nid="'+n.id+'" title="Porträt">'+(src?'<img src="'+src+'" alt="">':'<span>🧙</span>')+'</button>'+
     '<div style="flex:1;min-width:0"><input class="name npcname" value="'+esc(n.name)+'" data-nf="name" data-nid="'+n.id+'" title="Name ändern">'+
-    '<div class="hint">'+esc(raceName(n.race))+' · '+AGEADJ[n.age]+' · '+genderName(n.g)+'</div></div></div>'+
+    '<div class="hint">'+esc(raceName(n.race))+' · '+AGEADJ[n.age]+' · '+genderName(n.g)+(n.cls?' · '+className(n.cls):'')+'</div></div></div>'+
     '<div class="npcsec"><div class="lab">Beschreibung '+(saved?'':'<button class="sm" data-act="npcre" data-w="desc" title="Neu würfeln">↻</button>')+'</div><div>'+esc(n.desc)+'</div></div>'+
     '<div class="npcsec quirk"><div class="lab">✦ Eigenart '+(saved?'':'<button class="sm" data-act="npcre" data-w="quirk" title="Neu würfeln">↻</button>')+'</div><div>'+esc(n.quirk)+'</div></div>'+
     (saved?'<textarea class="npcnotes" data-nf="notes" data-nid="'+n.id+'" placeholder="Notizen (wo getroffen, was erzählt …)">'+esc(n.notes||'')+'</textarea>':'')+
@@ -1785,6 +1810,7 @@ function renderNpc(){
     '<div class="lab">Geschlecht</div><div class="seg three">'+GENDERS.map(function(g){return '<button class="'+(f.g===g[0]?'on':'')+'" data-act="npcg" data-g="'+g[0]+'">'+g[2]+' '+g[1]+'</button>';}).join('')+'</div>'+
     '<div class="row" style="margin-top:8px"><label class="lab" style="flex:1">Volk<br><select id="npcRace" style="width:100%"><option value="zufall">🎲 Zufall</option>'+RACES.map(function(r){return '<option value="'+r[0]+'"'+(f.race===r[0]?' selected':'')+'>'+r[1]+'</option>';}).join('')+'</select></label>'+
     '<label class="lab" style="flex:1">Alter<br><select id="npcAge" style="width:100%"><option value="zufall">🎲 Zufall</option>'+AGES.map(function(a){return '<option value="'+a[0]+'"'+(f.age===a[0]?' selected':'')+'>'+a[1]+'</option>';}).join('')+'</select></label></div>'+
+    '<label class="lab" style="margin-top:8px">Soziale Klasse<br><select id="npcCls" style="width:100%"><option value="zufall">🎲 Zufall</option>'+CLASSES.map(function(c){return '<option value="'+c[0]+'"'+(f.cls===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select></label>'+
     '<button class="pri big" id="npcGo">✨ NPC finden</button></div>'+
     (S.npcCur?npcCardHtml(S.npcCur,false):'<div class="empty">Wähle Geschlecht, Volk und Alter und tippe auf „NPC finden“.</div>')+'</div>'+
     '<h3>Gemerkte NPCs ('+S.npcs.length+')</h3>'+(S.npcs.length?'<input id="npcSearch" placeholder="Suchen …" value="'+esc(npcQ)+'" style="width:100%;margin-bottom:8px"><div class="npclist">'+
@@ -1849,7 +1875,7 @@ document.addEventListener('click',function(e){
   var a=t.dataset.act, C=S.cal;
   switch(a){
     case 'npcg': S.npcF.g=t.dataset.g; save(); renderNpc(); break;
-    case 'npcre': { var n=S.npcCur; if(!n) break; if(t.dataset.w==='name') n.name=npcName(n.race,n.g); else if(t.dataset.w==='desc') n.desc=npcDesc(n); else n.quirk=npcQuirk(n); save(); renderNpc(); break; }
+    case 'npcre': { var n=S.npcCur; if(!n) break; if(t.dataset.w==='name') n.name=npcName(n.race,n.g,n.cls); else if(t.dataset.w==='desc') n.desc=npcDesc(n); else n.quirk=npcQuirk(n); save(); renderNpc(); break; }
     case 'npcsave': if(S.npcCur&&!S.npcs.some(function(x){return x.id===S.npcCur.id;})){ S.npcs.push(JSON.parse(JSON.stringify(S.npcCur))); var k1='n:'+S.npcCur.id; save(); toast(S.npcCur.name+' gemerkt.'); renderNpc(); } break;
     case 'npcdel': { var id=t.dataset.nid; S.npcs=S.npcs.filter(function(x){return x.id!==id;}); delete S.images['n:'+id]; save(); renderNpc(); break; }
     case 'npccopy': { var nn=findNpc(t.dataset.nid); if(nn){ try{ navigator.clipboard.writeText(npcText(nn)).then(function(){ toast('Kopiert.'); },function(){ toast('Kopieren nicht möglich.'); }); }catch(err){ toast('Kopieren nicht möglich.'); } } break; }
@@ -1868,7 +1894,7 @@ document.addEventListener('click',function(e){
   }
 });
 document.addEventListener('change',function(e){ var t=e.target;
-  if(t.id==='npcRace'){ S.npcF.race=t.value; save(); } if(t.id==='npcAge'){ S.npcF.age=t.value; save(); }
+  if(t.id==='npcRace'){ S.npcF.race=t.value; save(); } if(t.id==='npcAge'){ S.npcF.age=t.value; save(); } if(t.id==='npcCls'){ S.npcF.cls=t.value; save(); }
   if(t.dataset.nf){ var n=findNpc(t.dataset.nid); if(n){ n[t.dataset.nf]=t.value; var s2=S.npcs.find(function(x){return x.id===n.id;}); if(s2&&s2!==n) s2[t.dataset.nf]=t.value; save(); } }
   if(t.id==='calYear'){ S.cal.year=Math.max(1,parseInt(t.value,10)||1); save(); renderCal(); }
 });
