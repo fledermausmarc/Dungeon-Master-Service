@@ -258,6 +258,7 @@
   .recp{border-left:6px solid var(--bad)} .recp.live{background:#fff1ec}
   .recbtn{font-weight:700;padding:8px 14px} .recbtn.on{background:#b23a2a;color:#fff;border-color:#b23a2a;animation:pulse 1.2s infinite}
   #recTime{font-family:Cinzel,serif;font-size:20px;color:var(--bad)} .reclive{margin-top:6px;font-style:italic;color:var(--muted);min-height:1.4em;font-size:14px}
+  .spkrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:8px} .spkrow .on{background:#b23a2a;color:#fff;border-color:#b23a2a}
   .seg.three small{font-size:11px;color:inherit;opacity:.8}
   @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
@@ -2419,7 +2420,7 @@ function micToggle(){
 document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('#lMic')) micToggle(); });
 
 /* =================== Loreyer: Sitzung aufnehmen =================== */
-var SREC={on:false,r:null,t0:0,timer:null,lock:null,interim:'',sid:null,lastMark:0};
+var SREC={on:false,r:null,t0:0,timer:null,lock:null,interim:'',sid:null,lastMark:0,spk:'',lastSpk:null};
 function fmtT(ms){ var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 function wakeOn(){ try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ SREC.lock=l; }).catch(function(){}); }catch(e){} }
 document.addEventListener('visibilitychange',function(){ if(SREC.on&&document.visibilityState==='visible') wakeOn(); });
@@ -2427,12 +2428,13 @@ function recStart(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast('Aufnahme braucht Chrome, Edge oder Safari.'); return; }
   if(recOn){ try{ recog.stop(); }catch(e){} }
-  var s=curSession(); SREC.sid=s.id; if(!s.tr) s.tr=''; SREC.on=true; SREC.t0=Date.now()-(s.trMs||0); SREC.lastMark=-1; wakeOn();
+  var s=curSession(); SREC.sid=s.id; if(!s.tr) s.tr=''; SREC.on=true; SREC.lastSpk=null; SREC.t0=Date.now()-(s.trMs||0); SREC.lastMark=-1; wakeOn();
   function startR(){ var r=new SR(); r.lang='de-DE'; r.continuous=true; r.interimResults=true; SREC.r=r;
     r.onresult=function(ev){ var tmp=''; var ss=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); if(!ss) return;
       for(var i=ev.resultIndex;i<ev.results.length;i++){ var tx=ev.results[i][0].transcript.trim(); if(!tx) continue;
-        if(ev.results[i].isFinal){ var el=Date.now()-SREC.t0, mk=Math.floor(el/300000);
-          if(mk!==SREC.lastMark){ SREC.lastMark=mk; ss.tr+=(ss.tr?'\n':'')+'['+fmtT(el)+'] '; } else ss.tr+=' ';
+        if(ev.results[i].isFinal){ var el=Date.now()-SREC.t0, mk=Math.floor(el/300000), nl=false;
+          if(mk!==SREC.lastMark){ SREC.lastMark=mk; ss.tr+=(ss.tr?'\n':'')+'['+fmtT(el)+'] '; nl=true; }
+          if(SREC.spk!==SREC.lastSpk||nl){ if(!nl) ss.tr+='\n'; if(SREC.spk) ss.tr+=SREC.spk+': '; SREC.lastSpk=SREC.spk; } else ss.tr+=' ';
           ss.tr+=tx.charAt(0).toUpperCase()+tx.slice(1)+'.'; ss.trMs=el; saveSoon(); }
         else tmp+=tx+' '; }
       SREC.interim=tmp; recUi(); };
@@ -2450,8 +2452,9 @@ function recPanel(s){
   return '<div class="panel recp'+(mine?' live':'')+'"><div class="row" style="margin:0;align-items:center">'+
     (mine?'<button class="recbtn on" data-act="recstop">⏹ Stopp</button><b id="recTime">'+fmtT(Date.now()-SREC.t0)+'</b><span class="hint" id="recWords">'+words+' Wörter</span>':
       '<button class="recbtn" data-act="recstart">⏺ Sitzung aufnehmen</button><span class="hint">'+(words?words+' Wörter · '+fmtT(s.trMs||0):'Alles mitschreiben lassen, danach auswerten')+'</span>')+'</div>'+
-    (mine?'<div class="reclive" id="recLive">'+esc(SREC.interim||(s.tr||'').slice(-140))+'</div>':'')+
-    (words&&!mine?'<div class="row" style="margin:8px 0 0"><button class="sm pri" data-act="recana">✨ Auswerten → Recap &amp; Quests</button><button class="sm" data-act="recdl">⬇️ .txt</button><button class="sm" data-act="recprompt">Prompt kopieren</button><button class="sm danger" data-act="recclr">✕</button></div>':'')+
+    (mine?'<div class="reclive" id="recLive">'+esc(SREC.interim||(s.tr||'').slice(-140))+'</div>'+
+      '<div class="spkrow"><span class="hint">Wer spricht?</span>'+[['','–']].concat([['SL','SL']],(S.chars||[]).map(function(c){ var n=c.short||c.name; return [n,n]; })).map(function(x){ return '<button class="sm'+(SREC.spk===x[0]?' on':'')+'" data-act="recspk" data-k="'+esc(x[0])+'">'+esc(x[1])+'</button>'; }).join('')+'</div>':'')+
+    (words&&!mine?'<div class="row" style="margin:8px 0 0"><button class="sm" data-act="recfix">🧹 Korrigieren</button>'+(s.trOrig?'<button class="sm" data-act="recundo">↩ Original</button>':'')+'<button class="sm pri" data-act="recana">✨ Auswerten → Recap &amp; Quests</button><button class="sm" data-act="recdl">⬇️ .txt</button><button class="sm" data-act="recprompt">Prompt kopieren</button><button class="sm danger" data-act="recclr">✕</button></div>':'')+
     (s.aiState?'<div class="hint" style="margin-top:6px">'+esc(s.aiState)+'</div>':'')+
     (words?'<details style="margin-top:6px"><summary class="hint">Transkript ansehen / korrigieren</summary><textarea id="lTr" rows="8" style="width:100%">'+esc(s.tr)+'</textarea></details>':'')+
     '<div class="hint" style="margin-top:6px">Alle am Tisch sollten zustimmen. Die Spracherkennung läuft über den Dienst des Browsers (bei Chrome: Google).</div></div>';
@@ -2459,12 +2462,28 @@ function recPanel(s){
 function aiCall(content){ return fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({messages:[{role:'system',content:'Du bist ein präziser Chronist für eine D&D-Kampagne in der Fantasywelt Aetheria. Antworte auf Deutsch.'},{role:'user',content:content}],model:'openai',referrer:'dungeon-master-service'})})
   .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); }); }
+
+var LORE_WORDS=['Aetheria','Gaia','Pandoria','Boraelia','Falkenstein','Morgenhain','Asterhall','Eichenwacht','Caliztán','Rotfels','Ignis','Nyrak','Eldric','Elias','Ser Lavitz','Clemens Ignatio','Kaelos','Harkon','Ostrid','Humara','Undor','Lumena','Semion','Ventra','Floriel','Faunar','Pomaris','Morvan','Wurzeltag','Stammtag','Zweigtag','Blatttag','Kronentag'];
+function vocab(){ var v=LORE_WORDS.slice(); (S.chars||[]).forEach(function(c){ v.push(c.name); if(c.short) v.push(c.short); if(c.player) v.push(c.player); });
+  (S.npcs||[]).forEach(function(n){ v.push(n.name); }); return v.filter(function(x,i,a){ return x&&a.indexOf(x)===i; }).join(', '); }
+function fixTr(s){
+  if(s.aiBusy) return; var lines=(s.tr||'').split('\n'), chunks=[], cur=[], cnt=0;
+  lines.forEach(function(l){ var w=l.split(/\s+/).length; if(cnt+w>1100&&cur.length){ chunks.push(cur.join('\n')); cur=[]; cnt=0; } cur.push(l); cnt+=w; }); if(cur.length) chunks.push(cur.join('\n'));
+  s.aiBusy=true; var out=[], orig=s.tr;
+  function step(k){ if(k>=chunks.length) return Promise.resolve();
+    s.aiState='🧹 Korrigiere Abschnitt '+(k+1)+' von '+chunks.length+' …'; renderLore();
+    return (k>0?wait(16000):Promise.resolve()).then(function(){ return aiCall('Korrigiere dieses automatisch erkannte Transkript einer deutschen D&D-Sitzung. Behebe Erkennungsfehler, Grammatik und Satzzeichen. Bekannte Namen und Begriffe (bitte genau so schreiben): '+vocab()+'.\nRegeln: Zeitmarken wie [12:30] und Sprecher wie „Name:“ unverändert lassen. Nichts kürzen, nichts erfinden, nichts zusammenfassen. Ergibt ein Satz keinen Sinn und lässt sich nicht sicher korrigieren, setze [?] dahinter. Gib nur den korrigierten Text zurück.\n\n'+chunks[k]); })
+      .then(function(t){ out.push(t.trim()); return step(k+1); }); }
+  step(0).then(function(){ s.trOrig=orig; s.tr=out.join('\n'); s.aiBusy=false; var q=(s.tr.match(/\[\?\]/g)||[]).length; s.aiState='🧹 Korrigiert.'+(q?' '+q+' unklare Stellen sind mit [?] markiert.':''); save(); renderLore(); toast('Transkript korrigiert.'); })
+   .catch(function(err){ s.aiBusy=false; s.aiState='KI nicht erreichbar ('+err.message+').'; save(); renderLore(); });
+}
+
 function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 var FINAL_PROMPT='Erstelle aus den folgenden Notizen einer D&D-Sitzung ein JSON-Objekt (nur JSON, nichts sonst) mit diesen Feldern:\n'+
  '"recap": stimmungsvolles Vorlese-Recap für die nächste Sitzung, an die Spieler gerichtet („Ihr …“), höchstens 150 Wörter, Vergangenheitsform;\n'+
  '"ereignisse": wichtigste Ereignisse in Reihenfolge (kurze Sätze); "npcs": getroffene Personen mit 3–6 Wörtern Beschreibung; "orte": besuchte Orte; "beute": erhaltene Gegenstände und Geld;\n'+
  '"quests": aktive Aufträge und Ziele der Gruppe (je ein Satz); "offen": offene Fragen und Rätsel; "zitate": höchstens 3 denkwürdige Sprüche.\n'+
- 'Ignoriere Regeldiskussionen, Würfelzahlen und Gespräche außerhalb des Spiels. Erfinde nichts.\n\n';
+ 'Sprecherkennungen („Name:“) helfen dir, wer was gesagt hat; „SL:“ ist der Spielleiter. Stellen mit [?] waren unklar, nutze sie nur, wenn der Zusammenhang eindeutig ist. Ignoriere Regeldiskussionen, Würfelzahlen und Gespräche außerhalb des Spiels. Erfinde nichts.\n\n';
 function parseJson(t){ var a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a<0||b<a) throw new Error('kein JSON'); return JSON.parse(t.slice(a,b+1)); }
 function applyAnalysis(s,j){
   s.notes=s.notes.filter(function(n){ return !n.auto; });
@@ -2492,6 +2511,9 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-act
     case 'recstart': recStart(); break;
     case 'recstop': recStop(); break;
     case 'recana': analyzeTr(s); break;
+    case 'recfix': fixTr(s); break;
+    case 'recundo': if(s.trOrig){ s.tr=s.trOrig; s.trOrig=''; s.aiState=''; save(); renderLore(); toast('Original wiederhergestellt.'); } break;
+    case 'recspk': SREC.spk=t.dataset.k; renderLore(); break;
     case 'recclr': if(!t.dataset.ok){ t.dataset.ok='1'; t.textContent='Transkript löschen?'; break; } s.tr=''; s.trMs=0; save(); renderLore(); break;
     case 'recdl': { var b=new Blob([s.tr],{type:'text/plain;charset=utf-8'}), u=URL.createObjectURL(b), a=document.createElement('a'); a.href=u; a.download='Sitzung_'+s.no+'_Transkript.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(u);},4000); break; }
     case 'recprompt': try{ navigator.clipboard.writeText(FINAL_PROMPT+'TRANSKRIPT:\n'+s.tr).then(function(){ toast('Prompt kopiert. Hier bei Claude einfügen, das Ergebnis kannst du übernehmen.'); }); }catch(err){} break;
