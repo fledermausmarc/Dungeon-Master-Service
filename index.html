@@ -123,7 +123,11 @@
   #lb{position:fixed;inset:0;z-index:50;background:rgba(10,7,4,.88);display:flex;align-items:center;justify-content:center;padding:16px}
   #lb[hidden],#toast[hidden]{display:none}
   #lb .box{background:var(--panel);color:var(--ink);border:1px solid var(--gold);border-radius:12px;padding:10px;max-width:min(92vw,720px);text-align:center}
-  #lb img{max-width:100%;max-height:70vh;border-radius:8px;display:block;margin:6px auto}
+  #lb .box{width:min(94vw,560px);max-height:94vh;overflow:auto}
+  .imgwrap{position:relative;margin:6px auto;width:min(80vw,360px);aspect-ratio:1;border-radius:10px;background:#f4ead3;border:1px solid var(--edge);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #lb img{width:100%;height:100%;object-fit:cover;display:block}
+  #lbPh{color:var(--muted);font-family:Cinzel,serif}
+  .genbox{text-align:left;margin-top:6px} .genbox textarea{width:100%;margin:6px 0;font-size:14px;resize:vertical}
   #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:#fbe1d8;border:1px solid var(--bad);border-radius:8px;padding:8px 12px}
   .card.ally{border-left-color:var(--good)} .card.object{border-left-color:#8a8a8a} .card.env{border-left-color:#5c7d3c} .card.crowd{border-left-color:#8a5fb5}
   .card.env .top select,.card.crowd .top select{max-width:150px}
@@ -202,8 +206,13 @@
   </aside>
 </div>
 
-<div id="lb" hidden><div class="box"><div id="lbTitle" style="font-weight:700;color:var(--gold)"></div><img id="lbImg" alt="">
-  <div class="row" style="justify-content:center"><button id="lbChange">Bild ändern</button><button id="lbDel" class="danger">Bild entfernen</button><button id="lbClose" class="pri">Schließen</button></div></div></div>
+<div id="lb" hidden><div class="box"><div id="lbTitle" style="font-weight:700;color:var(--gold);font-family:Cinzel,serif;font-size:18px"></div>
+  <div class="imgwrap"><img id="lbImg" alt=""><div id="lbPh">Noch kein Bild</div></div>
+  <div class="genbox"><div class="hint" style="text-align:left">✨ <b>Bildgenerator</b> (KI, Pollinations.ai). Beschreibung auf Englisch klappt am besten.</div>
+    <textarea id="genPrompt" rows="3"></textarea>
+    <div class="row"><select id="genStyle"><option value="paint">Gemälde</option><option value="ink">Bestiarium-Skizze</option><option value="dark">Düster</option><option value="comic">Comic</option><option value="token">Token (rund)</option></select>
+    <button id="genImg" class="pri">✨ Bild generieren</button></div><div id="genMsg" class="hint"></div></div>
+  <div class="row" style="justify-content:center"><button id="lbUse" class="pri" hidden>Übernehmen</button><button id="lbChange">Vom Gerät hochladen</button><button id="lbDel" class="danger">Bild entfernen</button><button id="lbClose">Schließen</button></div></div></div>
 <div id="toast" hidden></div>
 <div id="fab"><span class="r">R <span id="fabRound">1</span></span><button id="fabPrev">◀</button><button id="fabNext" class="pri">Nächster ▶</button></div>
 <input type="file" id="imgFile" accept="image/*" hidden>
@@ -975,9 +984,35 @@ function loadImage(file){
     im.onerror=function(){ toast('Diese Datei ließ sich nicht als Bild lesen.'); }; im.src=rd.result; };
   rd.readAsDataURL(file);
 }
-var lbKey=null;
-function openLb(key,title){ lbKey=key; $('lbImg').src=S.images[key]||''; $('lbTitle').textContent=title||''; $('lb').hidden=false; }
-function closeLb(){ $('lb').hidden=true; lbKey=null; }
+var lbKey=null, lbPending=null, genBusyUntil=0;
+var TYPE_EN={A:'aberration',B:'beast',C:'celestial',D:'dragon',E:'elemental',F:'fey creature',H:'humanoid',K:'construct',M:'monstrosity',P:'plant creature',R:'giant',S:'ooze',T:'undead',U:'fiend',X:'creature'};
+var STYLE={paint:', epic fantasy oil painting, dramatic lighting, highly detailed, centered full body',ink:', old bestiary illustration, ink and watercolor on parchment, hand drawn',dark:', dark fantasy art, moody, gloomy atmosphere, dramatic shadows',comic:', colorful fantasy comic illustration, bold clean lines',token:', round RPG token portrait, top-down view, ornate golden ring border, plain background'};
+function promptForName(name,t){ var m=SRD.find(function(x){return x.de===name;}); var subj=m&&m.en?m.en:name; t=t||(m&&m.t)||'X';
+  return subj+(m&&m.en?'':' (German name)')+', '+TYPE_EN[t]+', fantasy roleplaying game monster'; }
+function promptForCombatant(c){ if(c.side==='hero') return 'portrait of a fantasy adventurer hero named '+(c.baseName||c.name)+', heroic pose';
+  if(c.side==='ally') return 'frightened civilian, medieval fantasy townsperson'; if(c.side==='object') return (c.baseName||c.name)+', magical object, fantasy';
+  return promptForName(c.baseName||c.name,c.t); }
+function openLb(key,title,prompt){ lbKey=key; lbPending=null; var src=S.images[key]; $('lbImg').src=src||''; $('lbImg').style.display=src?'':'none'; $('lbPh').style.display=src?'none':'';
+  $('lbTitle').textContent=title||''; $('genPrompt').value=prompt||title||''; $('genMsg').textContent=''; $('lbUse').hidden=true; $('lbDel').hidden=!src; $('lb').hidden=false; }
+function closeLb(){ $('lb').hidden=true; lbKey=null; lbPending=null; }
+function genImage(){
+  var now=Date.now(); if(now<genBusyUntil){ $('genMsg').textContent='Bitte noch '+Math.ceil((genBusyUntil-now)/1000)+' s warten (kostenloser Dienst: 1 Bild pro 15 s).'; return; }
+  var p=$('genPrompt').value.trim(); if(!p) return; genBusyUntil=now+15000;
+  var url='https://image.pollinations.ai/prompt/'+encodeURIComponent(p+STYLE[$('genStyle').value])+'?width=512&height=512&nologo=true&seed='+Math.floor(Math.random()*1e9);
+  var im=$('lbImg'); $('genMsg').textContent='Wird gemalt … das dauert meist 10 bis 40 Sekunden.'; $('genImg').disabled=true;
+  var probe=new Image(); probe.crossOrigin='anonymous';
+  probe.onload=function(){ $('genImg').disabled=false; lbPending=probe; im.src=probe.src; im.style.display=''; $('lbPh').style.display='none'; $('lbUse').hidden=false; $('genMsg').textContent='Gefällt es dir? „Übernehmen“ speichert es, „Bild generieren“ malt ein neues.'; };
+  probe.onerror=function(){ $('genImg').disabled=false; $('genMsg').textContent='Das Bild ließ sich nicht laden. In der Claude-Vorschau sind Bilder aus dem Netz gesperrt; auf deiner GitHub-Seite funktioniert der Generator. Sonst kurz warten und erneut versuchen.'; };
+  probe.src=url;
+}
+function usePending(){
+  if(!lbPending||!lbKey) return; var key=lbKey, data;
+  try{ var mx=320, sc=Math.min(1,mx/Math.max(lbPending.naturalWidth,lbPending.naturalHeight)), cv=document.createElement('canvas');
+    cv.width=Math.round(lbPending.naturalWidth*sc); cv.height=Math.round(lbPending.naturalHeight*sc); cv.getContext('2d').drawImage(lbPending,0,0,cv.width,cv.height); data=cv.toDataURL('image/jpeg',0.84);
+  }catch(e){ data=lbPending.src; }
+  S.images[key]=data; if(!save()){ delete S.images[key]; toast('Speicher voll: Bild konnte nicht gespeichert werden.'); return; }
+  toast('Bild übernommen.'); closeLb(); render();
+}
 function toast(t){ var el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(function(){ el.hidden=true; },3500); }
 
 /* ---------- Generator-Panel ---------- */
@@ -1507,8 +1542,8 @@ document.addEventListener('click',function(e){
     case 'addmon': { var i2=parseInt(t.dataset.i,10), q=document.querySelector('[data-qty="'+i2+'"]'), cnt=Math.max(1,parseInt(q&&q.value,10)||1);
       addMonster(S.lib[i2],cnt,$('rollOnAdd')?$('rollOnAdd').checked:true); render(); break; }
     case 'delparty': S.party.splice(parseInt(t.dataset.i,10),1); render(); break;
-    case 'ava': { var k=keyOf(c); if(S.images[k]) openLb(k,c.name); else pickImage(k); break; }
-    case 'libimg': { var lm=S.lib[parseInt(t.dataset.i,10)], lk=lm.imgKey||('m:'+norm(lm.name)); if(S.images[lk]) openLb(lk,lm.name); else pickImage(lk); break; }
+    case 'ava': { var k=keyOf(c); openLb(k,c.name,promptForCombatant(c)); break; }
+    case 'libimg': { var lm=S.lib[parseInt(t.dataset.i,10)], lk=lm.imgKey||('m:'+norm(lm.name)); openLb(lk,lm.name,promptForName(lm.name,lm.t)); break; }
     case 'gtier': S.gen.tier=parseInt(t.dataset.i,10); renderGen(); save(); break;
     case 'gtype': { var ty=t.dataset.t, ix=S.gen.types.indexOf(ty); if(ix>=0) S.gen.types.splice(ix,1); else S.gen.types.push(ty); renderGen(); save(); break; }
     case 'gn': case 'gswap': case 'grm': case 'gfight': case 'glib': {
@@ -1576,6 +1611,8 @@ document.addEventListener('click',function(e){
   if(e.target.id==='toGen'){ S.tab='gen'; renderPanel(); save(); var as=document.querySelector('aside'); if(as&&as.scrollIntoView) as.scrollIntoView({behavior:'smooth',block:'start'}); }
   if(e.target.id==='lbClose'||e.target.id==='lb') closeLb();
   if(e.target.id==='lbChange'&&lbKey) pickImage(lbKey);
+  if(e.target.id==='genImg') genImage();
+  if(e.target.id==='lbUse') usePending();
   if(e.target.id==='lbDel'&&lbKey){ delete S.images[lbKey]; closeLb(); render(); }
 });
 document.addEventListener('input',function(e){ var t=e.target;

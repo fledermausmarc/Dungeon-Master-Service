@@ -8,7 +8,8 @@ Kampftracker, Begegnungsgenerator und Szenenwerkzeug für D&D 5e als einzelne We
 - Kampfgenerator nach Heldenstufe und Schwierigkeit (Einfach bis Sicher tödlich)
 - Monsterbuch mit 361 Monstern, Angriffen und Zaubern samt Zauberplätzen
 - Szene: Kampfgründe mit Countdown und Wellen, Umweltereignisse, Menschenmengen (inkl. W100-Chaostabelle für panische Mengen)
-- Eigene Bilder pro Monster oder Held, Startmelodie (abschaltbar)
+- Bilder pro Monster oder Held: hochladen oder mit dem KI-Bildgenerator (Pollinations.ai) erzeugen
+- Startmelodie (abschaltbar)
 
 ## Benutzen
 `index.html` im Browser öffnen. Daten werden im Browser gespeichert (localStorage).
