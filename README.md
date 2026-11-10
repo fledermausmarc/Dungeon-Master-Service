@@ -1,8 +1,12 @@
 # Dungeon Master Service
 
-Kampftracker, Begegnungsgenerator und Szenenwerkzeug für D&D 5e als einzelne Webseite (`index.html`), ohne Server und ohne Installation.
+Werkzeugkasten für Spielleiter in D&D 5e als einzelne Webseite (`index.html`), ohne Server und ohne Installation. Drei Hubs:
 
-## Funktionen
+- **Fight Club**: Kampftracker mit Generator, Monsterbuch und Szene
+- **NPCFindr**: NPCs mit Name, Beschreibung und Eigenart
+- **Kalender von Aetheria**: 10 Monate à 30 Tage, Tage abhaken, Feiertage und Notizen
+
+## Fight Club
 - Initiative mit Live-Sortierung, TP, Zustände, Runden- und Zugzähler
 - Monster-Import aus Excel (Blätter „Monster“ und „Aktionen“)
 - Kampfgenerator nach Heldenstufe und Schwierigkeit (Einfach bis Sicher tödlich)

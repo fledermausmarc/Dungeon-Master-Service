@@ -128,7 +128,7 @@
   #lb img{width:100%;height:100%;object-fit:cover;display:block}
   #lbPh{color:var(--muted);font-family:Cinzel,serif}
   .genbox{text-align:left;margin-top:6px} .genbox textarea{width:100%;margin:6px 0;font-size:14px;resize:vertical}
-  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:#fbe1d8;border:1px solid var(--bad);border-radius:8px;padding:8px 12px}
+  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:#33462a;color:#f6ecd0;border:1px solid #b8913f;border-radius:8px;padding:8px 12px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
   .card.ally{border-left-color:var(--good)} .card.object{border-left-color:#8a8a8a} .card.env{border-left-color:#5c7d3c} .card.crowd{border-left-color:#8a5fb5}
   .card.env .top select,.card.crowd .top select{max-width:150px}
   .card.env .pri,.card.crowd .pri{margin-top:6px}
@@ -143,6 +143,52 @@
   .spell{font-size:13px} .spell.roll{border-color:#8a6fae;background:#efe5f7} .spell.out{opacity:.4;text-decoration:line-through}
   .tabs{flex-wrap:wrap} .tabs button{padding:6px 4px;font-size:13.5px}
   #fab{display:none}
+  body:not(.v-fight) #fab{display:none!important}
+  .view[hidden]{display:none!important}
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#3b5130,#2c3c24);border-bottom:3px solid #b8913f;box-shadow:0 2px 10px rgba(40,30,10,.25);padding:8px 12px;display:flex;gap:8px;align-items:center}
+  .topbar .sp{flex:1} .topbar button{background:#f4ecd6;border-color:#b8913f}
+  .hubhome{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 14px 40px;text-align:center}
+  .hubtree{width:min(170px,40vw);margin:0 auto}.hubtree svg{width:100%;height:auto;filter:drop-shadow(0 0 14px rgba(184,134,43,.45))}
+  .hubhome h1{font-family:Cinzel,serif;color:#4a3410;letter-spacing:.1em;margin:8px 0 2px;font-size:clamp(22px,5vw,36px)}
+  .hubgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:20px}
+  .hubcard{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px;border-radius:16px;background:var(--panel);border:2px solid var(--edge);box-shadow:0 4px 14px rgba(90,60,20,.15);transition:transform .15s,border-color .15s}
+  .hubcard:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .hubcard .hi{font-size:44px} .hubcard b{font-family:Cinzel,serif;font-size:21px;color:#4a3410;letter-spacing:.05em} .hubcard small{color:var(--muted);font-size:14px;line-height:1.35}
+  .hubpage{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:14px 12px 60px}
+  .hubtitle{font-family:Cinzel,serif;font-size:26px;color:#4a3410;margin:4px 0 12px;display:flex;gap:10px;align-items:center}
+  .panel{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(90,60,20,.12)}
+  .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;display:block;margin-bottom:4px}
+  .seg.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px} .seg.three button{padding:10px 4px;font-size:15px}
+  button.big{width:100%;margin-top:12px;font-size:18px;padding:12px;font-family:Cinzel,serif}
+  .npcwrap{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:12px;align-items:start}
+  @media(max-width:760px){.npcwrap{grid-template-columns:1fr}}
+  .npc{background:var(--panel);border:1px solid var(--edge);border-left:6px solid var(--leaf);border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(90,60,20,.12)}
+  .npc.saved{margin-bottom:10px;border-left-color:var(--gold)}
+  .npchead{display:flex;gap:10px;align-items:center}
+  .ava.big{width:72px;height:72px;font-size:36px}
+  .npcname{font-size:20px!important;font-family:Cinzel,serif;width:100%}
+  .npcsec{margin-top:10px;line-height:1.5} .npcsec .lab{display:flex;align-items:center;gap:6px}
+  .npcsec.quirk>div:last-child{background:#efe5f7;border:1px solid #8a6fae;border-radius:8px;padding:6px 8px}
+  .npcnotes{width:100%;margin-top:8px;min-height:54px}
+  .calbar .today{font-size:16px} .calnav{justify-content:center;margin:12px 0 6px} .yr{font-family:Cinzel,serif;font-weight:700}
+  .mchips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+  .mchips button{position:relative;overflow:hidden;font-size:13.5px;padding:5px 9px}
+  .mchips button i{position:absolute;left:0;bottom:0;height:3px;background:var(--leaf)}
+  .mchips button.on{background:#7a5216;color:var(--cream);border-color:var(--gold)} .mchips button.cur{box-shadow:0 0 0 2px var(--leaf)}
+  .mhead{text-align:center;margin:14px 0 8px} .mname{font-family:Cinzel,serif;font-size:24px;color:#4a3410}
+  .calgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .calgrid .dn{font-family:Cinzel,serif;font-size:12px;text-align:center;color:#fff8e6;background:var(--forest);border-radius:6px;padding:5px 2px}
+  .day{background:var(--panel);border:1px solid var(--edge);border-radius:8px;min-height:74px;padding:5px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+  .day:hover{border-color:var(--gold)} .day.sel{outline:2px solid var(--gold)}
+  .day.done{background:#e3e9d6;color:#6f7a60} .day.done .dnum{text-decoration:line-through}
+  .day.hol{border-color:#8a6fae;background:#f3ecf8} .day.done.hol{background:#e6e0ec}
+  .day.today{box-shadow:0 0 0 3px var(--leaf);background:#fff6d8}
+  .dtop{display:flex;justify-content:space-between;align-items:center} .dnum{font-weight:700;font-size:16px}
+  .cbox{width:22px;height:22px;border:2px solid var(--leaf);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--good);font-weight:700;background:#fffaf0}
+  .hname{font-size:11.5px;color:#6a3f95;font-weight:700;line-height:1.2} .dnote{font-size:11px;color:var(--muted);line-height:1.2}
+  .dayed{margin-top:10px;display:grid;gap:8px}
+  .holtab{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel)} .holtab th,.holtab td{border:1px solid var(--edge);padding:5px 7px;text-align:left;vertical-align:top} .holtab th{background:#e7eedc;font-family:Cinzel,serif}
+  @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
   #show[hidden]{display:none}
   #show img{max-width:96vw;max-height:80vh;border-radius:14px;border:3px solid #b8913f;box-shadow:0 0 40px rgba(233,196,106,.35)}
@@ -170,12 +216,14 @@
 <g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
 <g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg></div><h1>DUNGEON MASTER SERVICE</h1><p>Kampf · Generator · Szene</p>
   <div class="row"><button class="enter" id="enterSnd">Eintreten</button><button id="enterQuiet" class="sm">ohne Ton</button></div></div>
+<div id="view-fight" class="view" hidden>
 <header>
   <span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
 <g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
 <path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
 <g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
 <g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span>
+  <button data-hub="hub" title="Zur Übersicht">⌂</button>
   <span class="round">Runde <span id="roundNo">1</span></span>
   <button id="prev">&#9664; Zurück</button>
   <button id="next" class="pri">Nächster &#9654;</button>
@@ -185,7 +233,7 @@
   <label><input type="checkbox" id="skipDown" checked> Besiegte Monster überspringen</label>
   <button id="toGen">Kampfgenerator</button>
   <span class="sp"></span>
-  <button id="sndBtn" title="Startmelodie an/aus">🔊</button>
+  <button id="sndBtn" data-snd title="Startmelodie an/aus">🔊</button>
   <button id="newFight" class="danger">Neuer Kampf</button>
 </header>
 
@@ -208,6 +256,41 @@
     <section id="tab-party" hidden></section>
     <section id="tab-log" hidden></section>
   </aside>
+</div>
+</div>
+<div id="view-hub" class="view" hidden>
+  <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubhome"><div class="hubtree"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#7a5a1c" stroke="#7a5a1c" stroke-linecap="round"><circle cx="100" cy="112" r="104" fill="none" stroke-width="3"/>
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg></div>
+    <h1>DUNGEON MASTER SERVICE</h1><p class="hint">Wähle deinen Hub</p>
+    <div class="hubgrid">
+      <button class="hubcard" data-hub="fight"><span class="hi">⚔️</span><b>Fight Club</b><small>Kampftracker mit Initiative, Generator, Monsterbuch und Szene</small></button>
+      <button class="hubcard" data-hub="npc"><span class="hi">🧙</span><b>NPCFindr</b><small>NPCs mit Namen, Beschreibung und einer seltsamen Eigenart</small></button>
+      <button class="hubcard" data-hub="cal"><span class="hi">📅</span><b>Kalender</b><small>Kalender von Aetheria: Tage abhaken, Feiertage, Notizen</small></button>
+    </div></div>
+</div>
+<div id="view-npc" class="view" hidden>
+  <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage" id="npcBody"></div>
+</div>
+<div id="view-cal" class="view" hidden>
+  <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage" id="calBody"></div>
 </div>
 
 <div id="lb" hidden><div class="box"><div id="lbTitle" style="font-weight:700;color:var(--gold);font-family:Cinzel,serif;font-size:18px"></div>
@@ -247,7 +330,7 @@ var PARTY0=[['Alphonse',28,15,0],['Cassian',28,15,0],['Azrakar',28,15,0],['Franz
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); return true; }catch(e){ return false; } }
 function load(){ try{ var r=localStorage.getItem(KEY); if(r){ var o=JSON.parse(r); if(o&&o.combatants){ S=Object.assign(S,o); } } }catch(e){}
   if(!S.party||!S.party.length) S.party=PARTY0.map(function(p){return Object.assign({},p);});
-  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; }
+  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; if(!S.npcF) S.npcF={g:'m',race:'zufall',age:'jung'}; if(!S.npcs) S.npcs=[]; if(S.npcCur===undefined) S.npcCur=null; if(!S.cal) S.cal=calDefaults(); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function $(id){return document.getElementById(id);}
 function d(n){return Math.floor(Math.random()*n)+1;}
@@ -1538,6 +1621,193 @@ function renderScene(){
   $('tab-scene').innerHTML=h;
 }
 
+/* =================== HUBS =================== */
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender'};
+function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
+function showView(v,push){
+  ['hub','fight','npc','cal'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  document.body.className='v-'+v; S.view=v;
+  if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal();
+  window.scrollTo(0,0); save();
+}
+window.addEventListener('hashchange',function(){ var v=viewFromHash(); if(v!==S.view) showView(v,false); });
+
+/* =================== NPCFindr =================== */
+var RACES=[
+ ['mensch','Mensch'],['elf','Elf'],['zwerg','Zwerg'],['halbling','Halbling'],['gnom','Gnom'],['halbelf','Halbelf'],
+ ['halbork','Halbork'],['ork','Ork'],['tiefling','Tiefling'],['drache','Drachenblütiger'],['goliath','Goliath']];
+var GENDERS=[['m','Männlich','♂'],['w','Weiblich','♀'],['d','Divers','⚥']];
+var AGES=[['kind','Kind'],['jung','Jung'],['alt','Alt']];
+function L(s){ return s.split(','); }
+var NAMES={
+ mensch:{m:L('Aldric,Bertram,Cedric,Dorian,Edwin,Falk,Gerold,Henrik,Jorun,Lennart,Merten,Osric,Ruprecht,Anselm'),w:L('Adela,Brida,Cora,Elsbeth,Freya,Greta,Hedda,Ilse,Jolanda,Liesel,Mira,Rosalind,Wiebke,Agnes'),d:L('Ari,Kim,Robin,Sasha,Jo,Toni,Luca,Noa'),s:L('Brenner,Kornfeld,Mühlstein,Eichhorn,Hagedorn,Weidenbach,Rabenschlag,Silberhand,Steinmetz,Fuchsbau,Graukamm,Krähenfeld')},
+ elf:{m:L('Aerendil,Caelion,Elrovar,Faelar,Ithilon,Merethil,Saelwyn,Tharion,Valandor,Ylvorin,Nerion,Calaith'),w:L('Aelira,Elowen,Faelina,Ilyndra,Liraen,Naeris,Sylvara,Thalia,Ysolde,Vaelith,Myrrine,Seraphel'),d:L('Ael,Ilys,Faen,Riel,Sorin,Vae'),s:L('Mondflüster,Sternenlaub,Silberquell,Taufall,Blattsang,Lichtwind,Abendrot,Nebelhain,Sonnensaum,Weidenlied')},
+ zwerg:{m:L('Baldrin,Borgar,Dorgrim,Grundi,Haldor,Korbin,Morgrim,Rurik,Thorvald,Ulfgar,Brokk,Durnik'),w:L('Brunhild,Dagna,Eldrun,Gunnlaug,Helga,Ingrid,Kathra,Ragna,Sigrun,Thora,Wenna,Ylva'),d:L('Keld,Orm,Skarn,Bror'),s:L('Eisenfaust,Steinbart,Hammerschlag,Glutschmied,Felsenherz,Erzbrecher,Tiefgrund,Kupferkessel,Donnerbräu,Granitzahn')},
+ halbling:{m:L('Bodo,Fredo,Milo,Ruben,Tobi,Wendel,Kasimir,Bendix,Jasper,Ole'),w:L('Bella,Daisy,Elfie,Hanni,Lotti,Mimi,Nelli,Paula,Rosi,Tilda'),d:L('Pip,Kiki,Fynn,Juli'),s:L('Apfelbaum,Butterblume,Honigtopf,Kleefeld,Krümelbach,Pfeifenkraut,Sonnhang,Teekessel,Wiesengrund,Zuckerstein')},
+ gnom:{m:L('Fizzwick,Tinkel,Bobbin,Zirkon,Wimbel,Quibbel,Pötter,Sprocket'),w:L('Bibbel,Fenni,Glimmi,Nissa,Pimpa,Tilli,Zinnia,Wiggla'),d:L('Pim,Zipp,Klick,Fips'),s:L('Zahnradwerk,Funkenschlag,Glitzerkiesel,Kniffelbart,Federkiel,Sprungfeder,Messingknopf,Tüftelstein')},
+ halbork:{m:L('Brug,Grosh,Hrok,Mordak,Thokk,Urzul,Varg,Zug'),w:L('Grasha,Hulga,Kansa,Murra,Ovka,Shura,Vola,Yeva'),d:L('Rokh,Ush,Kar'),s:L('Narbenfaust,Eisenhauer,Blutfels,Brenner,Steinmetz,Hagedorn')},
+ ork:{m:L('Grimzag,Uthrak,Krogg,Morzul,Bargash,Draknar,Shagrol,Zurk'),w:L('Gorza,Mukra,Shazra,Yazga,Ulra,Krisha,Bolga,Nazra'),d:L('Grak,Uzz,Mok'),s:L('Schädelspalter,Grollzahn,Aschenbrut,Felsbrecher,Knochensammler,Rotauge')},
+ tiefling:{m:L('Azrel,Kallos,Malvor,Nazir,Raziel,Valek,Xarion,Zeph'),w:L('Aziza,Lilith,Orianna,Seraphine,Vexa,Zarya,Mordessa,Ilvara'),d:L('Asche,Gnade,Sehnsucht,Zweifel,Glut,Schweigen,Hoffnung'),s:L('')},
+ drache:{m:L('Draxis,Toraxx,Valgor,Rhazun,Szorrak,Morthrax,Kaltharr,Vorrun'),w:L('Vyrra,Thessa,Zethra,Kaliya,Rhessa,Ixara,Sahrin,Jhessa'),d:L('Raz,Skarr,Thyx'),s:L('vom Clan Glutschwinge,vom Clan Sturmschuppe,vom Clan Rotfang,vom Clan Ascheklaue,vom Clan Frosthorn')},
+ goliath:{m:L('Gorrath,Kavak,Thalgar,Orun,Brakka,Maukar'),w:L('Ghara,Nalla,Veya,Thuna,Kethra,Ilvaa'),d:L('Kova,Tauk,Vann'),s:L('Felsenläufer,Gipfelwacht,Wolkenspringer,Steinwerfer,Lawinenhorch,Bergrufer')}
+};
+var RFEAT={
+ mensch:['hat sonnengegerbte Haut','trägt einen geflochtenen Zopf','hat eine Zahnlücke, die beim Lächeln auffällt','hat Sommersprossen bis über die Ohren'],
+ elf:['hat spitze Ohren mit silbernen Ohrringen','hat Augen in der Farbe von jungem Laub','bewegt sich lautlos wie ein Schatten','hat Haar, das im Mondlicht leicht schimmert'],
+ zwerg:['trägt einen kunstvoll geflochtenen Bart mit Messingperlen','hat Hände voller alter Brandnarben','riecht nach Kohle und Bier','hat eine Nase wie ein knorriger Fels'],
+ halbling:['hat lockige Haare und keine Schuhe an','hat stets Krümel am Kragen','hat rosige Pausbacken','hat auffallend große, behaarte Füße'],
+ gnom:['trägt eine Schutzbrille mit drei Linsen','hat ein Büschel weißer Haare, das in alle Richtungen absteht','hat ölverschmierte Finger','hat riesige, neugierige Augen'],
+ halbelf:['hat leicht spitze Ohren unter den Haaren versteckt','hat ein elfisches und ein menschliches Augenleuchten','wirkt jünger, als die Jahre vermuten lassen','trägt Kleidung aus zwei Welten'],
+ halbork:['hat kleine Hauer, die über die Lippe ragen','hat grünlich-graue Haut voller Narben','ist breitschultrig wie ein Kleiderschrank','hat ein überraschend sanftes Lächeln'],
+ ork:['hat mächtige Hauer mit eingeritzten Mustern','trägt Kriegsbemalung aus Asche','hat ein abgekautes Ohr','ist mit Trophäenketten behängt'],
+ tiefling:['hat geschwungene Hörner mit Goldringen','hat einen Schwanz, der nervös zuckt','hat Augen ohne Pupillen, glühend wie Kohlen','hat Haut in der Farbe von dunklem Wein'],
+ drache:['hat bronzefarbene Schuppen, die in der Sonne blitzen','stößt beim Lachen kleine Rauchwölkchen aus','hat einen Hornkamm voller Kerben','hat goldene Reptilienaugen'],
+ goliath:['überragt alle um mindestens einen Kopf','hat Haut mit dunklen, steinartigen Flecken','trägt Tätowierungen, die Siege erzählen','hat Hände so groß wie Schaufeln']
+};
+var FEAT=['trägt einen viel zu großen Hut','hat eine auffällige Narbe quer über der Wange','trägt nur Schwarz','ist überraschend elegant gekleidet','hat zerschlissene, oft geflickte Kleidung','trägt einen Mantel voller Taschen','hat tintenfleckige Finger','hat ein Glasauge','hinkt leicht','duftet stark nach Lavendel','hat eine heisere Stimme','trägt einen Ring an jedem Finger','hat ein Muttermal in Form eines Halbmonds','trägt einen zahmen Raben auf der Schulter','hat einen auffälligen Silberzahn','trägt eine Augenklappe, obwohl beide Augen gesund sind'];
+var DEMEANOR=['spricht leise und wählt jedes Wort mit Bedacht','redet ununterbrochen und springt von Thema zu Thema','ist misstrauisch gegenüber allen Fremden','lacht über die eigenen Witze am lautesten','ist übertrieben höflich','wirkt ständig gehetzt','ist herzlich und lädt jeden zum Essen ein','prahlt gern mit erfundenen Heldentaten','ist mürrisch, aber hilfsbereit','beobachtet alles mit wachem Blick','ist abergläubisch und sieht überall Zeichen','flüstert gerne Gerüchte weiter','ist tollpatschig und entschuldigt sich ständig','gibt sich geheimnisvoll','ist begeisterungsfähig wie ein Kind','ist ehrlich bis zur Unhöflichkeit'];
+var JOB={
+ kind:['hilft in der Backstube','läuft Botengänge für die Händler am Markt','hütet die Ziegen am Dorfrand','bettelt am Stadttor','geht in der Schmiede in die Lehre','fängt Ratten für ein paar Kupferstücke','verkauft Blumen an Reisende','singt auf dem Marktplatz für Münzen','sammelt Kräuter für die Heilerin','stiehlt in den Gassen, was nicht festgenagelt ist'],
+ jung:['arbeitet in der Schmiede','dient in der Stadtwache','verkauft Kräuter auf dem Markt','spielt Laute auf den Märkten und zieht von Stadt zu Stadt','lernt bei einem schrulligen Magier','arbeitet als Schankkraft in der Taverne','verdingt sich als Schwert zur Miete','schreibt Briefe für Leute, die nicht lesen können','bereitet sich im Tempel auf die Weihe vor','zieht als Händler mit einem Eselskarren umher','bringt mit der Fähre Reisende über den Fluss','jagt im Wald und verkauft Felle'],
+ alt:['führt seit Jahrzehnten eine kleine Taverne','sitzt im Ältestenrat und schlichtet jeden Streit','hütet die Bibliothek des Tempels','ist im Ruhestand und erzählt jedem von alten Kriegen','heilt mit zittrigen, aber sicheren Händen','führt einen Kramladen voller merkwürdiger Dinge','fährt seit fünfzig Jahren jeden Morgen zum Fischen hinaus','erzählt gern, früher selbst auf Abenteuer gezogen zu sein','zeichnet Karten, die nie ganz stimmen','braut das beste Bier der Gegend','lebt allein in einer Hütte am Waldrand']
+};
+var MOTIVE=['will genug Gold für eine eigene Werkstatt sparen','sucht ein verschollenes Familienmitglied','will eine alte Schuld begleichen','träumt davon, das Meer zu sehen','will Rache an einem Adligen','sucht jemanden, der eine alte Karte lesen kann','will den eigenen Namen reinwaschen','möchte einfach nur in Ruhe gelassen werden','sammelt Geschichten über die Gärtner Gaias','will in einen Orden aufgenommen werden','sucht ein Heilmittel für ein krankes Tier','will herausfinden, was hinter dem Leuchten im Wald steckt','will den eigenen Laden vor der Diebesgilde schützen','hofft, eines Tages Abenteurer zu werden','will ein Versprechen einlösen, das vor Jahren gegeben wurde'];
+var MOTIVE_KID=['will unbedingt ein echtes Schwert halten','sucht die entlaufene Katze','will beweisen, dass es Drachen gibt','möchte in die Gruppe der Helden aufgenommen werden','hat ein Geheimnis entdeckt und platzt fast'];
+var QUIRK=['zählt alles, was in Dreiergruppen vorkommt, laut mit','redet mit einem Löffel namens „Herr Rührwerk“','niest jedes Mal, wenn jemand lügt','kann jedes Tier am Geruch erkennen','sammelt Zähne und weigert sich zu sagen, von wem','spricht rückwärts, sobald es brenzlig wird','hat panische Angst vor Schmetterlingen','summt immer dieselbe Melodie, die niemand kennt','bespricht wichtige Entscheidungen mit einem Kieselstein','kann im Dunkeln etwas besser sehen, seit einem Blitzschlag','schläft grundsätzlich im Stehen','hat ein Gedächtnis für jedes Gesicht, aber keinen einzigen Namen','glaubt fest, in einem früheren Leben eine Ziege gewesen zu sein','isst nur Dinge, die rund sind','schreibt jedem Gast ein kurzes Gedicht','spricht fließend eine Sprache, die es nicht mehr gibt','sieht im Spiegel manchmal eine andere Person','bewahrt einen getrockneten Finger in einer Dose auf','kann Wetteränderungen in den Knien spüren, auf die Stunde genau','vergibt jedem Gegenstand einen Namen','lacht bei Beerdigungen und weint bei Hochzeiten','riecht immer leicht nach Gewitter','hat nie geschlafen, soweit sich jemand erinnern kann','besitzt eine Katze, die angeblich sprechen kann (sie tut es nur nicht vor Zeugen)','spricht über sich nur in der dritten Person','trägt immer Handschuhe, auch im Hochsommer','hat ein unheimliches Talent, verlorene Dinge zu finden','kann jeden Akzent perfekt nachmachen','weigert sich, über Brücken zu gehen','beginnt jede Unterhaltung mit einer Wettervorhersage','hat einen Schatten, der manchmal einen Moment zu spät folgt','sammelt Abschiedsbriefe von Fremden','bekommt beim Lügen knallrote Ohren','pfeift beim Nachdenken ein Lied der Gärtner','hat Angst vor dem eigenen Spiegelbild','trinkt Tee aus einem polierten Totenschädel','hört angeblich die Bäume flüstern','führt ein Tagebuch über jeden Fremden, der vorbeikommt','kann sich an jedes Gespräch wörtlich erinnern','verschenkt jedem neuen Bekannten eine Münze aus fremden Ländern'];
+var QUIRK_KID=['hat einen unsichtbaren Freund, der angeblich ein Drache ist','sammelt Käfer in einer Streichholzschachtel','kennt jeden Schleichweg der Stadt','kann beeindruckend laut pfeifen','glaubt, alle Erwachsenen seien verkleidete Gnome'];
+var AGEADJ={kind:'Kind',jung:'Jung',alt:'Alt'};
+function rndOf(a){ return a[Math.floor(Math.random()*a.length)]; }
+function npcName(race,g){
+  var src=race==='halbelf'?(Math.random()<0.5?'mensch':'elf'):race, N=NAMES[src], pool=N[g]&&N[g].length?N[g]:N[Math.random()<0.5?'m':'w'];
+  if(g==='d'&&Math.random()<0.4) pool=N[Math.random()<0.5?'m':'w'];
+  var first=rndOf(pool), sur=rndOf(NAMES[race==='halbelf'?rndOf(['mensch','elf']):race].s).trim();
+  if(race==='tiefling'&&g!=='d'&&Math.random()<0.5) first=rndOf(N.d);
+  return sur?(sur.indexOf('vom ')===0?first+' '+sur:first+' '+sur):first;
+}
+function npcDesc(n){
+  var first=n.name.split(' ')[0], f1=rndOf(RFEAT[n.race]), f2=rndOf(FEAT.filter(function(x){return x!==f1;}));
+  var job=rndOf(JOB[n.age]), dem=rndOf(DEMEANOR), mot=rndOf(n.age==='kind'?MOTIVE_KID.concat(MOTIVE.slice(0,4)):MOTIVE);
+  if(f2.split(' ')[0]===f1.split(' ')[0]) f2=f2.split(' ').slice(1).join(' ');
+  var mw=mot.split(' '), verb=mw.shift();
+  return first+' '+f1+' und '+f2+'. '+first+' '+job+' und '+dem+'. Insgeheim '+verb+' '+first+' '+mw.join(' ')+'.';
+}
+function npcQuirk(n){ return rndOf(n.age==='kind'?QUIRK.concat(QUIRK_KID,QUIRK_KID):QUIRK); }
+function genNpc(){
+  var f=S.npcF, race=f.race==='zufall'?rndOf(RACES)[0]:f.race, age=f.age==='zufall'?rndOf(AGES)[0]:f.age;
+  var n={id:'n'+Date.now()+Math.floor(Math.random()*999),g:f.g,race:race,age:age}; n.name=npcName(race,f.g); n.desc=npcDesc(n); n.quirk=npcQuirk(n); n.notes='';
+  S.npcCur=n; save(); renderNpc();
+}
+function raceName(k){ return (RACES.find(function(r){return r[0]===k;})||[0,k])[1]; }
+function genderName(k){ return (GENDERS.find(function(r){return r[0]===k;})||[0,k])[1]; }
+function npcText(n){ return n.name+' ('+raceName(n.race)+', '+AGEADJ[n.age]+', '+genderName(n.g)+')\n'+n.desc+'\nEigenart: '+n.quirk+(n.notes?'\nNotizen: '+n.notes:''); }
+function npcCardHtml(n,saved){
+  var key='n:'+n.id, src=S.images[key];
+  return '<div class="npc'+(saved?' saved':'')+'" data-nid="'+n.id+'"><div class="npchead"><button class="ava big" data-act="npcimg" data-nid="'+n.id+'" title="Porträt">'+(src?'<img src="'+src+'" alt="">':'<span>🧙</span>')+'</button>'+
+    '<div style="flex:1;min-width:0"><input class="name npcname" value="'+esc(n.name)+'" data-nf="name" data-nid="'+n.id+'" title="Name ändern">'+
+    '<div class="hint">'+esc(raceName(n.race))+' · '+AGEADJ[n.age]+' · '+genderName(n.g)+'</div></div></div>'+
+    '<div class="npcsec"><div class="lab">Beschreibung '+(saved?'':'<button class="sm" data-act="npcre" data-w="desc" title="Neu würfeln">↻</button>')+'</div><div>'+esc(n.desc)+'</div></div>'+
+    '<div class="npcsec quirk"><div class="lab">✦ Eigenart '+(saved?'':'<button class="sm" data-act="npcre" data-w="quirk" title="Neu würfeln">↻</button>')+'</div><div>'+esc(n.quirk)+'</div></div>'+
+    (saved?'<textarea class="npcnotes" data-nf="notes" data-nid="'+n.id+'" placeholder="Notizen (wo getroffen, was erzählt …)">'+esc(n.notes||'')+'</textarea>':'')+
+    '<div class="row" style="margin-top:8px">'+(saved?'':'<button class="sm" data-act="npcre" data-w="name">↻ Name</button><button class="sm pri" data-act="npcsave">★ Merken</button>')+
+    '<button class="sm" data-act="npccopy" data-nid="'+n.id+'">Kopieren</button>'+(saved?'<button class="sm danger" data-act="npcdel" data-nid="'+n.id+'">✕ Löschen</button>':'')+'</div></div>';
+}
+function renderNpc(){
+  var f=S.npcF;
+  var h='<div class="hubtitle"><span>🧙</span> NPCFindr</div><div class="npcwrap"><div class="panel">'+
+    '<div class="lab">Geschlecht</div><div class="seg three">'+GENDERS.map(function(g){return '<button class="'+(f.g===g[0]?'on':'')+'" data-act="npcg" data-g="'+g[0]+'">'+g[2]+' '+g[1]+'</button>';}).join('')+'</div>'+
+    '<div class="row" style="margin-top:8px"><label class="lab" style="flex:1">Volk<br><select id="npcRace" style="width:100%"><option value="zufall">🎲 Zufall</option>'+RACES.map(function(r){return '<option value="'+r[0]+'"'+(f.race===r[0]?' selected':'')+'>'+r[1]+'</option>';}).join('')+'</select></label>'+
+    '<label class="lab" style="flex:1">Alter<br><select id="npcAge" style="width:100%"><option value="zufall">🎲 Zufall</option>'+AGES.map(function(a){return '<option value="'+a[0]+'"'+(f.age===a[0]?' selected':'')+'>'+a[1]+'</option>';}).join('')+'</select></label></div>'+
+    '<button class="pri big" id="npcGo">✨ NPC finden</button></div>'+
+    (S.npcCur?npcCardHtml(S.npcCur,false):'<div class="empty">Wähle Geschlecht, Volk und Alter und tippe auf „NPC finden“.</div>')+'</div>'+
+    '<h3>Gemerkte NPCs ('+S.npcs.length+')</h3>'+(S.npcs.length?'<input id="npcSearch" placeholder="Suchen …" value="'+esc(npcQ)+'" style="width:100%;margin-bottom:8px"><div class="npclist">'+
+      S.npcs.filter(function(n){ return !npcQ||norm(npcText(n)).indexOf(norm(npcQ))>=0; }).slice().reverse().map(function(n){return npcCardHtml(n,true);}).join('')+'</div>':'<div class="hint">Noch keine. Mit „★ Merken“ landet ein NPC hier, mit Platz für Notizen.</div>');
+  $('npcBody').innerHTML=h;
+}
+var npcQ='';
+function findNpc(id){ if(S.npcCur&&S.npcCur.id===id) return S.npcCur; return S.npcs.find(function(n){return n.id===id;}); }
+
+/* =================== Kalender von Aetheria =================== */
+var CAL_DAYS=['Wurzeltag','Stammtag','Zweigtag','Blatttag','Kronentag'];
+var CAL_MONTHS=[
+ ['Humara','Die Gärtnerin der Erde','Sie lockerte den kahlen Fels zu fruchtbarem Boden.'],
+ ['Undor','Der Gärtner des Wassers','Er grub Quellen, Flüsse und Seen und tränkte das Land.'],
+ ['Lumena','Die Gärtnerin des Lichts','Sie entzündete die Sonne, damit alles wachsen kann.'],
+ ['Semion','Der Gärtner der Saat','Er streute die ersten Samen über ganz Aetheria.'],
+ ['Ventra','Die Gärtnerin der Winde','Sie schickte Wind und Wolken und trug Pollen und Regen weit hinaus.'],
+ ['Floriel','Die Gärtnerin der Blüten','Sie ließ die Welt zum ersten Mal erblühen.'],
+ ['Faunar','Der Gärtner der Geschöpfe','Er weckte die Tiere in Wald, Wasser und Himmel.'],
+ ['Pomaris','Die Gärtnerin der Früchte','Sie ließ die Früchte reifen und schenkte die erste Ernte.'],
+ ['Morvan','Der Gärtner des Welkens','Er lehrte, dass alles vergeht, um neu zu wachsen.'],
+ ['Gaia','Die Mutter allen Lebens','Sie selbst pflanzte den Baum, der Aetheria zusammenhält.']];
+function ck(y,m,d){ return y+'-'+m+'-'+d; }
+function hk(m,d){ return m+'-'+d; }
+function calDefaults(){ return {year:1,view:0,today:{y:1,m:0,d:1},checked:{},notes:{},hol:{},sel:null}; }
+function renderCal(){
+  var C=S.cal, m=C.view, y=C.year, M=CAL_MONTHS[m], done=0;
+  for(var d0=1;d0<=30;d0++) if(C.checked[ck(y,m,d0)]) done++;
+  var t=C.today, tdName=CAL_DAYS[(t.d-1)%5];
+  var h='<div class="hubtitle"><span>📅</span> Kalender von Aetheria</div>'+
+   '<div class="calbar panel"><div class="today">Heute: <b>'+tdName+', '+t.d+'. '+CAL_MONTHS[t.m][0]+'</b> im Jahr '+t.y+'</div>'+
+   '<div class="row" style="margin:6px 0 0"><button class="pri" data-act="calnext">✔ Tag abhaken &amp; weiter</button><button class="sm" data-act="calgotoday">Zu heute</button></div></div>'+
+   '<div class="row calnav"><button data-act="calyear" data-d="-1">◀◀</button><span class="yr">Jahr <input type="number" id="calYear" value="'+y+'" style="width:70px;text-align:center"></span><button data-act="calyear" data-d="1">▶▶</button></div>'+
+   '<div class="mchips">'+CAL_MONTHS.map(function(mm,i){ var c=0; for(var dd=1;dd<=30;dd++) if(C.checked[ck(y,i,dd)]) c++;
+      return '<button class="'+(i===m?'on':'')+(t.y===y&&t.m===i?' cur':'')+'" data-act="calm" data-i="'+i+'"><b>'+(i+1)+'</b> '+mm[0]+'<i style="width:'+Math.round(c/30*100)+'%"></i></button>'; }).join('')+'</div>'+
+   '<div class="mhead"><div class="mname">'+(m+1)+'. Monat – '+M[0]+'</div><div class="hint"><i>'+M[1]+'.</i> '+M[2]+'</div><div class="hint">'+done+' von 30 Tagen abgehakt</div></div>'+
+   '<div class="calgrid">'+CAL_DAYS.map(function(dn){return '<div class="dn">'+dn+'</div>';}).join('');
+  for(var d=1;d<=30;d++){ var key=ck(y,m,d), hol=C.hol[hk(m,d)], note=C.notes[key], isT=(t.y===y&&t.m===m&&t.d===d), sel=C.sel===d;
+    h+='<div class="day'+(C.checked[key]?' done':'')+(hol?' hol':'')+(isT?' today':'')+(sel?' sel':'')+'" data-act="calday" data-d="'+d+'">'+
+      '<div class="dtop"><span class="dnum">'+d+'</span><span class="cbox" data-act="calcheck" data-d="'+d+'">'+(C.checked[key]?'✔':'')+'</span></div>'+
+      (hol?'<div class="hname">✦ '+esc(hol.n)+'</div>':'')+(note?'<div class="dnote">✎ '+esc(note)+'</div>':'')+'</div>'; }
+  h+='</div>';
+  if(C.sel){ var sd=C.sel, sk=ck(y,m,sd), sh=C.hol[hk(m,sd)]||{n:'',b:''};
+    h+='<div class="panel dayed"><div class="lab">'+CAL_DAYS[(sd-1)%5]+', '+sd+'. '+M[0]+' im Jahr '+y+'</div>'+
+      '<label class="lab">Feiertag (jedes Jahr)<input id="calHolN" value="'+esc(sh.n)+'" placeholder="z. B. Fest der ersten Saat" style="width:100%"></label>'+
+      '<label class="lab">Bedeutung<textarea id="calHolB" rows="2" style="width:100%" placeholder="Bräuche, Bedeutung …">'+esc(sh.b||'')+'</textarea></label>'+
+      '<label class="lab">Notiz nur für dieses Jahr<textarea id="calNote" rows="2" style="width:100%" placeholder="z. B. Die Gruppe erreicht Undorheim">'+esc(C.notes[sk]||'')+'</textarea></label>'+
+      '<div class="row"><button class="pri sm" data-act="calsave">Speichern</button><button class="sm" data-act="calsettoday">Als „Heute“ setzen</button><button class="sm" data-act="calclose">Schließen</button></div></div>'; }
+  var hols=[]; for(var d2=1;d2<=30;d2++){ var hh=C.hol[hk(m,d2)]; if(hh) hols.push([d2,hh]); }
+  h+='<h3>Feste im '+M[0]+'</h3>'+(hols.length?'<table class="holtab"><tr><th>Tag</th><th>Feiertag</th><th>Bedeutung</th></tr>'+hols.map(function(x){return '<tr><td>'+x[0]+'. ('+CAL_DAYS[(x[0]-1)%5]+')</td><td><b>'+esc(x[1].n)+'</b></td><td>'+esc(x[1].b||'')+'</td></tr>';}).join('')+'</table>':'<div class="hint">Noch keine Feiertage. Tippe auf einen Tag, um einen einzutragen.</div>')+
+   '<details style="margin-top:12px"><summary class="hint">Die Monate – die Gärtner Gaias</summary><table class="holtab">'+CAL_MONTHS.map(function(x,i){return '<tr><td>'+(i+1)+'</td><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+x[2]+'</td></tr>';}).join('')+'</table>'+
+   '<div class="hint" style="margin-top:6px">Wochentage: '+CAL_DAYS.join(' · ')+' (vom Wurzeltag bis zur Krone). 300 Tage im Jahr, jeder Monat beginnt mit einem Wurzeltag.</div></details>';
+  $('calBody').innerHTML=h;
+}
+function calAdvance(){ var C=S.cal, t=C.today; C.checked[ck(t.y,t.m,t.d)]=true; t.d++; if(t.d>30){ t.d=1; t.m++; if(t.m>9){ t.m=0; t.y++; } }
+  C.year=t.y; C.view=t.m; var hol=C.hol[hk(t.m,t.d)]; toast('Neuer Tag: '+CAL_DAYS[(t.d-1)%5]+', '+t.d+'. '+CAL_MONTHS[t.m][0]+(hol?' · ✦ '+hol.n:'')); }
+
+/* Hub-Ereignisse */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-hub],[data-act]'); if(!t) return;
+  if(t.dataset.hub){ showView(t.dataset.hub); return; }
+  var a=t.dataset.act, C=S.cal;
+  switch(a){
+    case 'npcg': S.npcF.g=t.dataset.g; save(); renderNpc(); break;
+    case 'npcre': { var n=S.npcCur; if(!n) break; if(t.dataset.w==='name') n.name=npcName(n.race,n.g); else if(t.dataset.w==='desc') n.desc=npcDesc(n); else n.quirk=npcQuirk(n); save(); renderNpc(); break; }
+    case 'npcsave': if(S.npcCur&&!S.npcs.some(function(x){return x.id===S.npcCur.id;})){ S.npcs.push(JSON.parse(JSON.stringify(S.npcCur))); var k1='n:'+S.npcCur.id; save(); toast(S.npcCur.name+' gemerkt.'); renderNpc(); } break;
+    case 'npcdel': { var id=t.dataset.nid; S.npcs=S.npcs.filter(function(x){return x.id!==id;}); delete S.images['n:'+id]; save(); renderNpc(); break; }
+    case 'npccopy': { var nn=findNpc(t.dataset.nid); if(nn){ try{ navigator.clipboard.writeText(npcText(nn)).then(function(){ toast('Kopiert.'); },function(){ toast('Kopieren nicht möglich.'); }); }catch(err){ toast('Kopieren nicht möglich.'); } } break; }
+    case 'npcimg': { var n2=findNpc(t.dataset.nid); if(n2){ var p='portrait of '+n2.name+', '+({mensch:'human',elf:'elf',zwerg:'dwarf',halbling:'halfling',gnom:'gnome',halbelf:'half-elf',halbork:'half-orc',ork:'orc',tiefling:'tiefling',drache:'dragonborn',goliath:'goliath'}[n2.race])+', '+({m:'man',w:'woman',d:'androgynous person'}[n2.g])+', '+({kind:'child',jung:'young',alt:'elderly'}[n2.age])+', fantasy townsfolk character';
+        openLb('n:'+n2.id,n2.name,p); } break; }
+    case 'calm': C.view=parseInt(t.dataset.i,10); C.sel=null; save(); renderCal(); break;
+    case 'calyear': C.year=Math.max(1,C.year+parseInt(t.dataset.d,10)); C.sel=null; save(); renderCal(); break;
+    case 'calcheck': { e.stopPropagation(); var k=ck(C.year,C.view,parseInt(t.dataset.d,10)); if(C.checked[k]) delete C.checked[k]; else C.checked[k]=true; save(); renderCal(); return; }
+    case 'calday': C.sel=parseInt(t.dataset.d,10); save(); renderCal(); var de=document.querySelector('.dayed'); if(de&&de.scrollIntoView) de.scrollIntoView({behavior:'smooth',block:'nearest'}); break;
+    case 'calclose': C.sel=null; save(); renderCal(); break;
+    case 'calsave': { var hn=$('calHolN').value.trim(), hb=$('calHolB').value.trim(), nt=$('calNote').value.trim(), kk=ck(C.year,C.view,C.sel), hkk=hk(C.view,C.sel);
+      if(hn) C.hol[hkk]={n:hn,b:hb}; else delete C.hol[hkk]; if(nt) C.notes[kk]=nt; else delete C.notes[kk]; C.sel=null; save(); renderCal(); toast('Gespeichert.'); break; }
+    case 'calsettoday': C.today={y:C.year,m:C.view,d:C.sel}; C.sel=null; save(); renderCal(); break;
+    case 'calnext': calAdvance(); save(); renderCal(); break;
+    case 'calgotoday': C.year=C.today.y; C.view=C.today.m; C.sel=null; save(); renderCal(); break;
+  }
+});
+document.addEventListener('change',function(e){ var t=e.target;
+  if(t.id==='npcRace'){ S.npcF.race=t.value; save(); } if(t.id==='npcAge'){ S.npcF.age=t.value; save(); }
+  if(t.dataset.nf){ var n=findNpc(t.dataset.nid); if(n){ n[t.dataset.nf]=t.value; var s2=S.npcs.find(function(x){return x.id===n.id;}); if(s2&&s2!==n) s2[t.dataset.nf]=t.value; save(); } }
+  if(t.id==='calYear'){ S.cal.year=Math.max(1,parseInt(t.value,10)||1); save(); renderCal(); }
+});
+document.addEventListener('input',function(e){ if(e.target.id==='npcSearch'){ npcQ=e.target.value; var pos=e.target.selectionStart; renderNpc(); var s=$('npcSearch'); if(s){ s.focus(); try{ s.setSelectionRange(pos,pos); }catch(x){} } } });
+document.addEventListener('click',function(e){ if(e.target.id==='npcGo') genNpc(); });
+
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
   var t=e.target.closest('[data-act],[data-tab]'); if(!t) return;
@@ -1671,12 +1941,12 @@ function playMelody(){
     setTimeout(function(){ try{ ac.close(); }catch(e){} },9000);
   }catch(e){}
 }
-function sndIcon(){ $('sndBtn').textContent=S.sound===false?'🔇':'🔊'; }
+function sndIcon(){ [].forEach.call(document.querySelectorAll('[data-snd]'),function(b){ b.textContent=S.sound===false?'🔇':'🔊'; }); }
 function enter(withSound){ var sp=$('splash'); if(withSound){ S.sound=true; playMelody(); } else S.sound=false; save(); sndIcon(); sp.classList.add('out'); setTimeout(function(){ sp.style.display='none'; },950); }
 $('enterSnd').addEventListener('click',function(){ enter(true); });
 $('enterQuiet').addEventListener('click',function(){ enter(false); });
-$('sndBtn').addEventListener('click',function(){ S.sound=S.sound===false; if(S.sound) playMelody(); sndIcon(); save(); });
-load(); render(); sndIcon(); if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
+document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-snd]')){ S.sound=S.sound===false; if(S.sound) playMelody(); sndIcon(); save(); } });
+load(); render(); showView(viewFromHash(),false); sndIcon(); if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
 window.__kt={state:function(){return S;},sorted:sorted};
 })();
 </script>
