@@ -213,6 +213,40 @@
   .aibox{margin-top:10px;border-left:6px solid #8a6fae} .aitext{line-height:1.6;font-style:italic;margin-top:6px}
   .showtxt.lshow{letter-spacing:0;font-family:"Alegreya Sans",sans-serif;font-size:clamp(16px,2.6vw,24px);text-align:left;max-height:84vh;overflow:auto}
   .showtxt.lshow .rnum,.showtxt.lshow .rtitle{color:#e9c46a} .showtxt.lshow .hint{color:#cbb88f}
+  .hubpage.wide{max-width:1180px}
+  .clist{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+  .ccard{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--edge);border-left:6px solid var(--hero);border-radius:12px;padding:10px;cursor:pointer;box-shadow:0 2px 6px rgba(90,60,20,.12)}
+  .ccard:hover{border-color:var(--gold)} .ccn{font-family:Cinzel,serif;font-size:17px;font-weight:700;color:#4a3410}
+  .cmini{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:14px} .cmini .warn{color:var(--bad);font-weight:700}
+  .cflag{background:#fbefd2;border:1px solid var(--warn);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:14px}
+  .sheet{background:var(--panel);border:2px solid var(--edge);border-radius:14px;padding:12px;box-shadow:0 3px 10px rgba(90,60,20,.15)}
+  .shtop{display:flex;gap:12px;align-items:flex-start} .cname{font-family:Cinzel,serif;font-size:22px!important;width:100%}
+  .cgrid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:6px}
+  .cf{display:flex;flex-direction:column;gap:2px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .cf input,.cf select,.cf textarea{text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink);font-size:14.5px;width:100%}
+  .cf.wide{margin-top:8px}
+  .cstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:6px;margin:12px 0}
+  .sbox{background:#fffaf0;border:2px solid var(--edge);border-radius:10px;padding:6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .sbox>span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .sbox b{font-size:24px;font-family:Cinzel,serif;color:#4a3410} .sbox>input{width:70px;text-align:center;font-size:20px;font-weight:700}
+  .sbox.big{border-color:var(--gold);border-radius:14px 14px 40px 40px} .sbox small{font-size:11px;color:var(--muted)} .sbox small input{font-size:12px;padding:1px 3px}
+  .sbox.hp{grid-column:span 2} .hpr{display:flex;align-items:center;gap:4px} .hpr input{width:62px;text-align:center;font-size:20px;font-weight:700}
+  .sbox.mini{padding:4px 10px} .sbox.mini b{font-size:18px}
+  .dsr{display:flex;gap:4px;align-items:center;font-size:13px} .pip.bad{border-color:var(--bad)} .pip.bad.used{background:var(--bad)}
+  .insp{font-size:22px;min-height:30px;padding:0 10px} .insp.on{background:#7a5216;color:#e9c46a}
+  .sbox small{max-width:100%} .sbox small input{max-width:100%;box-sizing:border-box} .sbox.big small input{width:100%;text-align:center}
+  @media(max-width:600px){.shtop{flex-direction:column;align-items:stretch}.shtop .ava{align-self:center}.cgrid4{grid-template-columns:1fr 1fr}}
+  .ccols{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:12px} @media(max-width:820px){.ccols{grid-template-columns:1fr}.sbox.hp{grid-column:span 1}}
+  .cabs{display:grid;gap:8px;align-content:start}
+  .abox{border:2px solid var(--edge);border-radius:10px;background:#fffaf0;overflow:hidden}
+  .ahead{display:flex;align-items:center;gap:8px;background:#efe4c8;padding:4px 8px;border-bottom:1px solid var(--edge)} .ahead>div:first-child{flex:1;font-family:Cinzel,serif;color:#4a3410}
+  .amod{font-family:Cinzel,serif;font-size:22px;font-weight:700;color:#4a3410;min-width:38px;text-align:center} .ascore{width:52px;text-align:center}
+  .arow{display:flex;align-items:center;gap:8px;padding:3px 8px;font-size:14px;border-top:1px dotted #e0cda4} .arow span:nth-child(2){flex:1} .arow.sv{font-weight:700}
+  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold);cursor:pointer;flex:0 0 14px} .dot.on{background:var(--gold)} .dot.exp{background:#7a5216;border-color:#7a5216;border-radius:3px;transform:rotate(45deg)}
+  .csec{background:#fffaf0;border:1px solid var(--edge);border-radius:10px;padding:8px 10px;margin-bottom:10px} .ctitle{font-family:Cinzel,serif;font-weight:700;color:#4a3410;margin-bottom:6px}
+  .wtab{width:100%;border-collapse:collapse;font-size:13px} .wtab th{text-align:left;font-size:10.5px;text-transform:uppercase;color:var(--muted);padding:2px} .wtab td{padding:2px} .wtab input{width:100%;font-size:13.5px;padding:3px 4px}
+  @media(max-width:600px){.wtab th:nth-child(5),.wtab td:nth-child(5){display:none}}
+  .slots{display:grid;gap:4px;margin:8px 0} .slot{display:flex;align-items:center;gap:8px;font-size:13px} .slot>span:first-child{min-width:56px;color:var(--muted)}
   @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
   #show[hidden]{display:none}
@@ -297,6 +331,7 @@
     <h1>DUNGEON MASTER SERVICE</h1><p class="hint">Wähle deinen Hub</p>
     <div class="hubgrid">
       <button class="hubcard" data-hub="fight"><span class="hi">⚔️</span><b>Fight Club</b><small>Kampftracker mit Initiative, Generator, Monsterbuch und Szene</small></button>
+      <button class="hubcard" data-hub="char"><span class="hi">🛡️</span><b>Charakteristico</b><small>Die Charakterbögen der Gruppe im 5.5e-Stil</small></button>
       <button class="hubcard" data-hub="npc"><span class="hi">🧙</span><b>NPCFindr</b><small>NPCs mit Namen, Beschreibung und einer seltsamen Eigenart</small></button>
       <button class="hubcard" data-hub="cal"><span class="hi">📅</span><b>Kalender</b><small>Kalender von Aetheria: Tage abhaken, Feiertage, Notizen</small></button>
       <button class="hubcard" data-hub="quest"><span class="hi">📜</span><b>Questmaster</b><small>Quests und Rätsel auf Knopfdruck</small></button>
@@ -326,6 +361,14 @@
 <g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
 <g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
   <div class="hubpage" id="loreBody"></div>
+</div>
+<div id="view-char" class="view" hidden>
+  <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
+<g stroke="none"><circle cx="100" cy="58" r="34"/><circle cx="62" cy="76" r="27"/><circle cx="138" cy="76" r="27"/><circle cx="44" cy="102" r="19"/><circle cx="156" cy="102" r="19"/><circle cx="80" cy="44" r="22"/><circle cx="120" cy="44" r="22"/><circle cx="100" cy="92" r="24"/><circle cx="76" cy="104" r="15"/><circle cx="124" cy="104" r="15"/></g>
+<path stroke="none" d="M91 200 C94 172 95 150 89 122 L111 122 C105 150 106 172 109 200 Z"/>
+<g fill="none" stroke-width="5"><path d="M97 130 C82 118 66 112 52 98"/><path d="M103 130 C118 118 134 112 148 98"/><path d="M100 124 C100 108 99 96 100 80"/></g>
+<g fill="none" stroke-width="4"><path d="M92 198 C74 204 54 208 30 206"/><path d="M108 198 C126 204 146 208 170 206"/><path d="M97 202 C90 210 80 216 66 220"/><path d="M103 202 C110 210 120 216 134 220"/></g></g></svg><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage wide" id="charBody"></div>
 </div>
 <div id="view-cal" class="view" hidden>
   <div class="topbar"><span class="brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 2 212 224"><g fill="#e9c46a" stroke="#e9c46a" stroke-linecap="round">
@@ -373,7 +416,7 @@ var PARTY0=[['Alphonse',28,15,0],['Cassian',28,15,0],['Azrakar',28,15,0],['Franz
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); return true; }catch(e){ return false; } }
 function load(){ try{ var r=localStorage.getItem(KEY); if(r){ var o=JSON.parse(r); if(o&&o.combatants){ S=Object.assign(S,o); } } }catch(e){}
   if(!S.party||!S.party.length) S.party=PARTY0.map(function(p){return Object.assign({},p);});
-  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; if(!S.npcF) S.npcF={g:'m',race:'zufall',age:'jung'}; if(!S.npcs) S.npcs=[]; if(S.npcCur===undefined) S.npcCur=null; if(!S.cal) S.cal=calDefaults(); if(!S.qF) S.qF={type:'zufall'}; if(!S.quests) S.quests=[]; if(S.qCur===undefined) S.qCur=null; if(!S.qR) S.qR='raetsel'; if(S.qRid===undefined) S.qRid=null; if(S.qRunes===undefined) S.qRunes=true; if(!S.lore) S.lore=loreDefaults(); }
+  S.party.forEach(function(p){ if(!p.level) p.level=3; }); if(!S.images) S.images={}; if(!S.gen) S.gen=genDefaults(); if(!S.genRes) S.genRes=[]; if(!S.scene) S.scene={pick:'',prop:null,terr:'wald',int:1,crowd:'markt'}; if(S.obj===undefined) S.obj=null; if(!S.npcF) S.npcF={g:'m',race:'zufall',age:'jung'}; if(!S.npcs) S.npcs=[]; if(S.npcCur===undefined) S.npcCur=null; if(!S.cal) S.cal=calDefaults(); if(!S.qF) S.qF={type:'zufall'}; if(!S.quests) S.quests=[]; if(S.qCur===undefined) S.qCur=null; if(!S.qR) S.qR='raetsel'; if(S.qRid===undefined) S.qRid=null; if(S.qRunes===undefined) S.qRunes=true; if(!S.lore) S.lore=loreDefaults(); if(!S.chars){ S.chars=JSON.parse(JSON.stringify(CHARS0)); S.party=S.party.filter(function(p){ return ['Alphonse','Cassian','Azrakar','Franzl','Indutiomarus'].indexOf(p.name)<0; }); syncParty(); } if(S.charSel===undefined) S.charSel=null; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function $(id){return document.getElementById(id);}
 function d(n){return Math.floor(Math.random()*n)+1;}
@@ -530,7 +573,7 @@ function renderLib(){
   $('tab-lib').innerHTML=h; bindLib();
 }
 function renderParty(){
-  var h='<div class="hint">Standardwerte (TP 28, RK 15) sind Platzhalter, bitte anpassen.</div><h3>Gruppe</h3>';
+  var h='<div class="hint">Die Helden kommen aus dem Charakteristico und werden dort gepflegt.</div><h3>Gruppe</h3>';
   S.party.forEach(function(p,i){
     h+='<div class="mon"><div class="m"><input value="'+esc(p.name)+'" data-pf="name" data-i="'+i+'" style="width:110px">'+
       ' St <input type="number" min="1" max="20" value="'+(p.level||3)+'" data-pf="level" data-i="'+i+'" style="width:44px"> TP <input type="number" value="'+p.hp+'" data-pf="hp" data-i="'+i+'" style="width:54px"> RK <input type="number" value="'+p.ac+'" data-pf="ac" data-i="'+i+'" style="width:48px"> INI <input type="number" value="'+p.bonus+'" data-pf="bonus" data-i="'+i+'" style="width:48px"></div>'+
@@ -1665,13 +1708,13 @@ function renderScene(){
 }
 
 /* =================== HUBS =================== */
-var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer'};
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico'};
 function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
 function showView(v,push){
-  ['hub','fight','npc','cal','quest','lore'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  ['hub','fight','npc','cal','quest','lore','char'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
-  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore();
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars();
   window.scrollTo(0,0); save();
 }
 window.addEventListener('hashchange',function(){ var v=viewFromHash(); if(v!==S.view) showView(v,false); });
@@ -2083,6 +2126,143 @@ document.addEventListener('keydown',function(e){ if(e.target.id==='lIn'&&e.key==
 document.addEventListener('change',function(e){ var t=e.target, s=S.lore&&curSession(); if(!s) return;
   if(t.id==='lTitle'){ s.title=t.value; save(); } if(t.id==='lAet'){ s.aet=t.value; save(); } if(t.id==='lDate'){ s.date=t.value; save(); } });
 
+/* =================== Charakteristico =================== */
+var ABS=[['str','STÄ','Stärke'],['dex','GES','Geschicklichkeit'],['con','KON','Konstitution'],['int','INT','Intelligenz'],['wis','WEI','Weisheit'],['cha','CHA','Charisma']];
+var SKILLS=[['akro','Akrobatik','dex'],['arka','Arkane Kunde','int'],['athl','Athletik','str'],['auft','Auftreten','cha'],['eins','Einschüchtern','cha'],['fing','Fingerfertigkeit','dex'],
+ ['gesch','Geschichte','int'],['heil','Heilkunde','wis'],['heim','Heimlichkeit','dex'],['tier','Mit Tieren umgehen','wis'],['motiv','Motiv erkennen','wis'],['nach','Nachforschungen','int'],
+ ['natur','Naturkunde','int'],['reli','Religion','int'],['taeu','Täuschen','cha'],['ueberl','Überlebenskunst','wis'],['ueberz','Überzeugen','cha'],['wahr','Wahrnehmung','wis']];
+function mod(v){ return Math.floor(((parseInt(v,10)||10)-10)/2); }
+function sgn(n){ return (n>=0?'+':'')+n; }
+function pbOf(c){ return Math.ceil((parseInt(c.level,10)||1)/4)+1; }
+function iniOf(c){ return mod(c.ab.dex)+(parseInt(c.iniX,10)||0); }
+function skillVal(c,k){ var s=SKILLS.find(function(x){return x[0]===k;}); return mod(c.ab[s[2]])+pbOf(c)*(c.skills[k]||0); }
+function saveVal(c,a){ return mod(c.ab[a])+(c.saves[a]?pbOf(c):0); }
+function ppOf(c){ return 10+skillVal(c,'wahr'); }
+function blankChar(name){ return {id:'c'+Date.now()+Math.floor(Math.random()*999),name:name||'Neuer Charakter',short:(name||'Neu').split(' ')[0],player:'',species:'',cls:'',sub:'',level:3,bg:'',align:'',xp:'',age:'',
+  ab:{str:10,dex:10,con:10,int:10,wis:10,cha:10},saves:{},skills:{},ac:10,acNote:'',speed:'9 m',iniX:0,hpMax:10,hpCur:10,hpTemp:0,hd:'',ds:{s:0,f:0},insp:false,exh:0,
+  weapons:[],spellAb:'',slots:[0,0,0,0,0,0,0,0,0],used:[0,0,0,0,0,0,0,0,0],spells:'',features:'',equip:'',langs:'',story:'',dm:'',flag:''}; }
+function mkChar(o){ var c=blankChar(o.name); Object.keys(o).forEach(function(k){ c[k]=o[k]; }); if(o.slots){ c.slots=o.slots.concat([0,0,0,0,0,0,0,0,0]).slice(0,9); } return c; }
+var CHARS0=[
+ mkChar({name:'Alphonse „Al“ Edwards',short:'Alphonse',player:'Ludo',species:'Mensch',cls:'Paladin',sub:'Schwur der Alten',level:3,bg:'Akolyth',age:'14 Jahre · 160 cm',
+  ab:{str:16,dex:8,con:14,int:10,wis:10,cha:16},saves:{wis:1,cha:1},skills:{motiv:1,reli:1},ac:18,acNote:'Kettenhemd + Schild',hpMax:35,hpCur:35,hd:'3W10',spellAb:'cha',slots:[3],
+  features:'Handauflegen (Pool 15 TP)\nGöttlicher Sinn (Kanalisieren)\nKampfstil, Göttlicher Schlag\nWaffenmeisterschaft\nSchwur der Alten',
+  story:'Geboren 1185 n.E. nahe Falkenstein. Schüler der Akademie Morgenhain, Anwärter im Orden der 50 Ringe, Mentor Ser Lavitz.\nBegleitet die Delegation der Akademie zur Prozession (Schutz, Sanitäter, Träger).\nDas Wunder von Morgenhain: holte einen Bediensteten aus dem Feuer, weißgoldenes Licht heilte beide.\nAussehen: zerzaustes blondes Haar, grüner Umhang.',
+  dm:'Geheim: menschgewordene Gottheit (welche, ist offen). Ignatio ahnt es.\nErinnerung: Am Turm (Abbild der Urgötter) Verbindung aufgreifen.',
+  flag:'TP-Maximum stand nicht auf dem Bogen (35 = aktueller Wert). Paladin-Fertigkeiten und Waffen fehlen noch.'}),
+ mkChar({name:'Cassian Veyr',short:'Cassian',player:'Matze',species:'Mensch',cls:'Zauberer',sub:'Aberrante Zauberei',level:3,bg:'Scharlatan',
+  ab:{str:8,dex:15,con:14,int:10,wis:10,cha:17},saves:{con:1,cha:1},skills:{fing:1,taeu:1},ac:12,acNote:'mit Magierrüstung 15',hpMax:23,hpCur:23,hd:'3W6',spellAb:'cha',slots:[4,2],
+  features:'Zaubermagie-Punkte: 3\nMetamagie (2 Optionen): offen\nAberrante Zauberei',
+  story:'Aus Boraelia. Besuchte die Akademie Morgenhain bei Falkenstein.\nVerschwand ohne Abschied, tauchte nach fast drei Jahren ohne Erinnerung an einem Straßenrand wieder auf.\nHört seitdem die Stimme „Elias“.\nKennt Franz Huber aus Morgenhain.\nElias sagte ihm, er müsse zum 25. Zyklus nach Pandoria zum Baum.',
+  dm:'Elias = Joren Wessel, Kindheitsfreund aus Boraelia.',flag:'Zwei Zaubererfertigkeiten noch offen.'}),
+ mkChar({name:'Azrakar Vhol',short:'Azrakar',player:'Benny',species:'Tiefling (Abyssisch)',cls:'Waldläufer',sub:'Herr der Tiere',level:3,bg:'Wegfinder',align:'Neutral gut',xp:'900',age:'25 Jahre · 195 cm',
+  ab:{str:12,dex:15,con:15,int:10,wis:14,cha:10},saves:{str:1,dex:1},skills:{athl:2,heim:1,tier:1,wahr:1,ueberl:1,nach:1},ac:14,acNote:'mit Schild 16',hpMax:28,hpCur:28,hd:'3W10',spellAb:'wis',slots:[3],
+  weapons:[{n:'Langbogen',atk:'+6',dmg:'1W8+2',typ:'Stich',mast:'Verlangsamen'},{n:'Streitaxt',atk:'+3',dmg:'1W8+1',typ:'Hieb',mast:'Umstoßen'},{n:'Dolch',atk:'+4',dmg:'1W4+2',typ:'Stich',mast:''}],
+  spells:'Zaubertricks: Thaumaturgie, Gift versprühen, Dornenpeitsche, Donnerschlag\n1. Grad: Strahl der Übelkeit (Volk), Zeichen des Jägers, Dornenhagel, Fesselnder Schlag, Tierfreundschaft, Eismesser',
+  features:'Dunkelsicht 18 m\nTalente: Eingeweihter der Magie (Druide), Kampfstil Bogenschießen\nNyrak (Urbegleiter): RK 15, 20 TP, 12 m (Klettern 12 m), Dunkelsicht 18 m\n  Bestienschlag 1W8+2+WEI, Ansturm (+1W6, liegend)',
+  equip:'Lederrüstung, Schild mit Baum-Motiv, Holzamulette, blitzgeschlagener Zweig (von Eldric)',
+  story:'Mentor Eldric. Glaubt an Gaia, misstraut der Kirche, die ihn in Eichenwacht ausgegrenzt hat.\nTiefrote Haut, grüne Augen, geschwungene Hörner.',
+  dm:'Stammt ursprünglich aus der anderen Welt. Harkon erkennt ihn und grinst.\nDas Symbol ist die Flamme von Ignis (von Eldric zurückgelassen).',flag:'Angriffsbonus Langbogen berechnet (GES + Übung + Bogenschießen).'}),
+ mkChar({name:'Franzl Huber',short:'Franzl',player:'Peter',species:'Goliath',cls:'Barbar',sub:'',level:3,bg:'',age:'38 Jahre · 2,25 m',
+  ab:{str:16,dex:14,con:16,int:8,wis:10,cha:10},saves:{str:1,con:1},skills:{},ac:15,acNote:'Ungepanzerte Verteidigung (V)',hpMax:35,hpCur:35,hd:'3W12',
+  features:'Kampfrausch (Wut)\nUngepanzerte Verteidigung\nWaffenmeisterschaft\nGefahrengespür, Leichtsinniger Angriff\nUrwissen',
+  story:'Familie Huber aus Austun (Nepla-Gebirge, Boraelia), betreibt eines der größten Gasthäuser der Region. Alle in der Familie sind Zauberer, Franzl nur „halbe Abstammung“: der Mann fürs Grobe.\nWar mit Cassian ein Jahr Mitbewohner in Morgenhain, jetzt an der Akademie Asterhall.\nTaschenspielerei als Rollenspiel: Flamme nur mit SG 13, sonst Chaosmagie.',
+  dm:'Halskette des Feuerballs: Peter wirft sie jemandem zu (Gebirgspass, Killerschafe).\nWirtsfrau Alexa: Gag, später.',
+  flag:'⚠ Werte fehlen: Attribute, RK und TP sind Platzhalter (V). Bitte mit Peters Bogen ersetzen.'}),
+ mkChar({name:'Indutiomarus Taxceilaan von Rotfels',short:'Indutiomarus',player:'Totti',species:'Mensch',cls:'Kämpfer',sub:'Champion',level:3,bg:'Adliger',age:'18 Jahre',
+  ab:{str:16,dex:13,con:15,int:10,wis:8,cha:12},saves:{str:1,con:1},skills:{gesch:1,ueberz:1},ac:18,acNote:'Kettenrüstung + Schild',hpMax:28,hpCur:28,hd:'3W10',spellAb:'int',
+  weapons:[{n:'Zweihandschwert',atk:'+5',dmg:'2W6+3',typ:'Hieb',mast:'Streifen'},{n:'Flegel',atk:'+5',dmg:'1W8+3',typ:'Wucht',mast:'Auslaugen'},{n:'Blasrohr',atk:'+3',dmg:'1+1',typ:'Stich',mast:'Plagen'}],
+  spells:'Eingeweihter der Magie (Magier):\nZaubertricks: Klingenbann, Kleine Illusion\n1/Tag: Nebelwolke',
+  features:'Champion: Verbesserter Kritischer Treffer (19–20), Bemerkenswerter Athlet\nDurchhaltevermögen, Tatendrang, Kampfstil, Waffenmeisterschaft\nTalente: Geschickt, Eingeweihter der Magie (Magier)',
+  story:'Haus Rotfels aus Caliztán (Boraelia). Wappen: roter Eisenfels auf Grün, gekreuzte Duellschwerter. „Der Fels weicht nicht.“\nReist zur Ausbildung, eskortiert eine Kräuterkarawane zur Prozession. Will ernstzunehmender Anwärter auf die Nachfolge werden.\nFamilie: Vater Atepomaros, Mutter Vangiora, Bruder Segomarus, Zwillinge Cingetorix und Ancamna.',
+  flag:'TP berechnet (Kämpfer St. 3, KON 15). Weitere Fertigkeiten aus „Geschickt“ und Klasse fehlen noch. Zweihandschwert und Schild gleichzeitig: bitte prüfen.'})
+];
+function getPath(o,p){ return p.split('.').reduce(function(a,k){ return a==null?a:a[k]; },o); }
+function setPath(o,p,v){ var ks=p.split('.'), last=ks.pop(), t=ks.reduce(function(a,k){ return a[k]; },o); t[last]=v; }
+function cField(c,p,lab,type,w){ var v=getPath(c,p); return '<label class="cf"><span>'+lab+'</span><input data-cf="'+p+'"'+(type?' type="'+type+'"':'')+' value="'+esc(v==null?'':v)+'"'+(w?' style="width:'+w+'"':'')+'></label>'; }
+function cArea(c,p,lab,rows){ return '<label class="cf wide"><span>'+lab+'</span><textarea data-cf="'+p+'" rows="'+(rows||4)+'">'+esc(getPath(c,p)||'')+'</textarea></label>'; }
+function syncParty(){
+  var keep=S.party.filter(function(p){return !p.cid;}), list=S.chars.map(function(c){ return {cid:c.id,name:c.short||c.name,hp:parseInt(c.hpMax,10)||1,ac:parseInt(c.ac,10)||10,bonus:iniOf(c),level:parseInt(c.level,10)||1}; });
+  S.party=list.concat(keep.filter(function(p){ return !list.some(function(l){return l.name===p.name;}); }));
+}
+function charToFight(c,silent){
+  var name=c.short||c.name, ex=S.combatants.find(function(x){ return x.side==='hero'&&(x.cid===c.id||x.name===name||x.baseName===name); });
+  var vals={name:name,ac:parseInt(c.ac,10)||10,bonus:iniOf(c),hp:Math.max(0,parseInt(c.hpCur,10)||0),max:parseInt(c.hpMax,10)||1};
+  if(ex){ ex.cid=c.id; ex.name=vals.name; ex.ac=vals.ac; ex.bonus=vals.bonus; ex.max=vals.max; ex.hp=Math.min(vals.hp,vals.max); ex.imgKey='c:'+c.id; }
+  else { var n=addCombatant({name:vals.name,side:'hero',ini:0,bonus:vals.bonus,hp:vals.max,ac:vals.ac,imgKey:'c:'+c.id}); n.hp=Math.min(vals.hp,vals.max); n.cid=c.id; }
+  if(!silent) toast(name+' ist im Fight Club.');
+}
+function charSheet(c){
+  var pb=pbOf(c), sp=c.spellAb, smod=sp?mod(c.ab[sp]):0;
+  var h='<div class="row" style="margin:0 0 8px"><button data-act="cback">← Alle Bögen</button><span class="sp" style="flex:1"></span><button class="pri" data-act="cfight" data-c="'+c.id+'">⚔️ In den Fight Club</button></div>'+
+   (c.flag?'<div class="cflag">'+esc(c.flag)+'</div>':'')+
+   '<div class="sheet"><div class="shtop"><button class="ava big" data-act="cimg" data-c="'+c.id+'">'+(S.images['c:'+c.id]?'<img src="'+S.images['c:'+c.id]+'" alt="">':'<span>🛡️</span>')+'</button>'+
+   '<div style="flex:1;min-width:0"><input class="name cname" data-cf="name" value="'+esc(c.name)+'"><div class="cgrid4">'+cField(c,'short','Kurzname (Fight Club)')+cField(c,'player','Spieler')+cField(c,'species','Spezies')+cField(c,'bg','Hintergrund')+
+   cField(c,'cls','Klasse')+cField(c,'sub','Unterklasse')+cField(c,'level','Stufe','number')+cField(c,'xp','EP')+cField(c,'align','Gesinnung')+cField(c,'age','Alter · Größe')+'</div></div></div>'+
+   '<div class="cstrip">'+
+    '<div class="sbox big"><span>RK</span><input data-cf="ac" type="number" value="'+c.ac+'"><small><input data-cf="acNote" value="'+esc(c.acNote)+'" placeholder="Rüstung"></small></div>'+
+    '<div class="sbox"><span>Initiative</span><b>'+sgn(iniOf(c))+'</b><small>Extra <input data-cf="iniX" type="number" value="'+c.iniX+'" style="width:44px"></small></div>'+
+    '<div class="sbox"><span>Bewegung</span><input data-cf="speed" value="'+esc(c.speed)+'"></div>'+
+    '<div class="sbox"><span>Übung</span><b>'+sgn(pb)+'</b></div>'+
+    '<div class="sbox"><span>Passive Wahrn.</span><b>'+ppOf(c)+'</b></div>'+
+    '<div class="sbox hp"><span>Trefferpunkte</span><div class="hpr"><input data-cf="hpCur" type="number" value="'+c.hpCur+'"><i>/</i><input data-cf="hpMax" type="number" value="'+c.hpMax+'"></div><small>Temp <input data-cf="hpTemp" type="number" value="'+c.hpTemp+'" style="width:44px"> · TW <input data-cf="hd" value="'+esc(c.hd)+'" style="width:56px"></small></div>'+
+    '<div class="sbox"><span>Todesrettung</span><div class="dsr">✔ '+[0,1,2].map(function(i){return '<span class="pip'+(i<c.ds.s?' used':'')+'" data-act="cds" data-k="s" data-i="'+i+'" data-c="'+c.id+'"></span>';}).join('')+'</div><div class="dsr">✕ '+[0,1,2].map(function(i){return '<span class="pip bad'+(i<c.ds.f?' used':'')+'" data-act="cds" data-k="f" data-i="'+i+'" data-c="'+c.id+'"></span>';}).join('')+'</div></div>'+
+    '<div class="sbox"><span>Inspiration</span><button class="insp'+(c.insp?' on':'')+'" data-act="cinsp" data-c="'+c.id+'">'+(c.insp?'★':'☆')+'</button><small>Erschöpfung <input data-cf="exh" type="number" min="0" max="6" value="'+c.exh+'" style="width:40px"></small></div>'+
+   '</div><div class="ccols"><div class="cabs">'+ABS.map(function(a){ var k=a[0];
+      return '<div class="abox"><div class="ahead"><div><b>'+a[2]+'</b></div><div class="amod">'+sgn(mod(c.ab[k]))+'</div><input class="ascore" data-cf="ab.'+k+'" type="number" value="'+c.ab[k]+'"></div>'+
+        '<div class="arow sv"><span class="dot'+(c.saves[k]?' on':'')+'" data-act="csave" data-k="'+k+'" data-c="'+c.id+'"></span><span>Rettungswurf</span><b>'+sgn(saveVal(c,k))+'</b></div>'+
+        SKILLS.filter(function(s){return s[2]===k;}).map(function(s){ var lv=c.skills[s[0]]||0;
+          return '<div class="arow"><span class="dot'+(lv===1?' on':lv===2?' exp':'')+'" data-act="cskill" data-k="'+s[0]+'" data-c="'+c.id+'" title="Tippen: geübt → Expertise → nichts"></span><span>'+s[1]+'</span><b>'+sgn(skillVal(c,s[0]))+'</b></div>'; }).join('')+'</div>'; }).join('')+
+    '<div class="hint">● geübt · ◆ Expertise (Tippen wechselt)</div></div>'+
+   '<div class="cright"><div class="csec"><div class="ctitle">Waffen &amp; Angriffe</div><table class="wtab"><tr><th>Name</th><th>Angriff</th><th>Schaden</th><th>Art</th><th>Meisterschaft</th><th></th></tr>'+
+     c.weapons.map(function(w,i){ return '<tr>'+['n','atk','dmg','typ','mast'].map(function(f){return '<td><input data-cf="weapons.'+i+'.'+f+'" value="'+esc(w[f]||'')+'"></td>';}).join('')+'<td><button class="sm danger" data-act="cwdel" data-i="'+i+'" data-c="'+c.id+'">✕</button></td></tr>'; }).join('')+
+     '</table><button class="sm" data-act="cwadd" data-c="'+c.id+'">＋ Waffe</button></div>'+
+    '<div class="csec"><div class="ctitle">Zauberwirken</div><div class="row" style="margin:0"><label class="cf"><span>Attribut</span><select data-cf="spellAb"><option value="">–</option>'+ABS.map(function(a){return '<option value="'+a[0]+'"'+(sp===a[0]?' selected':'')+'>'+a[1]+'</option>';}).join('')+'</select></label>'+
+      (sp?'<div class="sbox mini"><span>Zauber-SG</span><b>'+(8+pb+smod)+'</b></div><div class="sbox mini"><span>Zauberangriff</span><b>'+sgn(pb+smod)+'</b></div>':'')+'</div>'+
+      '<div class="slots">'+[0,1,2,3,4,5,6,7,8].map(function(i){ var mx=parseInt(c.slots[i],10)||0; if(!mx&&i>2&&!(parseInt(c.slots[i-1],10))) return '';
+        var pips=''; for(var j=0;j<mx;j++) pips+='<span class="pip'+(j<(c.used[i]||0)?' used':'')+'" data-act="cslot" data-l="'+i+'" data-i="'+j+'" data-c="'+c.id+'"></span>';
+        return '<div class="slot"><span>'+(i+1)+'. Grad</span><input data-cf="slots.'+i+'" type="number" min="0" max="9" value="'+mx+'" style="width:44px"><span class="pips">'+pips+'</span></div>'; }).join('')+'</div>'+
+      cArea(c,'spells','Zauber',4)+'</div>'+
+    '<div class="csec">'+cArea(c,'features','Merkmale & Talente',5)+cArea(c,'equip','Ausrüstung',3)+cArea(c,'langs','Sprachen & Übungen',2)+'</div>'+
+    '<div class="csec">'+cArea(c,'story','Hintergrund & Persönlichkeit',6)+'<details><summary class="hint">🔒 Spielleiter-Notizen</summary>'+cArea(c,'dm','Nur für dich',4)+'</details></div>'+
+   '</div></div></div>'+
+   '<div class="row" style="margin-top:12px"><button class="sm danger" data-act="cdel" data-c="'+c.id+'">Charakter löschen</button></div>';
+  return h;
+}
+function renderChars(){
+  var sel=S.chars.find(function(c){return c.id===S.charSel;}), h='<div class="hubtitle"><span>🛡️</span> Charakteristico</div>';
+  if(sel) h+=charSheet(sel);
+  else h+='<div class="clist">'+S.chars.map(function(c){ var src=S.images['c:'+c.id];
+     return '<div class="ccard" data-act="copen" data-c="'+c.id+'"><span class="ava big">'+(src?'<img src="'+src+'" alt="">':'<span>🛡️</span>')+'</span><div style="flex:1;min-width:0"><div class="ccn">'+esc(c.name)+'</div>'+
+       '<div class="hint">'+esc([c.species,c.cls+(c.sub?' ('+c.sub+')':''),'St. '+c.level].filter(Boolean).join(' · '))+(c.player?' · '+esc(c.player):'')+'</div>'+
+       '<div class="cmini"><span>RK <b>'+c.ac+'</b></span><span>TP <b>'+c.hpCur+'/'+c.hpMax+'</b></span><span>INI <b>'+sgn(iniOf(c))+'</b></span>'+(c.flag&&/⚠/.test(c.flag)?'<span class="warn">⚠ Werte fehlen</span>':'')+'</div></div></div>'; }).join('')+'</div>'+
+    '<div class="row" style="margin-top:12px"><button class="pri" data-act="callfight">⚔️ Alle in den Fight Club</button><button data-act="cnew">＋ Neuer Charakter</button></div>'+
+    '<div class="hint" style="margin-top:6px">Übernommen werden Name, RK, TP und Initiativebonus. Bilder gelten auch im Fight Club.</div>';
+  $('charBody').innerHTML=h;
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]'); if(!t||!S.chars) return; var c=S.chars.find(function(x){return x.id===(t.dataset.c||S.charSel);});
+  switch(t.dataset.act){
+    case 'copen': S.charSel=t.dataset.c; save(); renderChars(); window.scrollTo(0,0); break;
+    case 'cback': S.charSel=null; save(); renderChars(); break;
+    case 'cnew': { var n=blankChar(); S.chars.push(n); S.charSel=n.id; syncParty(); save(); renderChars(); break; }
+    case 'cdel': if(!t.dataset.ok){ t.dataset.ok='1'; t.textContent='Wirklich löschen? Nochmal tippen'; break; } S.chars=S.chars.filter(function(x){return x.id!==c.id;}); S.charSel=null; syncParty(); save(); renderChars(); break;
+    case 'cfight': charToFight(c); save(); break;
+    case 'callfight': S.chars.forEach(function(x){ charToFight(x,true); }); save(); toast(S.chars.length+' Helden im Fight Club.'); break;
+    case 'csave': c.saves[t.dataset.k]=c.saves[t.dataset.k]?0:1; save(); renderChars(); break;
+    case 'cskill': { var k=t.dataset.k; c.skills[k]=((c.skills[k]||0)+1)%3; save(); renderChars(); break; }
+    case 'cds': { var i=parseInt(t.dataset.i,10), kk=t.dataset.k; c.ds[kk]=c.ds[kk]>i?i:i+1; save(); renderChars(); break; }
+    case 'cinsp': c.insp=!c.insp; save(); renderChars(); break;
+    case 'cslot': { var l=parseInt(t.dataset.l,10), j=parseInt(t.dataset.i,10); c.used[l]=(c.used[l]||0)>j?j:j+1; save(); renderChars(); break; }
+    case 'cwadd': c.weapons.push({n:'',atk:'',dmg:'',typ:'',mast:''}); save(); renderChars(); break;
+    case 'cwdel': c.weapons.splice(parseInt(t.dataset.i,10),1); save(); renderChars(); break;
+    case 'cimg': openLb('c:'+c.id,c.name,'portrait of '+c.name+', '+(c.species||'')+' '+(c.cls||'')+', fantasy RPG hero, '+(c.story||'').split('\n').pop().slice(0,120)); break;
+  }
+});
+document.addEventListener('change',function(e){ var t=e.target; if(!t.dataset.cf||!S.chars) return; var c=S.chars.find(function(x){return x.id===S.charSel;}); if(!c) return;
+  var p=t.dataset.cf, v=t.value, num=/^(ab\.|level$|ac$|iniX$|hpCur$|hpMax$|hpTemp$|exh$|slots\.)/.test(p);
+  setPath(c,p,num?(parseInt(v,10)||0):v); if(p==='slots.'+p.split('.')[1]){ var li=parseInt(p.split('.')[1],10); c.used[li]=Math.min(c.used[li]||0,parseInt(v,10)||0); }
+  syncParty(); save(); renderChars(); });
+
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
   var t=e.target.closest('[data-act],[data-tab]'); if(!t) return;
@@ -2165,7 +2345,7 @@ document.addEventListener('click',function(e){
   if(e.target.id==='addParty'){ S.party.push({name:'Neuer Held',hp:28,ac:15,bonus:0}); renderParty(); save(); }
   if(e.target.id==='partyToFight'){ var roll=$('rollHeroes').checked;
     S.party.forEach(function(p){ if(S.combatants.some(function(c){return c.side==='hero'&&c.name===p.name;})) return;
-      addCombatant({name:p.name,side:'hero',ini:roll?d(20)+p.bonus:0,bonus:p.bonus,hp:p.hp,ac:p.ac,imgKey:'h:'+norm(p.name)}); }); render(); }
+      var nc=addCombatant({name:p.name,side:'hero',ini:roll?d(20)+p.bonus:0,bonus:p.bonus,hp:p.hp,ac:p.ac,imgKey:p.cid?'c:'+p.cid:'h:'+norm(p.name)}); if(p.cid){ nc.cid=p.cid; var ch=S.chars.find(function(x){return x.id===p.cid;}); if(ch) nc.hp=Math.min(parseInt(ch.hpCur,10)||nc.max,nc.max); } }); render(); }
   if(e.target.id==='clearLog'){ S.log=[]; render(); }
   if(e.target.id==='objRoll'||e.target.id==='objRoll2'){ S.scene.prop=rollObjective(S.scene.pick); renderScene(); save(); }
   if(e.target.id==='objAcc'&&S.scene.prop){ acceptObjective(S.scene.prop); S.scene.prop=null; render(); toast('Kampfgrund übernommen.'); }
