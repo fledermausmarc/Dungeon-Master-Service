@@ -259,6 +259,17 @@
   .recbtn{font-weight:700;padding:8px 14px} .recbtn.on{background:#b23a2a;color:#fff;border-color:#b23a2a;animation:pulse 1.2s infinite}
   #recTime{font-family:Cinzel,serif;font-size:20px;color:var(--bad)} .reclive{margin-top:6px;font-style:italic;color:var(--muted);min-height:1.4em;font-size:14px}
   .spkrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:8px} .spkrow .on{background:#b23a2a;color:#fff;border-color:#b23a2a}
+  .vbtn{display:inline-flex;align-items:center;cursor:pointer;background:var(--panel2);border:1px solid var(--edge);border-radius:8px;padding:6px 10px;min-height:34px}
+  .vscenes{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px} .vscenes .on{background:#7a5216;color:var(--cream);border-color:var(--gold)}
+  .vtools{margin-top:10px} .vcanvas{margin-top:10px;display:flex;justify-content:center;background:#1d160e;border-radius:12px;padding:8px;overflow:hidden}
+  #vttCv{touch-action:none;border-radius:6px;max-width:100%;cursor:crosshair}
+  body.vtt-player{background:#000!important;overflow:hidden} body.vtt-player::before{display:none}
+  #pv{position:fixed;inset:0;background:#000;overflow:hidden} #pwrap{position:absolute;left:0;top:0;transform-origin:0 0}
+  .pmedia{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+  #pfog{position:absolute;inset:0;width:100%;height:100%;filter:blur(6px)}
+  #pmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cbb88f;font-family:Cinzel,serif;font-size:24px}
+  #pfs{position:absolute;right:14px;bottom:14px;opacity:.55} #pfs:hover{opacity:1}
+  #ptap{position:absolute;left:50%;top:20px;transform:translateX(-50%);background:#33462a;color:#f2e2b0;border:1px solid #b8913f;border-radius:999px;padding:8px 16px;cursor:pointer}
   .seg.three small{font-size:11px;color:inherit;opacity:.8}
   @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
@@ -334,6 +345,7 @@
       <button class="hubcard" data-hub="quest"><span class="hi">📜</span><b>Questmaster</b><small>Quests und Rätsel auf Knopfdruck</small></button>
       <button class="hubcard" data-hub="lore"><span class="hi">⚖️</span><b>Loreyer</b><small>Sitzungsnotizen und Recap für die nächste Runde</small></button>
       <button class="hubcard" data-hub="shop"><span class="hi">🎁</span><b>Mystery Shop</b><small>Zum Wunderbaren Unfug: Truhen und unnütze Magie</small></button>
+      <button class="hubcard" data-hub="vtt"><span class="hi">📺</span><b>VTT Caster</b><small>Karten und Videos auf den zweiten Bildschirm, mit Nebel des Krieges</small></button>
     </div></div>
 </div>
 <div id="view-npc" class="view" hidden>
@@ -355,6 +367,10 @@
 <div id="view-shop" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
   <div class="hubpage" id="shopBody"></div>
+</div>
+<div id="view-vtt" class="view" hidden>
+  <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage wide" id="vttBody"></div>
 </div>
 <div id="view-cal" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
@@ -1690,16 +1706,16 @@ function renderScene(){
 }
 
 /* =================== HUBS =================== */
-var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop'};
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop',vtt:'vtt-caster'};
 function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
 function showView(v,push){
-  ['hub','fight','npc','cal','quest','lore','char','shop'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  ['hub','fight','npc','cal','quest','lore','char','shop','vtt'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
-  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop();
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='vtt') renderVtt();
   window.scrollTo(0,0); save();
 }
-window.addEventListener('hashchange',function(){ var v=viewFromHash(); if(v!==S.view) showView(v,false); });
+window.addEventListener('hashchange',function(){ if(location.hash==='#vtt-player') return; var v=viewFromHash(); if(v!==S.view) showView(v,false); });
 
 /* =================== NPCFindr =================== */
 var RACES=[
@@ -2538,6 +2554,129 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-act
   } });
 document.addEventListener('change',function(e){ if(e.target.id==='lTr'){ var s=curSession(); s.tr=e.target.value; save(); } });
 
+/* =================== VTT Caster =================== */
+var VTT={bc:null,scenes:[],cur:-1,mode:'reveal',brush:50,aspect:16/9,connected:false,win:null,sound:false,fogT:null,drag:null,hover:null};
+function vttBC(){ if(!VTT.bc){ try{ VTT.bc=new BroadcastChannel('dms-vtt'); VTT.bc.onmessage=function(ev){ var m=ev.data||{};
+  if(m.t==='hello'){ VTT.connected=true; if(m.aspect) VTT.aspect=m.aspect; vttSendAll(); vttStatus(); vttDraw(); }
+  if(m.t==='bye'){ VTT.connected=false; vttStatus(); } }; }catch(e){} } return VTT.bc; }
+function vttPost(m){ var b=vttBC(); if(b) try{ b.postMessage(m); }catch(e){} }
+function vttScene(){ return VTT.scenes[VTT.cur]||null; }
+function vttSendAll(){ var sc=vttScene(); if(!sc){ vttPost({t:'clear'}); return; }
+  vttPost({t:'media',blob:sc.file,kind:sc.kind,w:sc.w,h:sc.h}); vttSendFog(true); vttPost({t:'vp',vp:sc.vp}); vttPost({t:'sound',on:VTT.sound}); }
+function vttSendFog(now){ var sc=vttScene(); if(!sc) return; clearTimeout(VTT.fogT);
+  VTT.fogT=setTimeout(function(){ sc.fog.toBlob(function(b){ vttPost({t:'fog',blob:b}); },'image/png'); }, now?0:120); }
+function vttStatus(){ var el=$('vttStat'); if(el) el.innerHTML=VTT.connected?'🟢 Castschirm verbunden':'⚪ Kein Castschirm'; }
+function vttOpen(){
+  var url=location.href.split('#')[0]+'#vtt-player', feat='width=1280,height=720';
+  function go(f){ VTT.win=window.open(url,'dmsCaster',f); if(!VTT.win) toast('Popup blockiert. Bitte Popups für diese Seite erlauben.'); else toast('Castschirm geöffnet. Auf den 2. Bildschirm ziehen oder per Chrome „Streamen“ casten.'); }
+  if(window.getScreenDetails){ window.getScreenDetails().then(function(sd){ var ext=sd.screens.find(function(s){return !s.isPrimary;});
+      go(ext?'left='+ext.availLeft+',top='+ext.availTop+',width='+ext.availWidth+',height='+ext.availHeight:feat); }).catch(function(){ go(feat); }); }
+  else go(feat);
+}
+function vttStill(file,kind){ return new Promise(function(res,rej){
+  if(kind==='image'){ var im=new Image(); im.onload=function(){ res({img:im,w:im.naturalWidth,h:im.naturalHeight}); }; im.onerror=rej; im.src=URL.createObjectURL(file); return; }
+  var v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=URL.createObjectURL(file);
+  v.onloadeddata=function(){ v.currentTime=Math.min(1,(v.duration||2)/2); };
+  v.onseeked=function(){ var c=document.createElement('canvas'); c.width=v.videoWidth; c.height=v.videoHeight; c.getContext('2d').drawImage(v,0,0); res({img:c,w:v.videoWidth,h:v.videoHeight}); };
+  v.onerror=function(){ rej(new Error('Video nicht lesbar')); }; }); }
+function vttAdd(files){
+  [].forEach.call(files,function(f){ var kind=/^video\//.test(f.type)?'video':(/^image\//.test(f.type)?'image':null); if(!kind){ toast(f.name+': Format nicht unterstützt.'); return; }
+    vttStill(f,kind).then(function(st){ var fs=Math.min(1,1600/Math.max(st.w,st.h)), fog=document.createElement('canvas'); fog.width=Math.round(st.w*fs); fog.height=Math.round(st.h*fs);
+      var g=fog.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,fog.width,fog.height);
+      VTT.scenes.push({name:f.name.replace(/\.[^.]+$/,''),file:f,kind:kind,still:st.img,w:st.w,h:st.h,fog:fog,fs:fs,vp:{cx:st.w/2,cy:st.h/2,zoom:1}});
+      VTT.cur=VTT.scenes.length-1; vttSendAll(); renderVtt(); }).catch(function(){ toast(f.name+' konnte nicht geladen werden.'); }); });
+}
+function vttRegion(sc){ var A=VTT.aspect, baseW=(sc.w/sc.h>A)?sc.w:sc.h*A, w=baseW/sc.vp.zoom, h=w/A; return {x:sc.vp.cx-w/2,y:sc.vp.cy-h/2,w:w,h:h}; }
+function vttDraw(){
+  var cv=$('vttCv'), sc=vttScene(); if(!cv) return; var box=cv.parentNode, maxH=Math.max(260,window.innerHeight*0.68);
+  if(!sc){ cv.width=box.clientWidth; cv.height=200; var c0=cv.getContext('2d'); c0.fillStyle='#2a2114'; c0.fillRect(0,0,cv.width,cv.height); c0.fillStyle='#cbb88f'; c0.font='16px sans-serif'; c0.textAlign='center'; c0.fillText('Bild oder Video laden (JPG, PNG, WebP, MP4, WebM)',cv.width/2,105); return; }
+  var cw=box.clientWidth, ch=cw*sc.h/sc.w; if(ch>maxH){ ch=maxH; cw=ch*sc.w/sc.h; } cv.width=Math.round(cw); cv.height=Math.round(ch); cv.style.width=cv.width+'px';
+  var c=cv.getContext('2d'); c.drawImage(sc.still,0,0,cv.width,cv.height);
+  c.globalAlpha=0.6; c.drawImage(sc.fog,0,0,cv.width,cv.height); c.globalAlpha=1;
+  var k=cv.width/sc.w, R=vttRegion(sc); c.strokeStyle='#e9c46a'; c.lineWidth=3; c.setLineDash([10,6]); c.strokeRect(R.x*k,R.y*k,R.w*k,R.h*k); c.setLineDash([]);
+  c.fillStyle='rgba(51,70,42,.85)'; c.fillRect(R.x*k,R.y*k-20,92,20); c.fillStyle='#e9c46a'; c.font='bold 12px sans-serif'; c.textAlign='left'; c.fillText('📺 Castschirm',R.x*k+5,R.y*k-6);
+  if(VTT.drag&&VTT.drag.rect){ var d=VTT.drag; c.strokeStyle='#fff'; c.lineWidth=2; c.strokeRect(Math.min(d.x0,d.x1),Math.min(d.y0,d.y1),Math.abs(d.x1-d.x0),Math.abs(d.y1-d.y0)); }
+  if(VTT.hover&&(VTT.mode==='reveal'||VTT.mode==='hide')){ c.strokeStyle=VTT.mode==='reveal'?'#9fe39a':'#ff9a8a'; c.lineWidth=2; c.beginPath(); c.arc(VTT.hover.x,VTT.hover.y,VTT.brush/2,0,Math.PI*2); c.stroke(); }
+}
+function vttPaint(sc,x0,y0,x1,y1){ var cv=$('vttCv'), k=sc.w/cv.width*sc.fs, g=sc.fog.getContext('2d');
+  g.save(); g.globalCompositeOperation=VTT.mode==='reveal'?'destination-out':'source-over'; g.strokeStyle='#000'; g.fillStyle='#000'; g.lineCap='round'; g.lineWidth=VTT.brush*k;
+  g.beginPath(); g.moveTo(x0*k,y0*k); g.lineTo(x1*k+0.01,y1*k); g.stroke(); g.restore(); vttSendFog(); }
+function vttBind(){
+  var cv=$('vttCv'); if(!cv||cv.dataset.b) return; cv.dataset.b='1';
+  function pos(e){ var r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}; }
+  cv.addEventListener('pointerdown',function(e){ var sc=vttScene(); if(!sc) return; cv.setPointerCapture(e.pointerId); var p=pos(e);
+    if(VTT.mode==='rect') VTT.drag={rect:1,x0:p.x,y0:p.y,x1:p.x,y1:p.y};
+    else if(VTT.mode==='pan') VTT.drag={pan:1,x:p.x,y:p.y};
+    else { VTT.drag={paint:1,x:p.x,y:p.y}; vttPaint(sc,p.x,p.y,p.x,p.y); } vttDraw(); });
+  cv.addEventListener('pointermove',function(e){ var sc=vttScene(); if(!sc) return; var p=pos(e); VTT.hover=p; var d=VTT.drag;
+    if(d&&d.paint){ vttPaint(sc,d.x,d.y,p.x,p.y); d.x=p.x; d.y=p.y; }
+    else if(d&&d.rect){ d.x1=p.x; d.y1=p.y; }
+    else if(d&&d.pan){ var k=sc.w/cv.width; sc.vp.cx+=(p.x-d.x)*k; sc.vp.cy+=(p.y-d.y)*k; d.x=p.x; d.y=p.y; vttPost({t:'vp',vp:sc.vp}); }
+    vttDraw(); });
+  function up(){ var sc=vttScene(), d=VTT.drag; if(sc&&d&&d.rect){ var k=sc.w/$('vttCv').width*sc.fs, g=sc.fog.getContext('2d'); g.save(); g.globalCompositeOperation='destination-out';
+      g.fillRect(Math.min(d.x0,d.x1)*k,Math.min(d.y0,d.y1)*k,Math.abs(d.x1-d.x0)*k,Math.abs(d.y1-d.y0)*k); g.restore(); vttSendFog(true); } VTT.drag=null; vttDraw(); }
+  cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up); cv.addEventListener('pointerleave',function(){ VTT.hover=null; vttDraw(); });
+  cv.addEventListener('wheel',function(e){ var sc=vttScene(); if(!sc) return; e.preventDefault(); vttZoom(e.deltaY<0?1.15:1/1.15); },{passive:false});
+}
+function vttZoom(f){ var sc=vttScene(); if(!sc) return; sc.vp.zoom=Math.max(0.5,Math.min(8,sc.vp.zoom*f)); vttPost({t:'vp',vp:sc.vp}); vttDraw(); }
+function renderVtt(){
+  vttBC(); var sc=vttScene();
+  var h='<div class="hubtitle"><span>📺</span> VTT Caster</div>'+
+   '<div class="panel"><div class="row" style="margin:0"><button class="pri" data-act="vopen">📺 Castschirm öffnen</button><span id="vttStat" class="hint"></span>'+
+   '<label class="vbtn">＋ Bild / Video<input type="file" id="vttFile" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple hidden></label></div>'+
+   (VTT.scenes.length?'<div class="vscenes">'+VTT.scenes.map(function(s,i){ return '<button class="'+(i===VTT.cur?'on':'')+'" data-act="vsel" data-i="'+i+'">'+(s.kind==='video'?'🎞️ ':'🖼️ ')+esc(s.name)+'</button>'; }).join('')+'</div>':'')+'</div>'+
+   (sc?'<div class="panel vtools"><div class="seg">'+[['reveal','👁 Aufdecken'],['hide','🌫 Verdecken'],['rect','▭ Rechteck aufdecken'],['pan','✋ Ausschnitt']].map(function(m){ return '<button class="sm'+(VTT.mode===m[0]?' on':'')+'" data-act="vmode" data-m="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'+
+     '<div class="row" style="margin:6px 0 0"><label class="hint">Pinsel <input type="range" id="vttBrush" min="10" max="200" value="'+VTT.brush+'"></label>'+
+     '<button class="sm" data-act="vfog" data-v="1">Alles verdecken</button><button class="sm" data-act="vfog" data-v="0">Alles aufdecken</button>'+
+     '<button class="sm" data-act="vzoom" data-f="0.8">−</button><button class="sm" data-act="vzoom" data-f="1.25">＋</button><button class="sm" data-act="vfit">Ganze Karte</button>'+
+     (sc.kind==='video'?'<button class="sm" data-act="vsound">'+(VTT.sound?'🔊 Ton an':'🔇 Ton aus')+'</button>':'')+'<button class="sm danger" data-act="vdel">✕ Szene</button></div></div>':'')+
+   '<div class="vcanvas"><canvas id="vttCv"></canvas></div>'+
+   '<div class="hint" style="margin-top:6px">Du siehst alles, der Nebel ist für dich halb durchsichtig. Der goldene Rahmen ist der Ausschnitt des Castschirms: mit ✋ verschieben, mit ＋/− oder dem Mausrad zoomen. Videos laufen nur auf dem Castschirm.</div>';
+  $('vttBody').innerHTML=h; vttStatus(); vttBind(); setTimeout(vttDraw,0);
+}
+document.addEventListener('click',function(e){ var t=e.target.closest('[data-act]'); if(!t) return; var sc=vttScene();
+  switch(t.dataset.act){
+    case 'vopen': vttOpen(); break;
+    case 'vsel': VTT.cur=parseInt(t.dataset.i,10); vttSendAll(); renderVtt(); break;
+    case 'vmode': VTT.mode=t.dataset.m; renderVtt(); break;
+    case 'vfog': if(sc){ var g=sc.fog.getContext('2d'); if(t.dataset.v==='1'){ g.fillStyle='#000'; g.fillRect(0,0,sc.fog.width,sc.fog.height); } else g.clearRect(0,0,sc.fog.width,sc.fog.height); vttSendFog(true); vttDraw(); } break;
+    case 'vzoom': vttZoom(parseFloat(t.dataset.f)); break;
+    case 'vfit': if(sc){ sc.vp={cx:sc.w/2,cy:sc.h/2,zoom:1}; vttPost({t:'vp',vp:sc.vp}); vttDraw(); } break;
+    case 'vsound': VTT.sound=!VTT.sound; vttPost({t:'sound',on:VTT.sound}); renderVtt(); break;
+    case 'vdel': if(sc){ VTT.scenes.splice(VTT.cur,1); VTT.cur=VTT.scenes.length-1; vttSendAll(); renderVtt(); } break;
+  } });
+document.addEventListener('change',function(e){ if(e.target.id==='vttFile'){ vttAdd(e.target.files); e.target.value=''; } });
+document.addEventListener('input',function(e){ if(e.target.id==='vttBrush') VTT.brush=parseInt(e.target.value,10); });
+window.addEventListener('resize',function(){ if(S&&S.view==='vtt') vttDraw(); });
+
+/* ---------- Castschirm (eigenes Fenster) ---------- */
+function vttPlayer(){
+  document.body.className='vtt-player'; ['splash','fab'].forEach(function(id){ var el=$(id); if(el) el.style.display='none'; });
+  [].forEach.call(document.querySelectorAll('.view'),function(v){ v.hidden=true; });
+  var root=document.createElement('div'); root.id='pv'; root.innerHTML='<div id="pwrap"></div><div id="pmsg">🌳 Warte auf den Spielleiter …</div><button id="pfs">⛶ Vollbild</button><div id="ptap" hidden>🔊 Tippen für Ton</div>';
+  document.body.appendChild(root); document.title='Castschirm · Dungeon Master Service';
+  var wrap=$('pwrap'), media=null, fog=document.createElement('canvas'), W=1, H=1, vp=null, bc=new BroadcastChannel('dms-vtt'), wantSound=false; fog.id='pfog';
+  function hello(){ bc.postMessage({t:'hello',aspect:innerWidth/innerHeight}); }
+  function layout(){ if(!vp) return; var A=innerWidth/innerHeight, baseW=(W/H>A)?W:H*A, rw=baseW/vp.zoom, rh=rw/A, x=vp.cx-rw/2, y=vp.cy-rh/2, s=innerWidth/rw;
+    wrap.style.width=W+'px'; wrap.style.height=H+'px'; wrap.style.transform='translate('+(-x*s)+'px,'+(-y*s)+'px) scale('+s+')'; }
+  function trySound(){ if(media&&media.tagName==='VIDEO'){ media.muted=!wantSound; var p=media.play(); if(p&&p.catch) p.catch(function(){ if(wantSound){ media.muted=true; media.play(); $('ptap').hidden=false; } }); } }
+  bc.onmessage=function(ev){ var m=ev.data||{};
+    if(m.t==='clear'){ wrap.innerHTML=''; media=null; $('pmsg').style.display=''; }
+    if(m.t==='media'){ W=m.w; H=m.h; wrap.innerHTML=''; var u=URL.createObjectURL(m.blob);
+      if(m.kind==='video'){ media=document.createElement('video'); media.autoplay=true; media.loop=true; media.muted=true; media.playsInline=true; }
+      else media=document.createElement('img');
+      media.src=u; media.className='pmedia'; wrap.appendChild(media); wrap.appendChild(fog); $('pmsg').style.display='none'; trySound(); layout(); }
+    if(m.t==='fog'&&m.blob){ createImageBitmap(m.blob).then(function(bm){ fog.width=bm.width; fog.height=bm.height; var g=fog.getContext('2d'); g.clearRect(0,0,fog.width,fog.height); g.drawImage(bm,0,0); }); }
+    if(m.t==='vp'){ vp=m.vp; layout(); }
+    if(m.t==='sound'){ wantSound=m.on; trySound(); } };
+  window.addEventListener('resize',function(){ hello(); layout(); });
+  window.addEventListener('beforeunload',function(){ bc.postMessage({t:'bye'}); });
+  $('pfs').addEventListener('click',function(){ try{ document.documentElement.requestFullscreen(); }catch(e){} });
+  $('ptap').addEventListener('click',function(){ $('ptap').hidden=true; if(media){ media.muted=false; media.play(); } });
+  document.addEventListener('fullscreenchange',function(){ $('pfs').style.display=document.fullscreenElement?'none':''; });
+  hello();
+}
+
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
   var t=e.target.closest('[data-act],[data-tab]'); if(!t) return;
@@ -2676,7 +2815,7 @@ function enter(withSound){ var sp=$('splash'); if(withSound){ S.sound=true; play
 $('enterSnd').addEventListener('click',function(){ enter(true); });
 $('enterQuiet').addEventListener('click',function(){ enter(false); });
 document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-snd]')){ S.sound=S.sound===false; if(S.sound) playMelody(); sndIcon(); save(); } });
-load(); render(); showView(viewFromHash(),false); sndIcon(); if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
+load(); if(location.hash==='#vtt-player'){ vttPlayer(); } else { render(); showView(viewFromHash(),false); sndIcon(); } if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
 window.__kt={state:function(){return S;},sorted:sorted};
 })();
 </script>
