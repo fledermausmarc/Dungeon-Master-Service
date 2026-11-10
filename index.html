@@ -143,6 +143,10 @@
   .spell{font-size:13px} .spell.roll{border-color:#8a6fae;background:#efe5f7} .spell.out{opacity:.4;text-decoration:line-through}
   .tabs{flex-wrap:wrap} .tabs button{padding:6px 4px;font-size:13.5px}
   #fab{display:none}
+  #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
+  #show[hidden]{display:none}
+  #show img{max-width:96vw;max-height:80vh;border-radius:14px;border:3px solid #b8913f;box-shadow:0 0 40px rgba(233,196,106,.35)}
+  #showName{font-family:Cinzel,serif;color:#e9c46a;font-size:clamp(22px,5vw,40px);letter-spacing:.08em;text-align:center}
   #splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px;
     background:radial-gradient(ellipse at center,#fbf3dc 0%,#eadfc4 55%,#cdb98c 100%);transition:opacity .9s ease}
   #splash.out{opacity:0;pointer-events:none}
@@ -212,8 +216,10 @@
     <textarea id="genPrompt" rows="3"></textarea>
     <div class="row"><select id="genStyle"><option value="paint">Gemälde</option><option value="ink">Bestiarium-Skizze</option><option value="dark">Düster</option><option value="comic">Comic</option><option value="token">Token (rund)</option></select>
     <button id="genImg" class="pri">✨ Bild generieren</button></div><div id="genMsg" class="hint"></div></div>
+  <div class="row" style="justify-content:center" id="lbShowRow"><button id="lbShow" class="pri">🖼️ Den Spielern zeigen</button><button id="lbDl">⬇️ Herunterladen</button><button id="lbShare" hidden>📤 Teilen</button></div>
   <div class="row" style="justify-content:center"><button id="lbUse" class="pri" hidden>Übernehmen</button><button id="lbChange">Vom Gerät hochladen</button><button id="lbDel" class="danger">Bild entfernen</button><button id="lbClose">Schließen</button></div></div></div>
 <div id="toast" hidden></div>
+<div id="show" hidden><img id="showImg" alt=""><div id="showName"></div><div class="hint" style="color:#cbb88f">Tippen zum Schließen</div></div>
 <div id="fab"><span class="r">R <span id="fabRound">1</span></span><button id="fabPrev">◀</button><button id="fabNext" class="pri">Nächster ▶</button></div>
 <input type="file" id="imgFile" accept="image/*" hidden>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -976,7 +982,7 @@ function pickImage(key){ imgTarget=key; var f=$('imgFile'); f.value=''; f.click(
 function loadImage(file){
   if(!file||!imgTarget) return; var key=imgTarget, rd=new FileReader();
   rd.onload=function(){ var im=new Image(); im.onload=function(){
-      var mx=320, sc=Math.min(1,mx/Math.max(im.width,im.height)), cv=document.createElement('canvas');
+      var mx=720, sc=Math.min(1,mx/Math.max(im.width,im.height)), cv=document.createElement('canvas');
       cv.width=Math.round(im.width*sc); cv.height=Math.round(im.height*sc); cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
       S.images[key]=cv.toDataURL('image/jpeg',0.82);
       if(!save()){ delete S.images[key]; toast('Speicher voll: Bild konnte nicht gespeichert werden.'); }
@@ -993,21 +999,35 @@ function promptForCombatant(c){ if(c.side==='hero') return 'portrait of a fantas
   if(c.side==='ally') return 'frightened civilian, medieval fantasy townsperson'; if(c.side==='object') return (c.baseName||c.name)+', magical object, fantasy';
   return promptForName(c.baseName||c.name,c.t); }
 function openLb(key,title,prompt){ lbKey=key; lbPending=null; var src=S.images[key]; $('lbImg').src=src||''; $('lbImg').style.display=src?'':'none'; $('lbPh').style.display=src?'none':'';
-  $('lbTitle').textContent=title||''; $('genPrompt').value=prompt||title||''; $('genMsg').textContent=''; $('lbUse').hidden=true; $('lbDel').hidden=!src; $('lb').hidden=false; }
+  $('lbTitle').textContent=title||''; lbTitleTxt=title||''; $('genPrompt').value=prompt||title||''; $('lbShowRow').style.display=src?'':'none';
+  $('lbShare').hidden=!(navigator.canShare&&window.File&&(function(){ try{ return navigator.canShare({files:[new File([''],'x.jpg',{type:'image/jpeg'})]}); }catch(e){ return false; } })()); $('genMsg').textContent=''; $('lbUse').hidden=true; $('lbDel').hidden=!src; $('lb').hidden=false; }
 function closeLb(){ $('lb').hidden=true; lbKey=null; lbPending=null; }
+var lbTitleTxt='';
+function curImgSrc(){ return lbPending?lbPending.src:(S.images[lbKey]||''); }
+function fileName(){ return (lbTitleTxt||'bild').replace(/[^\wäöüÄÖÜß -]+/g,'').trim().replace(/\s+/g,'_')+'.jpg'; }
+function imgBlob(cb){ var src=curImgSrc(); if(!src){ toast('Noch kein Bild vorhanden.'); return; }
+  if(lbPending&&!src.startsWith('data:')){ try{ var cv=document.createElement('canvas'); cv.width=lbPending.naturalWidth; cv.height=lbPending.naturalHeight; cv.getContext('2d').drawImage(lbPending,0,0); cv.toBlob(function(b){ b?cb(b):fetchBlob(); },'image/jpeg',0.92); return; }catch(e){} }
+  fetchBlob(); function fetchBlob(){ fetch(src).then(function(r){return r.blob();}).then(cb).catch(function(){ toast('Bild konnte nicht gelesen werden.'); }); } }
+function downloadImg(){ imgBlob(function(b){ var u=URL.createObjectURL(b), a=document.createElement('a'); a.href=u; a.download=fileName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(u); },4000);
+  toast('Download gestartet. In der Claude-Vorschau sind Downloads gesperrt, auf GitHub klappt es.'); }); }
+function shareImg(){ imgBlob(function(b){ var f=new File([b],fileName(),{type:'image/jpeg'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})) navigator.share({files:[f],title:lbTitleTxt}).catch(function(){}); else toast('Teilen wird von diesem Browser nicht unterstützt. Nutze „Herunterladen“.'); }); }
+function showPlayers(){ var src=curImgSrc(); if(!src){ toast('Noch kein Bild vorhanden.'); return; } $('showImg').src=src; $('showName').textContent=lbTitleTxt; $('show').hidden=false;
+  try{ var el=$('show'); (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }catch(e){} }
+function hideShow(){ $('show').hidden=true; try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} }
 function genImage(){
   var now=Date.now(); if(now<genBusyUntil){ $('genMsg').textContent='Bitte noch '+Math.ceil((genBusyUntil-now)/1000)+' s warten (kostenloser Dienst: 1 Bild pro 15 s).'; return; }
   var p=$('genPrompt').value.trim(); if(!p) return; genBusyUntil=now+15000;
   var url='https://image.pollinations.ai/prompt/'+encodeURIComponent(p+STYLE[$('genStyle').value])+'?width=512&height=512&nologo=true&seed='+Math.floor(Math.random()*1e9);
   var im=$('lbImg'); $('genMsg').textContent='Wird gemalt … das dauert meist 10 bis 40 Sekunden.'; $('genImg').disabled=true;
   var probe=new Image(); probe.crossOrigin='anonymous';
-  probe.onload=function(){ $('genImg').disabled=false; lbPending=probe; im.src=probe.src; im.style.display=''; $('lbPh').style.display='none'; $('lbUse').hidden=false; $('genMsg').textContent='Gefällt es dir? „Übernehmen“ speichert es, „Bild generieren“ malt ein neues.'; };
+  probe.onload=function(){ $('genImg').disabled=false; lbPending=probe; im.src=probe.src; im.style.display=''; $('lbPh').style.display='none'; $('lbUse').hidden=false; $('lbShowRow').style.display=''; $('genMsg').textContent='Gefällt es dir? „Übernehmen“ speichert es, „Bild generieren“ malt ein neues.'; };
   probe.onerror=function(){ $('genImg').disabled=false; $('genMsg').textContent='Das Bild ließ sich nicht laden. In der Claude-Vorschau sind Bilder aus dem Netz gesperrt; auf deiner GitHub-Seite funktioniert der Generator. Sonst kurz warten und erneut versuchen.'; };
   probe.src=url;
 }
 function usePending(){
   if(!lbPending||!lbKey) return; var key=lbKey, data;
-  try{ var mx=320, sc=Math.min(1,mx/Math.max(lbPending.naturalWidth,lbPending.naturalHeight)), cv=document.createElement('canvas');
+  try{ var mx=640, sc=Math.min(1,mx/Math.max(lbPending.naturalWidth,lbPending.naturalHeight)), cv=document.createElement('canvas');
     cv.width=Math.round(lbPending.naturalWidth*sc); cv.height=Math.round(lbPending.naturalHeight*sc); cv.getContext('2d').drawImage(lbPending,0,0,cv.width,cv.height); data=cv.toDataURL('image/jpeg',0.84);
   }catch(e){ data=lbPending.src; }
   S.images[key]=data; if(!save()){ delete S.images[key]; toast('Speicher voll: Bild konnte nicht gespeichert werden.'); return; }
@@ -1612,6 +1632,10 @@ document.addEventListener('click',function(e){
   if(e.target.id==='lbClose'||e.target.id==='lb') closeLb();
   if(e.target.id==='lbChange'&&lbKey) pickImage(lbKey);
   if(e.target.id==='genImg') genImage();
+  if(e.target.id==='lbDl') downloadImg();
+  if(e.target.id==='lbShare') shareImg();
+  if(e.target.id==='lbShow') showPlayers();
+  if(e.target.closest&&e.target.closest('#show')) hideShow();
   if(e.target.id==='lbUse') usePending();
   if(e.target.id==='lbDel'&&lbKey){ delete S.images[lbKey]; closeLb(); render(); }
 });
