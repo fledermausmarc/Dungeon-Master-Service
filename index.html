@@ -2409,10 +2409,12 @@ function micToggle(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast('Spracheingabe wird hier nicht unterstützt. Chrome, Edge oder Safari nutzen, oder das Mikrofon der Handy-Tastatur.'); return; }
   if(recOn){ try{ recog.stop(); }catch(e){} return; }
-  recog=new SR(); recog.lang='de-DE'; recog.continuous=true; recog.interimResults=true;
+  recog=new SR(); recog.lang='de-DE'; recog.continuous=!IS_MOBILE; recog.interimResults=true;
   var inp=$('lIn'); recBase=inp?inp.value.replace(/\s+$/,''):'';
-  recog.onresult=function(ev){ var fin='', tmp=''; for(var i=ev.resultIndex;i<ev.results.length;i++){ var tx=ev.results[i][0].transcript; if(ev.results[i].isFinal) fin+=tx; else tmp+=tx; }
-    if(fin){ recBase=(recBase?recBase+' ':'')+fin.trim(); } var el=$('lIn'); if(el) el.value=recBase+(tmp?(recBase?' ':'')+tmp:''); };
+  var done=0; SREC.lastFinal='';
+  recog.onresult=function(ev){ var tmp=''; for(var i=done;i<ev.results.length;i++){ var tx0=ev.results[i][0].transcript.trim(); if(!tx0) continue;
+      if(ev.results[i].isFinal){ done=i+1; var tx=newPart(tx0); if(tx) recBase=(recBase?recBase+' ':'')+tx; } else tmp+=tx0+' '; }
+    var el=$('lIn'); if(el) el.value=recBase+(tmp?(recBase?' ':'')+tmp.trim():''); };
   recog.onerror=function(ev){ toast(ev.error==='not-allowed'||ev.error==='service-not-allowed'?'Mikrofon nicht erlaubt. In der Claude-Vorschau gesperrt, auf GitHub im Browser erlauben.':'Spracheingabe: '+ev.error); };
   recog.onend=function(){ recOn=false; var b=$('lMic'); if(b) b.classList.remove('rec'); };
   try{ recog.start(); recOn=true; var b=$('lMic'); if(b) b.classList.add('rec'); toast('🎙️ Sprich jetzt … nochmal tippen zum Beenden.'); }catch(err){ toast('Spracheingabe konnte nicht starten.'); }
@@ -2420,6 +2422,20 @@ function micToggle(){
 document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('#lMic')) micToggle(); });
 
 /* =================== Loreyer: Sitzung aufnehmen =================== */
+var IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function nrm(t){ return String(t).toLowerCase().replace(/[^a-zäöüß0-9 ]/g,'').replace(/\s+/g,' ').trim(); }
+/* gibt nur den neuen Teil zurück (Handy-Browser melden Sätze oft mehrfach oder kumulativ) */
+function newPart(tx){ var a=nrm(SREC.lastFinal||''), b=nrm(tx); SREC.cont=false;
+  if(!b||b===a||(a&&a.slice(-b.length)===b)) return '';
+  if(a&&b.indexOf(a)===0){ var words=tx.trim().split(/\s+/), aw=a.split(' ').length; SREC.lastFinal=tx; SREC.cont=true; return words.slice(aw).join(' '); }
+  SREC.lastFinal=tx; return tx; }
+function dedupeText(t){
+  return String(t||'').split('\n').map(function(line){ var m=line.match(/^((?:\[[0-9:]+\]\s*)?(?:[^:\s.][^:.]{0,30}:\s)?)(.*)$/), pre=m?m[1]:'', body=m?m[2]:line;
+    var parts=body.split(/(?<=[.!?])\s+/), keep=[];
+    parts.forEach(function(p){ var b=nrm(p); if(!b) return; var last=keep.length?nrm(keep[keep.length-1]):'';
+      if(b===last||(last&&last.indexOf(b)===0)) return; if(last&&b.indexOf(last)===0){ keep[keep.length-1]=p; return; }
+      if(keep.some(function(k){ return nrm(k)===b; })) return; keep.push(p); });
+    return pre+keep.join(' '); }).join('\n'); }
 var SREC={on:false,r:null,t0:0,timer:null,lock:null,interim:'',sid:null,lastMark:0,spk:'',lastSpk:null};
 function fmtT(ms){ var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 function wakeOn(){ try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ SREC.lock=l; }).catch(function(){}); }catch(e){} }
@@ -2428,22 +2444,23 @@ function recStart(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast('Aufnahme braucht Chrome, Edge oder Safari.'); return; }
   if(recOn){ try{ recog.stop(); }catch(e){} }
-  var s=curSession(); SREC.sid=s.id; if(!s.tr) s.tr=''; SREC.on=true; SREC.lastSpk=null; SREC.t0=Date.now()-(s.trMs||0); SREC.lastMark=-1; wakeOn();
-  function startR(){ var r=new SR(); r.lang='de-DE'; r.continuous=true; r.interimResults=true; SREC.r=r;
+  var s=curSession(); SREC.sid=s.id; if(!s.tr) s.tr=''; SREC.on=true; SREC.lastSpk=null; SREC.lastFinal=''; SREC.t0=Date.now()-(s.trMs||0); SREC.lastMark=-1; wakeOn();
+  function startR(){ var r=new SR(); r.lang='de-DE'; r.continuous=!IS_MOBILE; r.interimResults=true; SREC.r=r; var committed=0;
     r.onresult=function(ev){ var tmp=''; var ss=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); if(!ss) return;
-      for(var i=ev.resultIndex;i<ev.results.length;i++){ var tx=ev.results[i][0].transcript.trim(); if(!tx) continue;
-        if(ev.results[i].isFinal){ var el=Date.now()-SREC.t0, mk=Math.floor(el/300000), nl=false;
+      for(var i=committed;i<ev.results.length;i++){ var tx0=ev.results[i][0].transcript.trim(); if(!tx0) continue;
+        if(ev.results[i].isFinal){ committed=i+1; var tx=newPart(tx0); if(!tx) continue;
+          if(SREC.cont&&/\.$/.test(ss.tr)){ ss.tr=ss.tr.replace(/\.$/,'')+' '+tx+'.'; ss.trMs=Date.now()-SREC.t0; saveSoon(); continue; } var el=Date.now()-SREC.t0, mk=Math.floor(el/300000), nl=false;
           if(mk!==SREC.lastMark){ SREC.lastMark=mk; ss.tr+=(ss.tr?'\n':'')+'['+fmtT(el)+'] '; nl=true; }
           if(SREC.spk!==SREC.lastSpk||nl){ if(!nl) ss.tr+='\n'; if(SREC.spk) ss.tr+=SREC.spk+': '; SREC.lastSpk=SREC.spk; } else ss.tr+=' ';
           ss.tr+=tx.charAt(0).toUpperCase()+tx.slice(1)+'.'; ss.trMs=el; saveSoon(); }
-        else tmp+=tx+' '; }
+        else tmp+=tx0+' '; }
       SREC.interim=tmp; recUi(); };
     r.onerror=function(ev){ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ SREC.on=false; toast('Mikrofon nicht erlaubt. Auf der GitHub-Seite im Browser erlauben.'); renderLore(); } };
     r.onend=function(){ if(SREC.on) setTimeout(function(){ if(SREC.on){ try{ startR(); }catch(e){} } },250); };
     try{ r.start(); }catch(e){} }
   startR(); SREC.timer=setInterval(recUi,1000); renderLore(); toast('⏺ Aufnahme läuft. Bildschirm bleibt an.');
 }
-function recStop(){ SREC.on=false; try{ SREC.r&&SREC.r.stop(); }catch(e){} clearInterval(SREC.timer); SREC.interim=''; try{ SREC.lock&&SREC.lock.release(); }catch(e){} SREC.lock=null; save(); renderLore(); toast('⏹ Aufnahme gestoppt.'); }
+function recStop(){ SREC.on=false; var sx=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); if(sx&&sx.tr) sx.tr=dedupeText(sx.tr); try{ SREC.r&&SREC.r.stop(); }catch(e){} clearInterval(SREC.timer); SREC.interim=''; try{ SREC.lock&&SREC.lock.release(); }catch(e){} SREC.lock=null; save(); renderLore(); toast('⏹ Aufnahme gestoppt.'); }
 var saveT=null; function saveSoon(){ clearTimeout(saveT); saveT=setTimeout(save,2000); }
 function recUi(){ var s=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); var a=$('recTime'), b=$('recWords'), c=$('recLive');
   if(a) a.textContent=fmtT(Date.now()-SREC.t0); if(b&&s) b.textContent=(s.tr?s.tr.split(/\s+/).length:0)+' Wörter'; if(c) c.textContent=SREC.interim||(s&&s.tr?s.tr.slice(-140):''); }
@@ -2454,7 +2471,7 @@ function recPanel(s){
       '<button class="recbtn" data-act="recstart">⏺ Sitzung aufnehmen</button><span class="hint">'+(words?words+' Wörter · '+fmtT(s.trMs||0):'Alles mitschreiben lassen, danach auswerten')+'</span>')+'</div>'+
     (mine?'<div class="reclive" id="recLive">'+esc(SREC.interim||(s.tr||'').slice(-140))+'</div>'+
       '<div class="spkrow"><span class="hint">Wer spricht?</span>'+[['','–']].concat([['SL','SL']],(S.chars||[]).map(function(c){ var n=c.short||c.name; return [n,n]; })).map(function(x){ return '<button class="sm'+(SREC.spk===x[0]?' on':'')+'" data-act="recspk" data-k="'+esc(x[0])+'">'+esc(x[1])+'</button>'; }).join('')+'</div>':'')+
-    (words&&!mine?'<div class="row" style="margin:8px 0 0"><button class="sm" data-act="recfix">🧹 Korrigieren</button>'+(s.trOrig?'<button class="sm" data-act="recundo">↩ Original</button>':'')+'<button class="sm pri" data-act="recana">✨ Auswerten → Recap &amp; Quests</button><button class="sm" data-act="recdl">⬇️ .txt</button><button class="sm" data-act="recprompt">Prompt kopieren</button><button class="sm danger" data-act="recclr">✕</button></div>':'')+
+    (words&&!mine?'<div class="row" style="margin:8px 0 0"><button class="sm" data-act="recdup">🧽 Doppelte entfernen</button><button class="sm" data-act="recfix">🧹 Korrigieren</button>'+(s.trOrig?'<button class="sm" data-act="recundo">↩ Original</button>':'')+'<button class="sm pri" data-act="recana">✨ Auswerten → Recap &amp; Quests</button><button class="sm" data-act="recdl">⬇️ .txt</button><button class="sm" data-act="recprompt">Prompt kopieren</button><button class="sm danger" data-act="recclr">✕</button></div>':'')+
     (s.aiState?'<div class="hint" style="margin-top:6px">'+esc(s.aiState)+'</div>':'')+
     (words?'<details style="margin-top:6px"><summary class="hint">Transkript ansehen / korrigieren</summary><textarea id="lTr" rows="8" style="width:100%">'+esc(s.tr)+'</textarea></details>':'')+
     '<div class="hint" style="margin-top:6px">Alle am Tisch sollten zustimmen. Die Spracherkennung läuft über den Dienst des Browsers (bei Chrome: Google).</div></div>';
@@ -2511,7 +2528,8 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-act
     case 'recstart': recStart(); break;
     case 'recstop': recStop(); break;
     case 'recana': analyzeTr(s); break;
-    case 'recfix': fixTr(s); break;
+    case 'recfix': s.tr=dedupeText(s.tr); fixTr(s); break;
+    case 'recdup': { var before=s.tr.split(/\s+/).length; s.trOrig=s.trOrig||s.tr; s.tr=dedupeText(s.tr); var after=s.tr.split(/\s+/).length; s.aiState='🧽 '+(before-after)+' doppelte Wörter entfernt.'; save(); renderLore(); break; }
     case 'recundo': if(s.trOrig){ s.tr=s.trOrig; s.trOrig=''; s.aiState=''; save(); renderLore(); toast('Original wiederhergestellt.'); } break;
     case 'recspk': SREC.spk=t.dataset.k; renderLore(); break;
     case 'recclr': if(!t.dataset.ok){ t.dataset.ok='1'; t.textContent='Transkript löschen?'; break; } s.tr=''; s.trMs=0; save(); renderLore(); break;
