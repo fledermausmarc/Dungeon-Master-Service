@@ -1,13 +1,14 @@
 # Dungeon Master Service
 
-Werkzeugkasten für Spielleiter in D&D 5e als einzelne Webseite (`index.html`), ohne Server und ohne Installation. Sechs Hubs:
+Werkzeugkasten für Spielleiter in D&D 5e als einzelne Webseite (`index.html`), ohne Server und ohne Installation. Sieben Hubs:
 
 - **Fight Club**: Kampftracker mit Generator, Monsterbuch und Szene
 - **Charakteristico**: Charakterbögen im 5.5e-Stil, Werte mit einem Tipp in den Fight Club
 - **NPCFindr**: NPCs mit Name, Beschreibung und Eigenart
 - **Kalender von Aetheria**: 10 Monate à 30 Tage, Tage abhaken, Feiertage und Notizen
 - **Questmaster**: Quests, Rätsel, Runenschloss und Geheimschrift auf Knopfdruck
-- **Loreyer**: Sitzungsnotizen nach Kategorien, automatisches Recap, optional KI-Zusammenfassung (Pollinations.ai)
+- **Loreyer**: Sitzungsnotizen nach Kategorien (auch per Spracheingabe), automatisches Recap, optional KI-Zusammenfassung (Pollinations.ai)
+- **Mystery Shop**: Zum Wunderbaren Unfug, Wundertruhen und Generator für unnütze magische Gegenstände
 
 ## Fight Club
 - Initiative mit Live-Sortierung, TP, Zustände, Runden- und Zugzähler
