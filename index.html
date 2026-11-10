@@ -254,6 +254,10 @@
   .ucard{background:var(--panel);border:1px solid var(--edge);border-left:6px solid #8a6fae;border-radius:12px;padding:12px;margin-top:10px;box-shadow:0 2px 6px rgba(90,60,20,.12)}
   .uhead{display:flex;gap:10px;align-items:center} .uname{font-family:Cinzel,serif;font-size:19px;color:#4a3410;line-height:1.2}
   .ueff{margin-top:8px;line-height:1.45} .uhk{margin-top:4px;font-style:italic;color:var(--muted)}
+  .uqk{margin-top:4px;color:#6a3f95}
+  .recp{border-left:6px solid var(--bad)} .recp.live{background:#fff1ec}
+  .recbtn{font-weight:700;padding:8px 14px} .recbtn.on{background:#b23a2a;color:#fff;border-color:#b23a2a;animation:pulse 1.2s infinite}
+  #recTime{font-family:Cinzel,serif;font-size:20px;color:var(--bad)} .reclive{margin-top:6px;font-style:italic;color:var(--muted);min-height:1.4em;font-size:14px}
   .seg.three small{font-size:11px;color:inherit;opacity:.8}
   @media(max-width:520px){.day{min-height:62px;padding:3px}.dnum{font-size:14px}.cbox{width:19px;height:19px}.calgrid .dn{font-size:9.5px}.hname{font-size:10px}}
   #show{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at center,#2a2114 0%,#0d0a06 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:pointer}
@@ -2018,8 +2022,8 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){ var t=e.target; if(t.id==='qType'){ S.qF.type=t.value; save(); } if(t.id==='qLvl'){ S.gen.level=Math.max(1,Math.min(20,parseInt(t.value,10)||1)); save(); } });
 
 /* =================== Loreyer =================== */
-var LTAGS=[['ev','⚔️','Geschehen'],['ort','🗺️','Ort'],['npc','🧙','NPC'],['loot','💰','Beute'],['open','❓','Offener Faden'],['quote','💬','Zitat'],['misc','📝','Sonstiges']];
-function ltag(k){ return LTAGS.find(function(x){return x[0]===k;})||LTAGS[6]; }
+var LTAGS=[['ev','⚔️','Geschehen'],['ort','🗺️','Ort'],['npc','🧙','NPC'],['loot','💰','Beute'],['open','❓','Offener Faden'],['quest','📜','Quest'],['quote','💬','Zitat'],['misc','📝','Sonstiges']];
+function ltag(k){ return LTAGS.find(function(x){return x[0]===k;})||LTAGS[LTAGS.length-1]; }
 function aetDate(){ var t=S.cal&&S.cal.today; return t?CAL_DAYS[(t.d-1)%5]+', '+t.d+'. '+CAL_MONTHS[t.m][0]+', Jahr '+t.y:''; }
 function loreDefaults(){ return {sessions:[],cur:null,tab:'notes',tag:'ev'}; }
 function newSession(){ var Lr=S.lore, no=Lr.sessions.length?Lr.sessions[Lr.sessions.length-1].no+1:1, d=new Date();
@@ -2028,10 +2032,10 @@ function curSession(){ var Lr=S.lore; return Lr.sessions.find(function(s){return
 function noteHtml(n,sid){ var tg=ltag(n.tag);
   return '<div class="lnote'+(n.star?' star':'')+(n.done?' done':'')+'"><button class="ltag" data-act="lcyc" data-s="'+sid+'" data-n="'+n.id+'" title="'+tg[2]+'">'+tg[1]+'</button>'+
    '<div class="ltxt">'+esc(n.text)+'</div><button class="sm" data-act="lstar" data-s="'+sid+'" data-n="'+n.id+'">'+(n.star?'★':'☆')+'</button>'+
-   (n.tag==='open'?'<button class="sm" data-act="ldone" data-s="'+sid+'" data-n="'+n.id+'">'+(n.done?'↺':'✔')+'</button>':'')+'<button class="sm danger" data-act="ldel" data-s="'+sid+'" data-n="'+n.id+'">✕</button></div>'; }
+   ((n.tag==='open'||n.tag==='quest')?'<button class="sm" data-act="ldone" data-s="'+sid+'" data-n="'+n.id+'">'+(n.done?'↺':'✔')+'</button>':'')+'<button class="sm danger" data-act="ldel" data-s="'+sid+'" data-n="'+n.id+'">✕</button></div>'; }
 function recapData(s){ var by={}; LTAGS.forEach(function(t){ by[t[0]]=[]; }); s.notes.forEach(function(n){ by[n.tag].push(n); });
-  var open=[]; S.lore.sessions.forEach(function(ss){ ss.notes.forEach(function(n){ if(n.tag==='open'&&!n.done) open.push({n:n,s:ss}); }); });
-  return {by:by,star:s.notes.filter(function(n){return n.star;}),open:open}; }
+  var open=[], quests=[]; S.lore.sessions.forEach(function(ss){ ss.notes.forEach(function(n){ if(n.tag==='open'&&!n.done) open.push({n:n,s:ss}); if(n.tag==='quest'&&!n.done) quests.push({n:n,s:ss}); }); });
+  return {by:by,star:s.notes.filter(function(n){return n.star;}),open:open,quests:quests}; }
 function recapHtml(s){ var R=recapData(s), h='';
   function sec(ic,title,arr,fn){ if(!arr.length) return ''; return '<div class="rsec"><div class="rtitle">'+ic+' '+title+'</div><ul>'+arr.map(fn||function(n){return '<li>'+esc(n.text)+'</li>';}).join('')+'</ul></div>'; }
   h+='<div class="rhead"><div class="rnum">Sitzung '+s.no+(s.title?' · '+esc(s.title):'')+'</div><div class="hint">'+esc(s.aet||'')+(s.date?' · '+esc(s.date):'')+'</div></div>';
@@ -2039,13 +2043,14 @@ function recapHtml(s){ var R=recapData(s), h='';
   h+=sec('⚔️','Was geschah',R.by.ev.concat(R.by.misc));
   h+=sec('🗺️','Orte',R.by.ort); h+=sec('🧙','Begegnungen',R.by.npc); h+=sec('💰','Beute',R.by.loot); h+=sec('💬','Zitate',R.by.quote,function(n){return '<li><i>„'+esc(n.text)+'“</i></li>';});
   h+=sec('❓','Offene Fäden (alle Sitzungen)',R.open,function(o){return '<li>'+esc(o.n.text)+' <span class="hint">(S'+o.s.no+')</span></li>';});
+  h+=sec('📜','Aktive Quests',R.quests,function(o){return '<li><b>'+esc(o.n.text)+'</b> <span class="hint">(S'+o.s.no+')</span></li>';});
   if(!s.notes.length) h+='<div class="empty">Noch keine Notizen in dieser Sitzung.</div>';
   return h; }
 function recapPlain(s){ var R=recapData(s), out=['Recap Sitzung '+s.no+(s.title?' – '+s.title:'')+(s.aet?' ('+s.aet+')':'')];
   function sec(t,arr,fn){ if(arr.length){ out.push('',t); arr.forEach(function(n){ out.push('• '+(fn?fn(n):n.text)); }); } }
   sec('Das Wichtigste',R.star); sec('Was geschah',R.by.ev.concat(R.by.misc)); sec('Orte',R.by.ort); sec('Begegnungen',R.by.npc); sec('Beute',R.by.loot); sec('Zitate',R.by.quote,function(n){return '„'+n.text+'“';});
-  sec('Offene Fäden',R.open,function(o){return o.n.text+' (S'+o.s.no+')';}); return out.join('\n'); }
-function aiPrompt(s){ return 'Du bist ein Barde in der Fantasywelt Aetheria. Fasse die folgenden Spielleiter-Notizen einer D&D-Sitzung als kurzes, stimmungsvolles Recap auf Deutsch zusammen, das der Spielleiter zu Beginn der nächsten Sitzung vorlesen kann. Höchstens 150 Wörter, Vergangenheitsform, an die Spieler gerichtet („Ihr …“). Erfinde nichts dazu. Nenne am Ende in einem Satz die offenen Fäden.\n\n'+recapPlain(s); }
+  sec('Offene Fäden',R.open,function(o){return o.n.text+' (S'+o.s.no+')';}); sec('Aktive Quests',R.quests,function(o){return o.n.text+' (S'+o.s.no+')';}); return out.join('\n'); }
+function aiPrompt(s){ return 'Du bist ein Barde in der Fantasywelt Aetheria. Fasse die folgenden Spielleiter-Notizen einer D&D-Sitzung als kurzes, stimmungsvolles Recap auf Deutsch zusammen, das der Spielleiter zu Beginn der nächsten Sitzung vorlesen kann. Höchstens 150 Wörter, Vergangenheitsform, an die Spieler gerichtet („Ihr …“). Erfinde nichts dazu. Nenne am Ende in ein bis zwei Sätzen die aktiven Quests und offenen Fäden.\n\n'+recapPlain(s); }
 var aiBusy=false;
 function aiRecap(s){
   if(aiBusy) return; aiBusy=true; s.ai='⏳'; renderLore();
@@ -2061,7 +2066,7 @@ function renderLore(){
    '<div class="panel shead"><input id="lTitle" placeholder="Titel der Sitzung" value="'+esc(s.title)+'"><div class="row" style="margin:6px 0 0"><input id="lAet" value="'+esc(s.aet)+'" placeholder="Datum in Aetheria" style="flex:1"><input id="lDate" value="'+esc(s.date)+'" style="width:110px"></div></div>'+
    '<div class="seg" style="margin:10px 0"><button class="'+(Lr.tab==='notes'?'on':'')+'" data-act="ltab" data-t="notes">📝 Notizen ('+s.notes.length+')</button><button class="'+(Lr.tab==='recap'?'on':'')+'" data-act="ltab" data-t="recap">📖 Recap</button></div>';
   if(Lr.tab==='notes'){
-    h+='<div class="panel"><div class="tagrow">'+LTAGS.map(function(t){return '<button class="sm'+(Lr.tag===t[0]?' on':'')+'" data-act="ltagsel" data-t="'+t[0]+'" title="'+t[2]+'">'+t[1]+' <span class="tl2">'+t[2]+'</span></button>';}).join('')+'</div>'+
+    h+=recPanel(s)+'<div class="panel" style="margin-top:10px"><div class="tagrow">'+LTAGS.map(function(t){return '<button class="sm'+(Lr.tag===t[0]?' on':'')+'" data-act="ltagsel" data-t="'+t[0]+'" title="'+t[2]+'">'+t[1]+' <span class="tl2">'+t[2]+'</span></button>';}).join('')+'</div>'+
       '<div class="row" style="margin:8px 0 0"><textarea id="lIn" rows="2" placeholder="'+ltag(Lr.tag)[1]+' '+ltag(Lr.tag)[2]+' … (Enter = speichern)" style="flex:1"></textarea><button id="lMic" class="mic'+(recOn?' rec':'')+'" title="Spracheingabe">🎙️</button><button class="pri" data-act="ladd">＋</button></div></div>'+
       '<div class="lnotes">'+(s.notes.length?s.notes.slice().reverse().map(function(n){return noteHtml(n,s.id);}).join(''):'<div class="empty">Was passiert gerade? Kategorie wählen, kurz notieren.</div>')+'</div>'+
       (Lr.sessions.length>1?'<div class="row" style="margin-top:14px"><button class="sm danger" data-act="lsdel">Sitzung löschen</button></div>':'');
@@ -2301,6 +2306,40 @@ var UPROP=[
  ['des Nebels','Stößt beim Benutzen eine kleine, dekorative Nebelwolke aus.'],
  ['der Zauberstimme','Spricht mit der Stimme der Großmutter des Besitzers.']];
 var USIDE=['Kein Nutzen.','Nachteil auf Heimlichkeit.','Quirin schwört, es sei ein Erbstück.','Die Wirkung endet nie.','Abnehmbar, aber es kommt zurück.','Funktioniert nur nachts.','Nur für Halblinge wirklich passend.','Völlig harmlos.','Kinder finden es großartig.','Ein Paladin würde es beschlagnahmen.','Riecht leicht nach Schwefel.','Bei einer 1 auf dem W20 verstärkt sich die Wirkung für 1 Stunde.'];
+/* Magische Gegenstände mit Segen, Preis und Schrulle (angelehnt an SRD-Gegenstände) */
+var MBASE=[['Stiefel','k'],['Umhang','k'],['Hut','k'],['Handschuhe','k'],['Gürtel','k'],['Ring','s'],['Amulett','s'],['Brosche','s'],['Ohrring','s'],['Brille','s'],
+ ['Langschwert','w'],['Dolch','w'],['Streitaxt','w'],['Kampfstab','w'],['Kurzbogen','w'],['Kriegshammer','w'],['Schild','r'],['Lederrüstung','r'],['Kettenhemd','r'],
+ ['Laterne','t'],['Beutel','t'],['Seil','t'],['Flöte','t'],['Becher','t'],['Kompass','t'],['Zauberstab','t'],['Kerze','t'],['Schlüssel','t']];
+/* Segen: [Beiname, Wirkung, Seltenheit G/U, erlaubte Typen] */
+var MBOON=[
+ ['der leisen Sohle','Vorteil auf Heimlichkeit.','U','k'],['des Schutzes','+1 auf die RK.','U','ksr'],['des Federfalls','Fällt der Träger, sinkt er sanft: kein Fallschaden.','U','ks'],
+ ['der tausend Gesichter','1/Tag: Selbstverkleidung wirken.','U','ks'],['des Glücks','+1 auf alle Rettungswürfe.','U','ks'],['der Nachtaugen','Dunkelsicht 18 m.','U','s'],
+ ['des kleinen Glücks','1/Tag: 1W4 auf einen eigenen Wurf addieren.','G','skt'],['der Labsal','1/Tag als Aktion: Der Besitzer heilt 2W4+2 TP.','G','st'],
+ ['der Quelle','1/Tag: 4 Liter frisches Wasser.','G','t'],['des Nimmervollen','Innen viel größer: fasst bis 250 kg.','U','t'],['der Eile','Bewegungsrate +3 m.','U','k'],
+ ['der Spinne','Klettern an Wänden ohne Probe, Hände frei.','U','k'],['der Tiefe','Atmen unter Wasser, Schwimmen 9 m.','U','ks'],['der Schärfe','+1 auf Angriff und Schaden.','U','w'],
+ ['der Glut','Resistenz gegen Feuerschaden.','U','ksr'],['des Nebels','1/Tag: Nebelschritt wirken.','U','ks'],['des Lichts','Leuchtet auf Befehl: 6 m helles Licht.','G','wtrs'],
+ ['des Lauschers','Vorteil auf Wahrnehmung, die auf Hören beruht.','G','s'],['der Zungen','1/Tag: 1 Stunde jede Sprache verstehen.','U','s'],
+ ['des Vorkosters','Wird eiskalt, wenn Gift in der Nähe ist (1,5 m).','G','st'],['des Mutes','Vorteil auf Rettungswürfe gegen Verängstigt.','G','ksr'],
+ ['des Hasen','1/Tag: Sprung bis 9 m weit.','G','k'],['der Wachsamkeit','Vorteil auf Initiative.','U','swk'],['des Donners','Bei einem Treffer 1/Tag: +1W6 Donnerschaden.','U','w'],
+ ['der Wurzeln','Kann nicht gegen den Willen umgestoßen werden.','U','kr'],['des Wegweisers','Zeigt 1/Tag den Weg zum nächsten Ort mit Namen.','G','t'],
+ ['der Ruhe','1/Tag: Schlaf (1. Grad) wirken.','U','t'],['des Hüters','Reaktion: +2 RK gegen einen Angriff, 1/kurze Rast.','U','rs']];
+var MCURSE=[
+ 'Nachteil auf Heimlichkeit.','Nachteil auf Überzeugen.','−1 auf die RK.','Bewegungsrate −1,5 m.','Jede Benutzung kostet 1 TP.','Nachts Nachteil auf Wahrnehmung.',
+ 'Nach jeder Benutzung: bis zur kurzen Rast keine Reaktionen.','Muss täglich mit einer Silbermünze „gefüttert“ werden, sonst wirkt es nicht.','Wirkt nur, solange der Träger summt oder singt.',
+ 'Der Träger niest bei jeder Lüge.','Zieht Ratten an: Sie folgen in 1W4 Stunden.','Wird jede Nacht 1 kg schwerer, bis man es poliert.',
+ 'Verflucht: lässt sich nicht freiwillig ablegen (Fluch brechen hilft).','Nachteil auf Rettungswürfe gegen Bezaubern.','Bei einer 1 auf einem Angriff erlischt die Wirkung für 1 Stunde.',
+ 'Feen halten den Träger für einen gesuchten Dieb.','Jede Benutzung kostet 1 GM, die Münze verschwindet.','Funktioniert nicht in Gegenwart von Kirchenleuten.',
+ 'Der Träger verträgt kein Bier mehr: Nach einem Krug vergiftet für 1 Stunde.','Hunde knurren den Träger an.','Bei Vollmond wirkt es nicht, dafür heult es.'];
+var MQUIRK=['Quietscht bei jedem Schritt.','Klatscht bei jedem Treffer.','Flüstert Komplimente in einer fremden Sprache.','Riecht nach nassen Socken.','Singt leise beim Benutzen.',
+ 'Kommentiert alles mit trockenem Humor.','Leuchtet rosa, wenn jemand flirtet.','Schmeckt nach Zitrone, falls man daran leckt.','Niest, wenn Magie in der Nähe gewirkt wird.',
+ 'Hinterlässt Fußspuren eines Huhns.','Ist immer leicht klebrig.','Bellt, wenn Fremde nahen.','Lässt kleine Blumen sprießen, wo es abgelegt wird.','Erzählt sehr schlechte Witze.',
+ 'Seufzt melancholisch bei Sonnenuntergang.','Färbt die Haare des Trägers jeden Morgen anders.','Spielt bei Gefahr eine dramatische Fanfare.','Wird bei Regen beleidigt und schweigt.',
+ 'Gähnt, wenn jemand lange redet.','Glitzert beim kleinsten Lichtstrahl.'];
+var MPRICE={G:'Gewöhnlich · Richtwert 100 GM',U:'Ungewöhnlich · Richtwert 400 GM'};
+function genMagic(){ var b, boon, tries=0;
+  do{ b=rndOf(MBASE); boon=rndOf(MBOON); tries++; } while(boon[3].indexOf(b[1])<0&&tries<50);
+  return {id:'u'+Date.now()+Math.floor(Math.random()*999),name:b[0]+' '+boon[0],eff:'✦ '+boon[1],hk:'⚠ '+rndOf(MCURSE),qk:'🤪 '+rndOf(MQUIRK),price:MPRICE[boon[2]],src:'Magischer Gegenstand'}; }
+
 function genUnfug(){ var o=rndOf(UOBJ), p=rndOf(UPROP), price=2+Math.floor(Math.random()*24);
   return {id:'u'+Date.now()+Math.floor(Math.random()*999),name:o+' '+p[0],eff:p[1],hk:rndOf(USIDE),price:price+' GM',src:'Unfug'}; }
 function openChest(kind){ var r, roll;
@@ -2309,14 +2348,14 @@ function openChest(kind){ var r, roll;
 function unfugCard(u,saved){ var src=S.images['u:'+u.id];
   return '<div class="ucard'+(saved?' saved':'')+'"><div class="uhead"><button class="ava big" data-act="uimg" data-u="'+u.id+'">'+(src?'<img src="'+src+'" alt="">':'<span>🎁</span>')+'</button>'+
    '<div style="flex:1;min-width:0"><div class="uname">'+esc(u.name)+'</div><div class="hint">'+esc(u.src)+' · <b>'+esc(u.price)+'</b></div></div></div>'+
-   '<div class="ueff">'+esc(u.eff)+'</div>'+(u.hk?'<div class="uhk">'+esc(u.hk)+'</div>':'')+(u.owner?'<div class="hint">🎒 '+esc(u.owner)+'</div>':'')+
+   '<div class="ueff">'+esc(u.eff)+'</div>'+(u.hk?'<div class="uhk">'+esc(u.hk)+'</div>':'')+(u.qk?'<div class="uqk">'+esc(u.qk)+'</div>':'')+(u.owner?'<div class="hint">🎒 '+esc(u.owner)+'</div>':'')+
    '<div class="row" style="margin-top:8px">'+(saved?'':'<button class="sm pri" data-act="usave" data-u="'+u.id+'">★</button>')+
    '<select data-uown="'+u.id+'" class="sm"><option value="">Verkauft an …</option>'+S.chars.map(function(c){return '<option'+(u.owner===(c.short||c.name)?' selected':'')+'>'+esc(c.short||c.name)+'</option>';}).join('')+'</select>'+
    '<button class="sm" data-act="ushow" data-u="'+u.id+'">🖼️</button><button class="sm" data-act="ucopy" data-u="'+u.id+'">⧉</button>'+(saved?'<button class="sm danger" data-act="udel" data-u="'+u.id+'">✕</button>':'')+'</div></div>'; }
 function renderShop(){
   var h='<div class="hubtitle"><span>🎁</span> Zum Wunderbaren Unfug</div><div class="hint" style="margin:-6px 0 10px">Quirin Knall, Gnom · keine Rückgabe · Blödsinn kauft er für 5 GM zurück</div>'+
    '<div class="qgrid"><div><div class="panel"><div class="lab">Truhe öffnen</div><div class="seg three">'+Object.keys(CHESTS).map(function(k){ var c=CHESTS[k]; return '<button data-act="uchest" data-k="'+k+'">'+(k==='holz'?'🪵':k==='eisen'?'⛓️':'🥈')+' '+c[0].replace('truhe','')+'<br><small>'+c[1]+' GM · '+c[2]+'</small></button>'; }).join('')+'</div>'+
-   '<button class="pri big" data-act="ugen">✨ Neuer Unfug</button></div>'+(S.uCur?unfugCard(S.uCur,false):'<div class="empty">🎁</div>')+'</div>'+
+   '<div class="row" style="margin-top:12px"><button class="pri" style="flex:2;padding:12px;font-family:Cinzel,serif" data-act="umagic">✨ Magischer Gegenstand</button><button style="flex:1;padding:12px" data-act="ugen">🤪 Reiner Unfug</button></div></div>'+(S.uCur?unfugCard(S.uCur,false):'<div class="empty">🎁</div>')+'</div>'+
    '<div><div class="lab" style="margin-top:4px">Ladenregal &amp; Verkauftes ('+S.unfug.length+')</div>'+(S.unfug.length?S.unfug.slice().reverse().map(function(u){return unfugCard(u,true);}).join(''):'<div class="hint">Mit ★ landen Gegenstände hier.</div>')+
    '<details style="margin-top:10px"><summary class="hint">Truhen-Tabelle (W20)</summary>'+CHEST_T.map(function(t,i){return '<div class="tl"><b>'+(i+1)+'</b> '+esc(t[0])+'</div>';}).join('')+'</details></div></div>';
   $('shopBody').innerHTML=h; }
@@ -2324,11 +2363,12 @@ function findU(id){ return (S.uCur&&S.uCur.id===id)?S.uCur:S.unfug.find(function
 document.addEventListener('click',function(e){ var t=e.target.closest('[data-act]'); if(!t||!S.unfug) return; var u;
   switch(t.dataset.act){
     case 'ugen': S.uCur=genUnfug(); save(); renderShop(); break;
+    case 'umagic': S.uCur=genMagic(); save(); renderShop(); break;
     case 'uchest': S.uCur=openChest(t.dataset.k); logAdd('🎁 '+esc(S.uCur.src)+': <b>'+esc(S.uCur.name)+'</b>'); save(); renderShop(); break;
     case 'usave': u=findU(t.dataset.u); if(u&&!S.unfug.some(function(x){return x.id===u.id;})){ S.unfug.push(JSON.parse(JSON.stringify(u))); save(); toast('Ins Regal gelegt.'); renderShop(); } break;
     case 'udel': S.unfug=S.unfug.filter(function(x){return x.id!==t.dataset.u;}); save(); renderShop(); break;
-    case 'ushow': u=findU(t.dataset.u); if(u){ var src=S.images['u:'+u.id]; showText(u.name,(src?'<img src="'+src+'" style="max-width:min(60vw,320px);border-radius:12px;border:3px solid #b8913f;display:block;margin:0 auto 12px">':'')+'<div style="font-size:.6em;line-height:1.5;font-family:\'Alegreya Sans\',sans-serif">'+esc(u.eff)+(u.hk?'<br><i>'+esc(u.hk)+'</i>':'')+'</div>'); } break;
-    case 'ucopy': u=findU(t.dataset.u); if(u) try{ navigator.clipboard.writeText(u.name+'\n'+u.eff+(u.hk?'\n'+u.hk:'')+'\nPreis: '+u.price).then(function(){toast('Kopiert.');}); }catch(err){} break;
+    case 'ushow': u=findU(t.dataset.u); if(u){ var src=S.images['u:'+u.id]; showText(u.name,(src?'<img src="'+src+'" style="max-width:min(60vw,320px);border-radius:12px;border:3px solid #b8913f;display:block;margin:0 auto 12px">':'')+'<div style="font-size:.6em;line-height:1.5;font-family:\'Alegreya Sans\',sans-serif">'+esc(u.eff)+(u.hk?'<br>'+esc(u.hk):'')+(u.qk?'<br><i>'+esc(u.qk)+'</i>':'')+'</div>'); } break;
+    case 'ucopy': u=findU(t.dataset.u); if(u) try{ navigator.clipboard.writeText(u.name+'\n'+u.eff+(u.hk?'\n'+u.hk:'')+(u.qk?'\n'+u.qk:'')+'\n'+u.price).then(function(){toast('Kopiert.');}); }catch(err){} break;
     case 'uimg': u=findU(t.dataset.u); if(u) openLb('u:'+u.id,u.name,'whimsical useless magic item: '+u.name+', '+u.eff+', fantasy shop curiosity, single object, plain background'); break;
   } });
 document.addEventListener('change',function(e){ var t=e.target; if(t.dataset.uown==null||!S.unfug) return; var u=findU(t.dataset.uown); if(!u) return; u.owner=t.value;
@@ -2338,6 +2378,7 @@ document.addEventListener('change',function(e){ var t=e.target; if(t.dataset.uow
 /* =================== Spracheingabe (Loreyer) =================== */
 var recog=null, recOn=false, recBase='';
 function micToggle(){
+  if(SREC.on){ toast('Die Sitzungsaufnahme läuft gerade, sie schreibt bereits mit.'); return; }
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast('Spracheingabe wird hier nicht unterstützt. Chrome, Edge oder Safari nutzen, oder das Mikrofon der Handy-Tastatur.'); return; }
   if(recOn){ try{ recog.stop(); }catch(e){} return; }
@@ -2350,6 +2391,86 @@ function micToggle(){
   try{ recog.start(); recOn=true; var b=$('lMic'); if(b) b.classList.add('rec'); toast('🎙️ Sprich jetzt … nochmal tippen zum Beenden.'); }catch(err){ toast('Spracheingabe konnte nicht starten.'); }
 }
 document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('#lMic')) micToggle(); });
+
+/* =================== Loreyer: Sitzung aufnehmen =================== */
+var SREC={on:false,r:null,t0:0,timer:null,lock:null,interim:'',sid:null,lastMark:0};
+function fmtT(ms){ var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function wakeOn(){ try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ SREC.lock=l; }).catch(function(){}); }catch(e){} }
+document.addEventListener('visibilitychange',function(){ if(SREC.on&&document.visibilityState==='visible') wakeOn(); });
+function recStart(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast('Aufnahme braucht Chrome, Edge oder Safari.'); return; }
+  if(recOn){ try{ recog.stop(); }catch(e){} }
+  var s=curSession(); SREC.sid=s.id; if(!s.tr) s.tr=''; SREC.on=true; SREC.t0=Date.now()-(s.trMs||0); SREC.lastMark=-1; wakeOn();
+  function startR(){ var r=new SR(); r.lang='de-DE'; r.continuous=true; r.interimResults=true; SREC.r=r;
+    r.onresult=function(ev){ var tmp=''; var ss=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); if(!ss) return;
+      for(var i=ev.resultIndex;i<ev.results.length;i++){ var tx=ev.results[i][0].transcript.trim(); if(!tx) continue;
+        if(ev.results[i].isFinal){ var el=Date.now()-SREC.t0, mk=Math.floor(el/300000);
+          if(mk!==SREC.lastMark){ SREC.lastMark=mk; ss.tr+=(ss.tr?'\n':'')+'['+fmtT(el)+'] '; } else ss.tr+=' ';
+          ss.tr+=tx.charAt(0).toUpperCase()+tx.slice(1)+'.'; ss.trMs=el; saveSoon(); }
+        else tmp+=tx+' '; }
+      SREC.interim=tmp; recUi(); };
+    r.onerror=function(ev){ if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ SREC.on=false; toast('Mikrofon nicht erlaubt. Auf der GitHub-Seite im Browser erlauben.'); renderLore(); } };
+    r.onend=function(){ if(SREC.on) setTimeout(function(){ if(SREC.on){ try{ startR(); }catch(e){} } },250); };
+    try{ r.start(); }catch(e){} }
+  startR(); SREC.timer=setInterval(recUi,1000); renderLore(); toast('⏺ Aufnahme läuft. Bildschirm bleibt an.');
+}
+function recStop(){ SREC.on=false; try{ SREC.r&&SREC.r.stop(); }catch(e){} clearInterval(SREC.timer); SREC.interim=''; try{ SREC.lock&&SREC.lock.release(); }catch(e){} SREC.lock=null; save(); renderLore(); toast('⏹ Aufnahme gestoppt.'); }
+var saveT=null; function saveSoon(){ clearTimeout(saveT); saveT=setTimeout(save,2000); }
+function recUi(){ var s=S.lore.sessions.find(function(x){return x.id===SREC.sid;}); var a=$('recTime'), b=$('recWords'), c=$('recLive');
+  if(a) a.textContent=fmtT(Date.now()-SREC.t0); if(b&&s) b.textContent=(s.tr?s.tr.split(/\s+/).length:0)+' Wörter'; if(c) c.textContent=SREC.interim||(s&&s.tr?s.tr.slice(-140):''); }
+function recPanel(s){
+  var words=s.tr?s.tr.split(/\s+/).length:0, mine=SREC.on&&SREC.sid===s.id;
+  return '<div class="panel recp'+(mine?' live':'')+'"><div class="row" style="margin:0;align-items:center">'+
+    (mine?'<button class="recbtn on" data-act="recstop">⏹ Stopp</button><b id="recTime">'+fmtT(Date.now()-SREC.t0)+'</b><span class="hint" id="recWords">'+words+' Wörter</span>':
+      '<button class="recbtn" data-act="recstart">⏺ Sitzung aufnehmen</button><span class="hint">'+(words?words+' Wörter · '+fmtT(s.trMs||0):'Alles mitschreiben lassen, danach auswerten')+'</span>')+'</div>'+
+    (mine?'<div class="reclive" id="recLive">'+esc(SREC.interim||(s.tr||'').slice(-140))+'</div>':'')+
+    (words&&!mine?'<div class="row" style="margin:8px 0 0"><button class="sm pri" data-act="recana">✨ Auswerten → Recap &amp; Quests</button><button class="sm" data-act="recdl">⬇️ .txt</button><button class="sm" data-act="recprompt">Prompt kopieren</button><button class="sm danger" data-act="recclr">✕</button></div>':'')+
+    (s.aiState?'<div class="hint" style="margin-top:6px">'+esc(s.aiState)+'</div>':'')+
+    (words?'<details style="margin-top:6px"><summary class="hint">Transkript ansehen / korrigieren</summary><textarea id="lTr" rows="8" style="width:100%">'+esc(s.tr)+'</textarea></details>':'')+
+    '<div class="hint" style="margin-top:6px">Alle am Tisch sollten zustimmen. Die Spracherkennung läuft über den Dienst des Browsers (bei Chrome: Google).</div></div>';
+}
+function aiCall(content){ return fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({messages:[{role:'system',content:'Du bist ein präziser Chronist für eine D&D-Kampagne in der Fantasywelt Aetheria. Antworte auf Deutsch.'},{role:'user',content:content}],model:'openai',referrer:'dungeon-master-service'})})
+  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); }); }
+function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+var FINAL_PROMPT='Erstelle aus den folgenden Notizen einer D&D-Sitzung ein JSON-Objekt (nur JSON, nichts sonst) mit diesen Feldern:\n'+
+ '"recap": stimmungsvolles Vorlese-Recap für die nächste Sitzung, an die Spieler gerichtet („Ihr …“), höchstens 150 Wörter, Vergangenheitsform;\n'+
+ '"ereignisse": wichtigste Ereignisse in Reihenfolge (kurze Sätze); "npcs": getroffene Personen mit 3–6 Wörtern Beschreibung; "orte": besuchte Orte; "beute": erhaltene Gegenstände und Geld;\n'+
+ '"quests": aktive Aufträge und Ziele der Gruppe (je ein Satz); "offen": offene Fragen und Rätsel; "zitate": höchstens 3 denkwürdige Sprüche.\n'+
+ 'Ignoriere Regeldiskussionen, Würfelzahlen und Gespräche außerhalb des Spiels. Erfinde nichts.\n\n';
+function parseJson(t){ var a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a<0||b<a) throw new Error('kein JSON'); return JSON.parse(t.slice(a,b+1)); }
+function applyAnalysis(s,j){
+  s.notes=s.notes.filter(function(n){ return !n.auto; });
+  function add(tag,arr){ (arr||[]).forEach(function(x){ if(x&&String(x).trim()) s.notes.push({id:'l'+Date.now()+Math.random().toString(36).slice(2,6),tag:tag,text:String(x).trim(),star:false,done:false,auto:true}); }); }
+  add('ev',j.ereignisse); add('npc',j.npcs); add('ort',j.orte); add('loot',j.beute); add('quest',j.quests); add('open',j.offen); add('quote',j.zitate);
+  if(j.recap) s.ai=String(j.recap).trim();
+}
+function analyzeTr(s){
+  if(s.aiBusy) return; var words=(s.tr||'').split(/\s+/), CH=1500, chunks=[];
+  for(var i=0;i<words.length;i+=CH) chunks.push(words.slice(i,i+CH).join(' '));
+  s.aiBusy=true; var parts=[];
+  function step(k){
+    if(k>=chunks.length||chunks.length===1){ s.aiState='⏳ Erstelle Recap und Quests …'; renderLore();
+      var src=chunks.length===1?'TRANSKRIPT:\n'+chunks[0]:'ZUSAMMENFASSUNGEN DER ABSCHNITTE:\n'+parts.join('\n\n');
+      return (k>0?wait(16000):Promise.resolve()).then(function(){ return aiCall(FINAL_PROMPT+src); }); }
+    s.aiState='⏳ Abschnitt '+(k+1)+' von '+chunks.length+' wird gelesen …'; renderLore();
+    return (k>0?wait(16000):Promise.resolve()).then(function(){ return aiCall('Fasse diesen Abschnitt eines Transkripts einer D&D-Sitzung in Stichpunkten zusammen: Ereignisse, Personen, Orte, Beute, Aufträge/Quests, offene Fragen, gute Zitate. Ignoriere Regeldiskussionen und Off-Topic.\n\n'+chunks[k]); })
+      .then(function(t){ parts.push('Abschnitt '+(k+1)+':\n'+t); return step(k+1); });
+  }
+  step(0).then(function(t){ applyAnalysis(s,parseJson(t)); s.aiState=''; s.aiBusy=false; S.lore.tab='recap'; save(); renderLore(); toast('Recap und Quests sind fertig.'); })
+   .catch(function(err){ s.aiBusy=false; s.aiState='KI nicht erreichbar ('+err.message+'). „Prompt kopieren“ und bei Claude einfügen.'; save(); renderLore(); });
+}
+document.addEventListener('click',function(e){ var t=e.target.closest('[data-act]'); if(!t||!S.lore) return; var s=curSession();
+  switch(t.dataset.act){
+    case 'recstart': recStart(); break;
+    case 'recstop': recStop(); break;
+    case 'recana': analyzeTr(s); break;
+    case 'recclr': if(!t.dataset.ok){ t.dataset.ok='1'; t.textContent='Transkript löschen?'; break; } s.tr=''; s.trMs=0; save(); renderLore(); break;
+    case 'recdl': { var b=new Blob([s.tr],{type:'text/plain;charset=utf-8'}), u=URL.createObjectURL(b), a=document.createElement('a'); a.href=u; a.download='Sitzung_'+s.no+'_Transkript.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(u);},4000); break; }
+    case 'recprompt': try{ navigator.clipboard.writeText(FINAL_PROMPT+'TRANSKRIPT:\n'+s.tr).then(function(){ toast('Prompt kopiert. Hier bei Claude einfügen, das Ergebnis kannst du übernehmen.'); }); }catch(err){} break;
+  } });
+document.addEventListener('change',function(e){ if(e.target.id==='lTr'){ var s=curSession(); s.tr=e.target.value; save(); } });
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
