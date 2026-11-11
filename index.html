@@ -368,7 +368,8 @@
 </div>
 <div id="view-shop" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
-  <div class="hubpage" id="shopBody"></div>
+  <div class="hubpage" id="shopMusic" style="padding-bottom:0"></div>
+  <div class="hubpage" style="padding-top:4px" id="shopBody"></div>
 </div>
 <div id="view-vtt" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
@@ -1715,6 +1716,7 @@ function showView(v,push){
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
   if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='vtt') renderVtt();
+  if(v==='shop') shopMusicInit(); else shopMusicLeave();
   window.scrollTo(0,0); save();
 }
 window.addEventListener('hashchange',function(){ if(location.hash==='#vtt-player') return; var v=viewFromHash(); if(v!==S.view) showView(v,false); });
@@ -2865,6 +2867,37 @@ function vttPlayer(){
   document.addEventListener('fullscreenchange',function(){ $('pfs').style.display=document.fullscreenElement?'none':''; });
   hello();
 }
+
+/* =================== Ladenmusik (Spotify, Dauerschleife) =================== */
+var SP=null, SPst={init:false,playing:false,last:0,resume:false};
+function spParse(u){ var m=String(u||'').match(/(track|playlist|album)[\/:]([A-Za-z0-9]{22})/); return m?'spotify:'+m[1]+':'+m[2]:null; }
+function spUri(){ return S.shopTrack||'spotify:track:6j42d7FIpooIDKl1SBAPMo'; }
+function shopMusicInit(){
+  var box=$('shopMusic'); if(!box) return;
+  if(SPst.init){ if(SPst.resume&&SP){ try{ SP.resume(); }catch(e){} SPst.resume=false; } return; }
+  SPst.init=true;
+  box.innerHTML='<details class="panel" style="padding:8px 10px" open><summary class="lab" style="cursor:pointer">🎵 Ladenmusik · Dauerschleife</summary>'+
+    '<div id="spEmbed" style="margin-top:8px;min-height:80px"></div>'+
+    '<div class="row" style="margin-top:6px"><input id="spLink" placeholder="Anderen Spotify-Link einfügen (Lied, Album, Playlist)" style="flex:1;min-width:0"><button class="sm" id="spSet">Übernehmen</button></div>'+
+    '<div class="hint" id="spHint" style="margin-top:4px">Einmal ▶ drücken, dann läuft das Lied in Schleife. Ohne Spotify-Anmeldung im Browser spielt Spotify nur 30 Sekunden Vorschau.</div></details>';
+  if(!navigator.onLine){ $('spHint').textContent='Offline: Spotify braucht Internet.'; }
+  window.onSpotifyIframeApiReady=function(API){
+    API.createController($('spEmbed'),{uri:spUri(),width:'100%',height:80},function(c){ SP=c;
+      c.addListener('playback_update',function(e){ var d=e.data||{}; if(!d.duration) return;
+        if(!d.isPaused){ SPst.playing=true; SPst.last=d.position; return; }
+        var ended=SPst.playing&&SPst.last>d.duration-2500&&(d.position===0||d.position>=d.duration-1500);
+        if(ended){ SPst.last=0; try{ c.seek(0); c.resume(); }catch(err){} } else SPst.playing=false; });
+    }); };
+  var sc=document.createElement('script'); sc.src='https://open.spotify.com/embed/iframe-api/v1'; sc.async=true;
+  sc.onerror=function(){ $('spEmbed').innerHTML=spFallback(); $('spHint').textContent='Spotify-Steuerung nicht ladbar: einfacher Player ohne Dauerschleife.'; };
+  document.head.appendChild(sc);
+}
+function spFallback(){ var p=spUri().split(':'); return '<iframe style="border-radius:12px;border:0;width:100%;height:80px" src="https://open.spotify.com/embed/'+p[1]+'/'+p[2]+'" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'; }
+document.addEventListener('click',function(e){ if(!(e.target.closest&&e.target.closest('#spSet'))) return;
+  var u=spParse($('spLink').value); if(!u){ toast('Kein gültiger Spotify-Link.'); return; }
+  S.shopTrack=u; save(); $('spLink').value=''; SPst.playing=false;
+  if(SP){ try{ SP.loadUri(u); }catch(err){} } else { $('spEmbed').innerHTML=spFallback(); } toast('🎵 Neue Ladenmusik.'); });
+function shopMusicLeave(){ if(SP&&SPst.playing){ try{ SP.pause(); }catch(e){} SPst.resume=true; SPst.playing=false; } }
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
