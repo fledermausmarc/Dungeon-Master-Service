@@ -2292,115 +2292,165 @@ document.addEventListener('change',function(e){ var t=e.target; if(!t.dataset.cf
 
 /* =================== Mystery Shop: Zum Wunderbaren Unfug =================== */
 var CHEST_T=[
- ['Flöte, die immer falsch spielt','Sie quietscht. Tiere im Umkreis von 9 m heulen oder bellen mit.','1/lange Rast: Tiere in der Nähe, die nicht kämpfen, sind 1 Runde abgelenkt.'],
- ['Schwert, das bei Gebrauch zu Gummi wird','Langschwert. Beim ersten Treffer jedes Kampfes 1 Minute aus Gummi: 1W4 Wucht, Ziel STÄ SG 10 oder 1,5 m zurückgeschleudert.',''],
- ['Umhang der halben Unsichtbarkeit','Die linke oder rechte Hälfte des Trägers wird unsichtbar, jeden Tag neu.','Kein spielerischer Vorteil.'],
- ['Stiefel der Schwebehöhe','Der Träger schwebt 3 cm über dem Boden. Keine Fußspuren.','Nachteil beim Klettern, Rutschgefahr auf Eis.'],
- ['Krug der Dürre','Füllt sich 1/Tag mit 1 Liter Wasser, das nach nassen Socken schmeckt.','In der Dürre sehr wertvoll.'],
- ['Hut der ständigen Komplimente','Flüstert unablässig Komplimente in einer unbekannten Sprache.','Nachteil auf Heimlichkeit.'],
- ['Laterne der milden Finsternis','Macht Dunkelheit statt Licht: helles Licht wird in 3 m zu schwachem Licht.','Hilfreich beim Schleichen.'],
- ['Seil der Knoten','Tagsüber ein normales Seil (15 m). Nachts verknotet es sich selbst.','1 Stunde Arbeit zum Entwirren.'],
- ['Würfel der Ehre','Zeigen immer eine 6, sobald niemand hinschaut.','Wer erwischt wird (Einsicht SG 14), fliegt raus.'],
- ['Ring des ehrlichen Schluckaufs','Schluckauf bei jeder Lüge.','Nachteil auf Täuschen. Abnehmbar.'],
- ['Beifallshandschuh','Klatscht laut bei jedem Treffer.','Nachteil auf Heimlichkeit.'],
- ['Löffel der guten Suppe','Jede Suppe, die er berührt, schmeckt köstlich.','Harmlos und beliebt.'],
- ['Trank der Heilung','Echt. Heilt 2W4+2 TP.','Ein ehrlicher Treffer.'],
- ['Schriftrolle (Zauber 1. Grades)','Zauber nach Wahl des SL, Tinte halb verwischt.','Beim Lesen W20: bei 1 verpufft der Zauber.'],
- ['Wünschelrute','1/Tag zeigt sie Wasser im Umkreis von 30 m an.','Findet häufig Latrinen.'],
- ['Ewige Kerze','Brennt ohne Wachs und brennt nie ab. Nur durch Ersticken zu löschen.','Die Wachszieher wären empört.'],
- ['Socken-Beutel','Innen unendlich groß, nimmt aber nur Socken an.',''],
- ['Plappernder Helm','+1 RK, redet ununterbrochen und kommentiert alles.','Nachteil auf Heimlichkeit.'],
- ['Singendes Schwert +1','Langschwert +1, singt im Kampf laut.','Ungewöhnlich, Balance prüfen.'],
- ['Echter Treffer','Ein ungewöhnlicher Gegenstand nach Wahl des SL (z. B. Elfenstiefel).','Quirin merkt es nicht einmal.']];
+ ['Flöte, die immer falsch spielt','Sie quietscht. Tiere im Umkreis von 9 m heulen oder bellen mit (Nyrak auch). Menschen halten sich die Ohren zu.','1/lange Rast: Tiere in der Nähe, die gerade nicht kämpfen, sind 1 Runde lang abgelenkt.'],
+ ['Schwert des Weltenbrechers','Beim Ziehen lodern violette Flammen an der Klinge, Runen leuchten, ein tiefes Grollen erfüllt die Luft (6 m schwaches Licht). Es sieht aus wie die mächtigste Waffe der Welt.','Im Kampf nutzlos: Bei jedem Treffer wird die Klinge zu Gummi und macht 0 Schaden, nach 1 Minute ist sie wieder Stahl. Vorteil auf Einschüchtern gegen alle, die es noch nicht in Aktion gesehen haben.'],
+ ['Umhang der halben Unsichtbarkeit','Die linke oder rechte Hälfte des Trägers wird unsichtbar, jeden Tag neu ausgewürfelt.','Kein spielerischer Vorteil. Spaßfaktor garantiert.'],
+ ['Stiefel der Schwebehöhe','Der Träger schwebt 3 cm über dem Boden. Keine Fußspuren, kein Schlamm an den Sohlen.','Nachteil beim Klettern, Rutschgefahr auf Eis.'],
+ ['Krug der Dürre','Füllt sich 1/Tag mit 1 Liter Wasser, das nach nassen Socken schmeckt.','In der Dürre sehr wertvoll. Ein ehrlicher Treffer.'],
+ ['Hut der ständigen Komplimente','Flüstert unablässig Komplimente in einer unbekannten Sprache.','1/lange Rast: Vorteil auf eine Charisma-Probe. Nachteil auf Heimlichkeit, solange man ihn trägt.'],
+ ['Laterne der milden Finsternis','Macht Dunkelheit statt Licht: Im Umkreis von 3 m wird helles Licht zu schwachem Licht.','Hilfreich beim Schleichen.'],
+ ['Seil der Knoten','Tagsüber ein normales Seil (15 m). Nachts verknotet es sich selbst zu wirren Knoten.','Erst nach 1 Stunde Arbeit wieder zu entwirren.'],
+ ['Würfel der Ehre','Zwei Würfel, die immer zwei Sechsen zeigen, solange nur der Würfler hinsieht. Sobald jemand zusieht (auch Nyrak oder ein Kind), fallen sie normal.','Wer zu oft 12 würfelt, fällt Jeb auf (Einsicht SG 14) und fliegt raus.'],
+ ['Ring des ehrlichen Schluckaufs','Der Träger bekommt bei jeder Lüge Schluckauf.','Nachteil auf Täuschen. Abnehmbar.'],
+ ['Weste der tausend Taschen','Hat immer eine Tasche mehr, als man sich vorstellen kann. 1/Tag zieht der Träger einen zufälligen Gegenstand heraus (W6): Knopf, Feder, getrockneter Frosch, Kreisel, Bohne (tut nichts), Silberling.',''],
+ ['Löffel der guten Suppe','Jede Suppe, die er berührt, schmeckt köstlich.','Harmlos und beliebt in der Dürre.'],
+ ['Fläschchen Heldenmut','Rot und schäumend. Wer es trinkt, hat 10 Minuten lang Vorteil auf Rettungswürfe gegen Furcht.','Brüllt dabei ununterbrochen Schlachtrufe (Nachteil auf Heimlichkeit). Einmalig.'],
+ ['Wahrsagemünze','1/Tag eine Ja/Nein-Frage stellen und werfen (Kopf = Ja). Der SL würfelt verdeckt W6: Bei 1–4 stimmt die Antwort, bei 5–6 ist sie falsch.','Die Spieler wissen nie, wann.'],
+ ['Hungerkompass','Die Nadel ist ein kleiner Löffel und zeigt zur nächsten nicht verdorbenen Mahlzeit im Umkreis von 1 km, oft zur Garküche eines Fremden.','In der Dürre ein Segen.'],
+ ['Ewige Kerze','Brennt ohne Wachs und brennt nie ab. Nur durch Ersticken zu löschen.','Die Wachszieher wären empört, und Ignis hätte sie gern.'],
+ ['Socken-Beutel','Innen unendlich groß, nimmt aber nur Socken an.','Ein hervorragendes Lager für Tauschgeschäfte.'],
+ ['Plappernder Helm','+1 auf die RK. Plappert ununterbrochen und verrät laut jeden Plan des Trägers (hörbar in 18 m).','Nachteil auf Heimlichkeit, Initiative und Wahrnehmung (Gehör). Erst nach einer langen Rast abnehmbar.'],
+ ['Schild des grimassierenden Wächters','Ein aufgemaltes Gesicht schneidet furchtbare Grimassen. 1/kurze Rast: Ein Angreifer macht vorher einen WEI-Rettungswurf SG 11, sonst hat er Nachteil.','Ungewöhnlich. Balance prüfen.'],
+ ['Echter Treffer: Nimmervoller Beutel','Ein Beutel, der innen viel größer ist als außen, dazu leicht zu tragen (Bag of Holding).','Reiner Komfortgewinn, bricht den Kampf nicht.']];
 var CHESTS={holz:['Holztruhe',15,'W12'],eisen:['Eisentruhe',50,'W20'],silber:['Silbertruhe',150,'2×W20, höherer']};
-var UOBJ=L('Teekanne,Löffel,Kamm,Hut,Socken,Laterne,Spiegel,Schöpfkelle,Nachttopf,Regenschirm,Pfeife,Glocke,Besen,Kerze,Gürtel,Handschuh,Brosche,Schlüssel,Nudelholz,Fingerhut,Federkiel,Tintenfass,Kissen,Taschentuch,Würfelbecher,Schaukelstuhl,Sanduhr,Topf,Brille,Halstuch,Gießkanne,Mundharmonika');
-var UPROP=[
- ['des ewigen Lauwarms','Alles, was damit in Berührung kommt, wird genau lauwarm.'],
- ['der falschen Richtung','Zeigt stets dorthin, wo man gerade nicht hinwill.'],
- ['der höflichen Verspätung','Funktioniert erst 6 Sekunden, nachdem man es braucht.'],
- ['des leisen Applauses','Applaudiert sanft, wenn jemand in der Nähe gähnt.'],
- ['der Gänseverehrung','Gänse im Umkreis von 30 m verbeugen sich davor.'],
- ['der unpassenden Musik','Spielt bei Gefahr eine fröhliche Polka.'],
- ['des Zwiebelduftes','Riecht nach frischen Zwiebeln, egal wie oft man es wäscht.'],
- ['der falschen Erinnerung','Wer es berührt, erinnert sich kurz an einen Urlaub, den es nie gab.'],
- ['des tapferen Zitterns','Zittert, sobald jemand lügt, aber auch bei Kälte, Wind und Freude.'],
- ['der Dramatik','Lässt einen leichten Windstoß durch das Haar des Besitzers wehen.'],
- ['der Mittagspause','Funktioniert jeden Tag zur Mittagszeit eine Stunde lang nicht.'],
- ['des grünen Schimmers','Färbt Fingerspitzen für einen Tag grün.'],
- ['der Katzenliebe','Katzen lieben es. Sie wollen es haben. Alle Katzen.'],
- ['der Wetterlaune','Wird bei Regen schwer wie Blei und bei Sonne federleicht.'],
- ['des ehrlichen Preises','Nennt laut seinen wahren Wert, sobald man es verkaufen will.'],
- ['der Verdoppelung','Erzeugt 1/Tag ein Duplikat, das nach 10 Sekunden zu Staub zerfällt.'],
- ['des Rückwärtsklangs','Alle Geräusche, die es macht, klingen rückwärts.'],
- ['der beleidigten Würde','Weigert sich, benutzt zu werden, wenn man „bitte“ vergisst.'],
- ['der kleinen Wolke','Eine winzige Regenwolke schwebt darüber und tropft.'],
- ['des Glitzerns','Hinterlässt überall feinen Glitzer. Für immer.'],
- ['der Gnomenzeit','Funktioniert nur, wenn ein Gnom in der Nähe ist.'],
- ['des Schnarchens','Schnarcht leise, sobald niemand hinsieht.'],
- ['der Butterseite','Fällt immer auf die ungünstigste Seite.'],
- ['der Bescheidenheit','Wird unsichtbar, sobald jemand es lobt.'],
- ['des Taubenrufs','Ruft beim Benutzen 1W6 Tauben herbei.'],
- ['der falschen Farbe','Hat jeden Tag eine andere, unpassende Farbe.'],
- ['der Schwerkraft-Laune','Fällt manchmal nach oben. Nur 30 cm, aber zuverlässig peinlich.'],
- ['des Lieblingswortes','Sagt alle 10 Minuten laut „Kartoffel“.'],
- ['der Wärme','Ist immer angenehm warm. Im Hochsommer unerträglich.'],
- ['des Echos','Wiederholt das letzte Wort jedes Satzes.'],
- ['der Schüchternheit','Versteckt sich, wenn Fremde in der Nähe sind.'],
- ['der Prophezeiung','Sagt 1/Tag das Wetter von gestern voraus.'],
- ['des Hungers','Knurrt wie ein leerer Magen, wenn sein Besitzer Hunger hat.'],
- ['des Nebels','Stößt beim Benutzen eine kleine, dekorative Nebelwolke aus.'],
- ['der Zauberstimme','Spricht mit der Stimme der Großmutter des Besitzers.']];
-var USIDE=['Kein Nutzen.','Nachteil auf Heimlichkeit.','Quirin schwört, es sei ein Erbstück.','Die Wirkung endet nie.','Abnehmbar, aber es kommt zurück.','Funktioniert nur nachts.','Nur für Halblinge wirklich passend.','Völlig harmlos.','Kinder finden es großartig.','Ein Paladin würde es beschlagnahmen.','Riecht leicht nach Schwefel.','Bei einer 1 auf dem W20 verstärkt sich die Wirkung für 1 Stunde.'];
-/* Magische Gegenstände mit Segen, Preis und Schrulle (angelehnt an SRD-Gegenstände) */
-var MBASE=[['Stiefel','k'],['Umhang','k'],['Hut','k'],['Handschuhe','k'],['Gürtel','k'],['Ring','s'],['Amulett','s'],['Brosche','s'],['Ohrring','s'],['Brille','s'],
- ['Langschwert','w'],['Dolch','w'],['Streitaxt','w'],['Kampfstab','w'],['Kurzbogen','w'],['Kriegshammer','w'],['Schild','r'],['Lederrüstung','r'],['Kettenhemd','r'],
- ['Laterne','t'],['Beutel','t'],['Seil','t'],['Flöte','t'],['Becher','t'],['Kompass','t'],['Zauberstab','t'],['Kerze','t'],['Schlüssel','t']];
-/* Segen: [Beiname, Wirkung, Seltenheit G/U, erlaubte Typen] */
-var MBOON=[
- ['der leisen Sohle','Vorteil auf Heimlichkeit.','U','k'],['des Schutzes','+1 auf die RK.','U','ksr'],['des Federfalls','Fällt der Träger, sinkt er sanft: kein Fallschaden.','U','ks'],
- ['der tausend Gesichter','1/Tag: Selbstverkleidung wirken.','U','ks'],['des Glücks','+1 auf alle Rettungswürfe.','U','ks'],['der Nachtaugen','Dunkelsicht 18 m.','U','s'],
- ['des kleinen Glücks','1/Tag: 1W4 auf einen eigenen Wurf addieren.','G','skt'],['der Labsal','1/Tag als Aktion: Der Besitzer heilt 2W4+2 TP.','G','st'],
- ['der Quelle','1/Tag: 4 Liter frisches Wasser.','G','t'],['des Nimmervollen','Innen viel größer: fasst bis 250 kg.','U','t'],['der Eile','Bewegungsrate +3 m.','U','k'],
- ['der Spinne','Klettern an Wänden ohne Probe, Hände frei.','U','k'],['der Tiefe','Atmen unter Wasser, Schwimmen 9 m.','U','ks'],['der Schärfe','+1 auf Angriff und Schaden.','U','w'],
- ['der Glut','Resistenz gegen Feuerschaden.','U','ksr'],['des Nebels','1/Tag: Nebelschritt wirken.','U','ks'],['des Lichts','Leuchtet auf Befehl: 6 m helles Licht.','G','wtrs'],
- ['des Lauschers','Vorteil auf Wahrnehmung, die auf Hören beruht.','G','s'],['der Zungen','1/Tag: 1 Stunde jede Sprache verstehen.','U','s'],
- ['des Vorkosters','Wird eiskalt, wenn Gift in der Nähe ist (1,5 m).','G','st'],['des Mutes','Vorteil auf Rettungswürfe gegen Verängstigt.','G','ksr'],
- ['des Hasen','1/Tag: Sprung bis 9 m weit.','G','k'],['der Wachsamkeit','Vorteil auf Initiative.','U','swk'],['des Donners','Bei einem Treffer 1/Tag: +1W6 Donnerschaden.','U','w'],
- ['der Wurzeln','Kann nicht gegen den Willen umgestoßen werden.','U','kr'],['des Wegweisers','Zeigt 1/Tag den Weg zum nächsten Ort mit Namen.','G','t'],
- ['der Ruhe','1/Tag: Schlaf (1. Grad) wirken.','U','t'],['des Hüters','Reaktion: +2 RK gegen einen Angriff, 1/kurze Rast.','U','rs']];
-var MCURSE=[
- 'Nachteil auf Heimlichkeit.','Nachteil auf Überzeugen.','−1 auf die RK.','Bewegungsrate −1,5 m.','Jede Benutzung kostet 1 TP.','Nachts Nachteil auf Wahrnehmung.',
- 'Nach jeder Benutzung: bis zur kurzen Rast keine Reaktionen.','Muss täglich mit einer Silbermünze „gefüttert“ werden, sonst wirkt es nicht.','Wirkt nur, solange der Träger summt oder singt.',
- 'Der Träger niest bei jeder Lüge.','Zieht Ratten an: Sie folgen in 1W4 Stunden.','Wird jede Nacht 1 kg schwerer, bis man es poliert.',
- 'Verflucht: lässt sich nicht freiwillig ablegen (Fluch brechen hilft).','Nachteil auf Rettungswürfe gegen Bezaubern.','Bei einer 1 auf einem Angriff erlischt die Wirkung für 1 Stunde.',
- 'Feen halten den Träger für einen gesuchten Dieb.','Jede Benutzung kostet 1 GM, die Münze verschwindet.','Funktioniert nicht in Gegenwart von Kirchenleuten.',
- 'Der Träger verträgt kein Bier mehr: Nach einem Krug vergiftet für 1 Stunde.','Hunde knurren den Träger an.','Bei Vollmond wirkt es nicht, dafür heult es.'];
-var MQUIRK=['Quietscht bei jedem Schritt.','Klatscht bei jedem Treffer.','Flüstert Komplimente in einer fremden Sprache.','Riecht nach nassen Socken.','Singt leise beim Benutzen.',
- 'Kommentiert alles mit trockenem Humor.','Leuchtet rosa, wenn jemand flirtet.','Schmeckt nach Zitrone, falls man daran leckt.','Niest, wenn Magie in der Nähe gewirkt wird.',
- 'Hinterlässt Fußspuren eines Huhns.','Ist immer leicht klebrig.','Bellt, wenn Fremde nahen.','Lässt kleine Blumen sprießen, wo es abgelegt wird.','Erzählt sehr schlechte Witze.',
- 'Seufzt melancholisch bei Sonnenuntergang.','Färbt die Haare des Trägers jeden Morgen anders.','Spielt bei Gefahr eine dramatische Fanfare.','Wird bei Regen beleidigt und schweigt.',
- 'Gähnt, wenn jemand lange redet.','Glitzert beim kleinsten Lichtstrahl.'];
-var MPRICE={G:'Gewöhnlich · Richtwert 100 GM',U:'Ungewöhnlich · Richtwert 400 GM'};
-function genMagic(){ var b, boon, tries=0;
-  do{ b=rndOf(MBASE); boon=rndOf(MBOON); tries++; } while(boon[3].indexOf(b[1])<0&&tries<50);
-  return {id:'u'+Date.now()+Math.floor(Math.random()*999),name:b[0]+' '+boon[0],eff:'✦ '+boon[1],hk:'⚠ '+rndOf(MCURSE),qk:'🤪 '+rndOf(MQUIRK),price:MPRICE[boon[2]],src:'Magischer Gegenstand'}; }
 
-function genUnfug(){ var o=rndOf(UOBJ), p=rndOf(UPROP), price=2+Math.floor(Math.random()*24);
-  return {id:'u'+Date.now()+Math.floor(Math.random()*999),name:o+' '+p[0],eff:p[1],hk:rndOf(USIDE),price:price+' GM',src:'Unfug'}; }
+/* Wundersame Gegenstände: [Name, Nutzen, Haken, Seltenheit G/U] */
+var WUNDER=[
+ ['Teekessel der Vorahnung','Pfeift eine Runde, bevor im Umkreis von 18 m ein Hinterhalt losgeht. Wer ihn bei sich trägt, kann nicht überrascht werden.','Pfeift genauso, sobald irgendwo Wasser kocht. Und irgendwo kocht immer Wasser.','U'],
+ ['Mantel des dramatischen Abgangs','1/Tag als Bonusaktion: Rückzug, begleitet von einem Windstoß und einer kleinen Nebelwolke.','Wirkt nur, wenn der Träger vorher laut einen Abschiedssatz sagt („Wir sehen uns wieder!“).','G'],
+ ['Handschuhe des zweiten Versuchs','1/Tag eine misslungene Fingerfertigkeits-Probe wiederholen.','Die Handschuhe seufzen dabei hörbar enttäuscht.','G'],
+ ['Kochlöffel des Feldkochs','Wer bei einer kurzen Rast davon isst, heilt pro ausgegebenem Trefferwürfel 1 TP mehr.','Das Essen ist immer grün. Der Löffel kritisiert jede Würzung.','G'],
+ ['Stiefel des höflichen Gastes','Stehen sie vor der Tür, während der Träger barfuß drinnen ist: Vorteil auf Überzeugen gegenüber dem Gastgeber.','Lassen sich nicht im Haus tragen. Sie gehen von allein wieder vor die Tür.','G'],
+ ['Ring der feigen Faust','+2 auf die RK gegen Gelegenheitsangriffe.','Der Träger muss dabei laut „Nicht ins Gesicht!“ rufen.','U'],
+ ['Schild des Vorwurfs','Reaktion, 1/kurze Rast: Wer den Träger trifft, macht einen WEI-Rettungswurf SG 11, sonst hat er Nachteil auf seinen nächsten Angriff. Der Schild redet ihm Schuldgefühle ein.','Der Schild macht auch dem Träger Vorwürfe, vor allem wegen nicht abgewaschenen Geschirrs.','U'],
+ ['Dolch des Bäckers','Ein normaler Dolch. Jedes Brot, das er schneidet, ist wieder ofenfrisch.','Getroffene Gegner riechen eine Stunde lang nach Hefezopf. Hunde folgen ihnen.','G'],
+ ['Laterne der Küchenwahrheit','In ihrem Licht (3 m) leuchtet grün, wer gerade lügt. Aber nur bei Lügen über Essen.','„Ich hab die Wurst nicht gegessen“ fliegt sofort auf. Alles andere nicht.','G'],
+ ['Seil des Mitdenkens','Als Aktion knotet es sich selbst an etwas Festes in bis zu 6 m Entfernung.','Ab 9 m Höhe bekommt es Höhenangst und wickelt sich um das nächstbeste Bein.','U'],
+ ['Feldflasche der Tapferkeit','3 Schlucke pro Tag. Wer trinkt, hat 1 Minute lang Vorteil auf Rettungswürfe gegen Verängstigt.','Der Inhalt ist warme Milch. Der Milchbart lässt sich eine Stunde lang nicht abwischen.','G'],
+ ['Kissen der tiefen Ruhe','Eine lange Rast dauert nur 6 statt 8 Stunden.','Wer darauf schläft, redet im Schlaf und verrät ein Geheimnis nach Wahl des SL.','U'],
+ ['Brille des Schnäppchenjägers','Zeigt den echten Marktwert jedes Gegenstands in Sichtweite.','Zeigt ihn auch bei Personen an („Stallbursche, ca. 3 SM“).','G'],
+ ['Hut der zweiten Meinung','1/Tag: Der Hut berät den Träger, +1W4 auf eine Attributsprobe.','Der Hut ist grundsätzlich anderer Meinung. Laut.','G'],
+ ['Gürtel des starken Mannes (fast)','Vorteil auf Stärke-Proben zum Heben, Tragen und Schieben.','Bei einer gewürfelten 1 auf eine Stärke-Probe öffnet sich die Schnalle. Die Hose fällt.','U'],
+ ['Glocke des letzten Rufs','1/Tag läuten: Alle Verbündeten in 9 m dürfen sich als Reaktion 1,5 m bewegen, ohne Gelegenheitsangriffe auszulösen.','Läutet außerdem jede Nacht um Mitternacht. Sehr laut.','U'],
+ ['Amulett des Totstellens','1/Tag als Reaktion auf einen Treffer: halber Schaden, der Träger fällt um und wirkt tot (Vorteil auf Täuschen).','Riecht danach eine Stunde lang nach Verwesung. Fliegen inklusive.','U'],
+ ['Kompass des Heimwehs','Zeigt immer zum Bett, in dem der Träger zuletzt eine lange Rast gemacht hat.','Weint leise, je weiter man sich entfernt.','G'],
+ ['Pfeife der Rauchzeichen','Der Rauch formt bis zu fünf Wörter, die 1 km weit zu sehen sind.','Bei einer 1 auf einem W6 schreibt sie stattdessen, was der Raucher gerade denkt.','G'],
+ ['Socken der Trockenheit','Die Füße bleiben immer trocken. Vorteil auf Rettungswürfe gegen Erschöpfung durch lange Märsche.','Der Rest des Körpers wird dafür ständig etwas feuchter.','G'],
+ ['Würfelbecher des Gauners','1/Tag einen Wurf in einem Glücksspiel wiederholen.','Der Becher kichert dabei. Einsicht SG 12 bemerkt es.','G'],
+ ['Armbrust der Empörung','+1 auf den Schaden.','Jeder Bolzen schreit im Flug „Aus dem Weeeg!“. Schießen aus dem Versteck verrät den Schützen immer.','U'],
+ ['Spiegel der ehrlichen Worte','1/Tag hineinsehen und W6 würfeln: 1–3 er macht Mut (Vorteil auf die nächste Charisma-Probe), 4–6 er sagt die Wahrheit (Nachteil).','Er erinnert sich an alles, was er je gesagt hat, und erzählt es gern weiter.','G'],
+ ['Bratpfanne der Abwehr','Kann als Schild (+1 RK) oder als Waffe dienen (1W6 Wucht).','Jeder Treffer macht ein BONG, das 90 m weit zu hören ist.','G'],
+ ['Ohrring des Lauschers','Vorteil auf Wahrnehmung (Hören) durch Türen und Wände.','Der Träger hört auch alles, was in 30 m über ihn gesagt wird, und muss WEI SG 11 bestehen, um nicht zu antworten.','U'],
+ ['Zauberstab der Beinahe-Magie','3 Ladungen, erneuert bei Sonnenaufgang: Magisches Geschoss. W6: 1–2 trifft ein zufälliges anderes Ziel, 3–5 normal, 6 ein Schwarm Schmetterlinge (kein Schaden).','Die Schmetterlinge bleiben und folgen dem Besitzer einen Tag lang.','U'],
+ ['Rucksack des Hamsters','Fasst doppelt so viel, das Gewicht halbiert sich.','Frisst jeden Tag eine Ration. Ist keine drin, ist er beleidigt und geht nicht auf.','U'],
+ ['Gießkanne des grünen Daumens','Eine gegossene Pflanze ist am nächsten Morgen ausgewachsen.','Die Pflanze folgt danach ihrem Gießer. Langsam, aber treu.','G'],
+ ['Halstuch der tausend Stimmen','Vorteil auf Täuschen, um eine Stimme nachzuahmen.','Bei Aufregung (Initiative) wechselt die Stimme zufällig: Großmutter, Ork, Kleinkind, Ziege.','G'],
+ ['Federkiel des Schreiberlings','Schreibt alles mit, was in 3 m diktiert wird.','Fügt eigene Kommentare in Klammern ein (meist abfällige).','G'],
+ ['Topf des Nachschlags','Die Suppe darin reicht immer für eine Person mehr.','Diese eine Person taucht meist auch auf. Ungebeten.','G'],
+ ['Schlüssel des Beinahe','Vorteil darauf, einfache Schlösser zu öffnen.','Dabei springt irgendwo im Umkreis von 30 m ein anderes Schloss zu. Zufällig.','U'],
+ ['Mundharmonika der Moral','Spielen als Bonusaktion, 1/kurze Rast: Ein Verbündeter erhält 1W4 temporäre TP.','Sie kann nur ein einziges Lied. Nach drei Tagen hassen es alle.','G'],
+ ['Sanduhr der Zeitlupe','1/Tag: Ein Verbündeter würfelt seine Initiative neu.','Der Benutzer altert dabei um einen Tag und hat schlagartig Lust auf Kekse.','U'],
+ ['Regenschirm der sanften Landung','Aufgespannt wirkt er wie Federfall.','Bei starkem Wind STÄ SG 11, sonst fliegt man 3 m mit.','U'],
+ ['Brosche des Namensgedächtnisses','Der Träger vergisst nie einen Namen. Vorteil auf Geschichte über Personen.','Er spricht jeden mit vollem Namen und Titel an. Jedes Mal.','G'],
+ ['Lederrüstung der Bescheidenheit','+1 auf die RK.','Lobt jemand die Rüstung, wird sie verlegen: −1 RK für eine Stunde.','U'],
+ ['Schaufel des Schatzsuchers','Vibriert über Metall, das bis zu 1,5 m tief liegt.','Meist sind es Nägel. Nur bei einer 20 auf dem W20 ist es etwas Wertvolles.','G'],
+ ['Pantoffeln der leisen Flure','Vorteil auf Heimlichkeit in Gebäuden.','Draußen quietschen sie auf Gras: Nachteil auf Heimlichkeit im Freien.','G'],
+ ['Krug des Zwergenmuts','Füllt sich 1/Tag mit Zwergenbier. Wer trinkt, hat 1 Stunde Vorteil gegen Verängstigt.','…und Nachteil auf Geschicklichkeitsproben.','G'],
+ ['Amulett der Tierstimmen','1/Tag: Mit Tieren sprechen (10 Minuten).','Die Tiere duzen den Träger und kennen all seine Peinlichkeiten.','U'],
+ ['Talisman des Glückspilzes','1/Tag einen W20 wiederholen.','Der nächste W20 vor der langen Rast hat Nachteil. Das Glück will zurück.','U'],
+ ['Umhang des Stimmungs-Chamäleons','Vorteil auf Heimlichkeit, solange der Träger sich nicht bewegt.','Die Farbe passt sich nicht der Umgebung an, sondern der Laune des Trägers.','U'],
+ ['Kriegshammer des Wanderschmieds','Repariert in 10 Minuten eine beschädigte Waffe oder Rüstung.','Jeder Treffer sprüht Funken: Bei einer 1 auf dem W6 fängt Brennbares in 1,5 m Feuer.','U'],
+ ['Kampfstab des Wanderers','Als Bonusaktion verwandelt er sich in einen Spazierstock mit Teekanne im Griff und zurück.','Der Tee ist immer Kamille. Keiner mag Kamille.','G'],
+ ['Kette des wachsamen Schlafs','Der Träger schläft mit offenen Augen und gilt beim Wachehalten als wach.','Er sieht dabei so gruselig aus, dass jeder, der neben ihm schläft, einmal pro Nacht schreiend aufwacht.','G'],
+ ['Becher der Vorkosterin','Wird eiskalt, wenn Gift darin ist.','Wird auch eiskalt bei schlechtem Wein. Der Wirt ist beleidigt.','G'],
+ ['Stiefel des Riesen','Hinterlassen Fußspuren eines 4 m großen Wesens. Verfolger haben Nachteil, die Gruppe zu finden.','Jäger und Abenteurer folgen der Spur mit großem Eifer.','G']];
+
+/* Reiner Unfug: [Name, Wirkung] */
+var UNFUG=[
+ ['Zylinder des treuen Kaninchens','Man kann jederzeit ein Kaninchen herausziehen. Es ist immer dasselbe Kaninchen, und es ist genervt.'],
+ ['Kamm des Haarwuchses','Lässt Haare wachsen, allerdings nur die Augenbrauen.'],
+ ['Schwert der Ankündigung','Sagt laut „Schwert“, sobald man es zieht.'],
+ ['Glas eingelegter Gurken','Bleibt für immer frisch, weil es sich nie öffnen lässt.'],
+ ['Seife der Ewigkeit','Wird nie kleiner. Macht aber auch nicht sauber.'],
+ ['Würfel der Beständigkeit','Würfelt immer eine 3.'],
+ ['Ring der Unsichtbarkeit','Der Ring selbst ist unsichtbar. Man verliert ihn ständig.'],
+ ['Trank der Größe','Man fühlt sich danach größer. Sonst passiert nichts.'],
+ ['Schriftrolle „Kerze entzünden“','Entzündet nur Kerzen, die schon brennen.'],
+ ['Federkiel der Lautstärke','SCHREIBT NUR IN GROSSBUCHSTABEN.'],
+ ['Spiegel der Trägheit','Das Spiegelbild bewegt sich eine halbe Sekunde zu spät.'],
+ ['Fläschchen Wolke','Beim Öffnen entweicht genau eine kleine Wolke in Form eines Schafs.'],
+ ['Brille der leichten Verschiebung','Alles erscheint 3 cm weiter links, als es ist.'],
+ ['Teller der Erbsenabwehr','Stößt Erbsen ab. Nur Erbsen.'],
+ ['Kissen des Schnarchens','Schnarcht, auch wenn niemand darauf liegt.'],
+ ['Glocke der Katzen','Nur Katzen hören sie. Alle Katzen hassen sie.'],
+ ['Kompass zu Quirin','Zeigt immer auf Quirin Knall. Auch wenn er neben einem steht.'],
+ ['Taschentuch der Höflichkeit','Sagt „Gesundheit!“, sobald man es berührt.'],
+ ['Gürtelschnalle der Zeitansage','Sagt die Uhrzeit an. Falsch, aber sehr selbstbewusst.'],
+ ['Besen der gerechten Verteilung','Fegt sehr gründlich, verteilt den Dreck aber nur gleichmäßig neu.'],
+ ['Pfeife der Seifenblasen','Bläst Seifenblasen statt Rauch. Sie platzen mit leisem „Pardon“.'],
+ ['Stab des überflüssigen Lichts','Leuchtet nur, wenn es schon hell ist.'],
+ ['Mantel der warmen Ellenbogen','Hält ausschließlich die Ellenbogen warm.'],
+ ['Duftkerze „Ork nach dem Training“','Riecht genau so.'],
+ ['Kette des Kicherns','Kichert leise, wenn jemand in der Nähe stolpert.'],
+ ['Becher der Gurke','Jedes Getränk darin schmeckt nach Gurke.'],
+ ['Schlüssel ohne Tür','Passt in ein Schloss, das es nicht gibt. Quirin weiß auch nicht, welches.'],
+ ['Schneekugel mit Dorf','Darin lebt ein winziges, echtes Dorf. Die Bewohner sind sauer, wenn man schüttelt.'],
+ ['Armband des Puddings','Vibriert, sobald jemand im Umkreis von 1 km „Pudding“ sagt.'],
+ ['Handschuh der Begeisterung','Verlangt nach jedem Erfolg ein Abklatschen. Lässt nicht locker.'],
+ ['Messer der Butter','Schneidet Butter perfekt. Nur Butter.'],
+ ['Laute mit einer Saite','Die einzige Saite ist immer verstimmt, egal wie man stimmt.'],
+ ['Hut der persönlichen Wolke','Unter diesem Hut regnet es immer ein bisschen.'],
+ ['Porträt des rollenden Blicks','Die Augen folgen einem durch den Raum und rollen dabei.'],
+ ['Singende Zahnbürste','Singt beim Putzen zwei Minuten lang. Immer dasselbe Lied.'],
+ ['Säckchen anhänglicher Bohnen','Sieben Bohnen. Wirft man eine, rollen alle anderen hinterher.'],
+ ['Feder der Rebellion','Fällt immer nach oben. Aber nur 30 cm.'],
+ ['Karte des Hier','Zeigt genau den Ort, an dem man gerade steht. Nur den.'],
+ ['Pantoffeln der Frösche','Ziehen Frösche an. Viele.'],
+ ['Stein der leichten Wärme','Ist immer ein kleines bisschen zu warm.'],
+ ['Lesezeichen der Wiederholung','Man landet immer eine Seite zu früh.'],
+ ['Schachtel des Klopfens','Klopft von innen, wenn man sie schließt. Sie ist leer.'],
+ ['Socke der Partnersuche','Findet jede verlorene Socke, nur nie ihre eigene.'],
+ ['Tasse des Lauwarms','Hält jedes Getränk dauerhaft auf lauwarm.'],
+ ['Trommel der Bescheidenheit','Klingt nur, wenn niemand zuhört.'],
+ ['Gabel des Zweifels','Jeder Bissen, den man aufspießt, fragt leise: „Wirklich?“'],
+ ['Laterne der Motten','Gibt kein Licht, zieht aber alle Motten im Umkreis von 30 m an.'],
+ ['Hosenträger der Spannung','Schnalzen jedes Mal, wenn jemand einen schlechten Witz macht.']];
+
+var PITCH=['Ein Erbstück! Von irgendwem.','Garantiert magisch oder Geld zurück. Nein, kein Geld zurück.','Hat schon einem König gehört. Oder einem Koch.','Sehr beliebt bei Abenteurern. Die meisten leben noch.','Fragt nicht, woher ich es habe.',
+ 'Hat die Zunftprüfung bestanden. Fast.','Der letzte Besitzer war sehr zufrieden. Glaube ich.','Es hat Charakter! Viel Charakter.','Gnomenqualität. Explodiert nur selten.','Nur heute zum Sonderpreis! Morgen auch.',
+ 'Ich würde es selbst behalten, aber meine Frau lässt mich nicht.','Den Haken erwähne ich nicht, weil es keinen gibt. Fast keinen.','Das letzte Exemplar! Bis ich das nächste finde.','Handgemacht. Wessen Hand, weiß keiner.','Absolut ungefährlich, wenn man es nicht benutzt.'];
+var WPRICE={G:[50,120,'Gewöhnlich'],U:[200,500,'Ungewöhnlich']};
+function bagPick(key,n){ if(!S.uBag) S.uBag={}; var b=S.uBag[key];
+  if(!b||!b.length||b.some(function(i){return i>=n;})){ b=[]; for(var i=0;i<n;i++) b.push(i); for(var j=b.length-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)), t=b[j]; b[j]=b[k]; b[k]=t; } }
+  var r=b.pop(); S.uBag[key]=b; return r; }
+function uid(){ return 'u'+Date.now()+Math.floor(Math.random()*999); }
+function priceIn(a,b){ return Math.round((a+Math.random()*(b-a))/5)*5; }
+function genMagic(){ var w=WUNDER[bagPick('w',WUNDER.length)], p=WPRICE[w[3]];
+  return {id:uid(),name:w[0],eff:'✦ '+w[1],hk:'⚠ '+w[2],pitch:rndOf(PITCH),price:priceIn(p[0],p[1])+' GM',src:'Wundersamer Gegenstand · '+p[2]}; }
+function genUnfug(){ var u=UNFUG[bagPick('u',UNFUG.length)];
+  return {id:uid(),name:u[0],eff:u[1],hk:'',pitch:rndOf(PITCH),price:(1+Math.floor(Math.random()*20))+' GM',src:'Reiner Unfug'}; }
+function aiItem(){
+  if(S.uAiBusy) return; S.uAiBusy=true; toast('🤖 Quirin kramt im Hinterzimmer …');
+  var ex=[WUNDER[0],WUNDER[16],WUNDER[22]].map(function(w){ return '- '+w[0]+': Nutzen: '+w[1]+' Haken: '+w[2]; }).join('\n');
+  aiCall('Erfinde EINEN neuen, lustigen magischen Gegenstand für D&D 5.5e (Stufe 3, gewöhnlich oder ungewöhnlich) für den schrulligen Gnomenladen „Zum Wunderbaren Unfug“. Stil: ein kleiner, echter Regelnutzen (Vorteil, 1/Tag, Rettungswurf SG 11 …) mit einem absurden, alltäglichen Haken. Kurz und trocken witzig. Beispiele:\n'+ex+'\nAntworte NUR als JSON: {"name":"…","nutzen":"…","haken":"…","selten":"G oder U"}')
+   .then(function(t){ var m=t.match(/\{[\s\S]*\}/); if(!m) throw new Error('Format'); var j=JSON.parse(m[0]); var p=WPRICE[j.selten==='U'?'U':'G'];
+     S.uCur={id:uid(),name:String(j.name||'Namenloses Ding'),eff:'✦ '+j.nutzen,hk:j.haken?'⚠ '+j.haken:'',pitch:rndOf(PITCH),price:priceIn(p[0],p[1])+' GM',src:'KI-Fundstück · '+p[2]}; })
+   .catch(function(err){ toast('KI nicht erreichbar ('+err.message+'). Nur online auf GitHub verfügbar.'); })
+   .then(function(){ S.uAiBusy=false; save(); renderShop(); }); }
 function openChest(kind){ var r, roll;
   if(kind==='holz'){ roll=d(12); r=roll; } else if(kind==='eisen'){ roll=d(20); r=roll; } else { var a=d(20),b=d(20); r=Math.max(a,b); roll=a+' / '+b; }
   var t=CHEST_T[r-1]; return {id:'u'+Date.now(),name:t[0],eff:t[1],hk:t[2],price:CHESTS[kind][1]+' GM ('+CHESTS[kind][0]+')',src:CHESTS[kind][0]+' · Wurf '+roll+' → '+r,nr:r}; }
 function unfugCard(u,saved){ var src=S.images['u:'+u.id];
   return '<div class="ucard'+(saved?' saved':'')+'"><div class="uhead"><button class="ava big" data-act="uimg" data-u="'+u.id+'">'+(src?'<img src="'+src+'" alt="">':'<span>🎁</span>')+'</button>'+
    '<div style="flex:1;min-width:0"><div class="uname">'+esc(u.name)+'</div><div class="hint">'+esc(u.src)+' · <b>'+esc(u.price)+'</b></div></div></div>'+
-   '<div class="ueff">'+esc(u.eff)+'</div>'+(u.hk?'<div class="uhk">'+esc(u.hk)+'</div>':'')+(u.qk?'<div class="uqk">'+esc(u.qk)+'</div>':'')+(u.owner?'<div class="hint">🎒 '+esc(u.owner)+'</div>':'')+
+   '<div class="ueff">'+esc(u.eff)+'</div>'+(u.hk?'<div class="uhk">'+esc(u.hk)+'</div>':'')+(u.qk?'<div class="uqk">'+esc(u.qk)+'</div>':'')+(u.pitch?'<div class="uqk">💬 Quirin: „'+esc(u.pitch)+'“</div>':'')+(u.owner?'<div class="hint">🎒 '+esc(u.owner)+'</div>':'')+
    '<div class="row" style="margin-top:8px">'+(saved?'':'<button class="sm pri" data-act="usave" data-u="'+u.id+'">★</button>')+
    '<select data-uown="'+u.id+'" class="sm"><option value="">Verkauft an …</option>'+S.chars.map(function(c){return '<option'+(u.owner===(c.short||c.name)?' selected':'')+'>'+esc(c.short||c.name)+'</option>';}).join('')+'</select>'+
    '<button class="sm" data-act="ushow" data-u="'+u.id+'">🖼️</button><button class="sm" data-act="ucopy" data-u="'+u.id+'">⧉</button>'+(saved?'<button class="sm danger" data-act="udel" data-u="'+u.id+'">✕</button>':'')+'</div></div>'; }
 function renderShop(){
   var h='<div class="hubtitle"><span>🎁</span> Zum Wunderbaren Unfug</div><div class="hint" style="margin:-6px 0 10px">Quirin Knall, Gnom · keine Rückgabe · Blödsinn kauft er für 5 GM zurück</div>'+
    '<div class="qgrid"><div><div class="panel"><div class="lab">Truhe öffnen</div><div class="seg three">'+Object.keys(CHESTS).map(function(k){ var c=CHESTS[k]; return '<button data-act="uchest" data-k="'+k+'">'+(k==='holz'?'🪵':k==='eisen'?'⛓️':'🥈')+' '+c[0].replace('truhe','')+'<br><small>'+c[1]+' GM · '+c[2]+'</small></button>'; }).join('')+'</div>'+
-   '<div class="row" style="margin-top:12px"><button class="pri" style="flex:2;padding:12px;font-family:Cinzel,serif" data-act="umagic">✨ Magischer Gegenstand</button><button style="flex:1;padding:12px" data-act="ugen">🤪 Reiner Unfug</button></div></div>'+(S.uCur?unfugCard(S.uCur,false):'<div class="empty">🎁</div>')+'</div>'+
+   '<div class="row" style="margin-top:12px"><button class="pri" style="flex:2;padding:12px;font-family:Cinzel,serif" data-act="umagic">✨ Wundersamer Gegenstand</button><button style="flex:1;padding:12px" data-act="ugen">🤪 Reiner Unfug</button></div><button style="width:100%;margin-top:8px;padding:10px" data-act="uai">🤖 KI-Fundstück (online)</button><div class="hint" style="margin-top:6px">'+WUNDER.length+' wundersame Gegenstände · '+UNFUG.length+' Unfug · keine Wiederholung, bis alle einmal dran waren</div></div>'+(S.uCur?unfugCard(S.uCur,false):'<div class="empty">🎁</div>')+'</div>'+
    '<div><div class="lab" style="margin-top:4px">Ladenregal &amp; Verkauftes ('+S.unfug.length+')</div>'+(S.unfug.length?S.unfug.slice().reverse().map(function(u){return unfugCard(u,true);}).join(''):'<div class="hint">Mit ★ landen Gegenstände hier.</div>')+
    '<details style="margin-top:10px"><summary class="hint">Truhen-Tabelle (W20)</summary>'+CHEST_T.map(function(t,i){return '<div class="tl"><b>'+(i+1)+'</b> '+esc(t[0])+'</div>';}).join('')+'</details></div></div>';
   $('shopBody').innerHTML=h; }
@@ -2409,6 +2459,7 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-act
   switch(t.dataset.act){
     case 'ugen': S.uCur=genUnfug(); save(); renderShop(); break;
     case 'umagic': S.uCur=genMagic(); save(); renderShop(); break;
+    case 'uai': aiItem(); break;
     case 'uchest': S.uCur=openChest(t.dataset.k); logAdd('🎁 '+esc(S.uCur.src)+': <b>'+esc(S.uCur.name)+'</b>'); save(); renderShop(); break;
     case 'usave': u=findU(t.dataset.u); if(u&&!S.unfug.some(function(x){return x.id===u.id;})){ S.unfug.push(JSON.parse(JSON.stringify(u))); save(); toast('Ins Regal gelegt.'); renderShop(); } break;
     case 'udel': S.unfug=S.unfug.filter(function(x){return x.id!==t.dataset.u;}); save(); renderShop(); break;
