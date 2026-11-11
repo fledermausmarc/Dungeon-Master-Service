@@ -1,5 +1,5 @@
 /* Dungeon Master Service: Offline-Speicher */
-const CACHE = 'dms-v2';
+const CACHE = 'dms-v3';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 const EXTERN = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];
 
