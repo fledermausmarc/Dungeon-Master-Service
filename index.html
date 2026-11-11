@@ -2868,36 +2868,46 @@ function vttPlayer(){
   hello();
 }
 
-/* =================== Ladenmusik (Spotify, Dauerschleife) =================== */
-var SP=null, SPst={init:false,playing:false,last:0,resume:false};
-function spParse(u){ var m=String(u||'').match(/(track|playlist|album)[\/:]([A-Za-z0-9]{22})/); return m?'spotify:'+m[1]+':'+m[2]:null; }
-function spUri(){ return S.shopTrack||'spotify:track:6j42d7FIpooIDKl1SBAPMo'; }
+/* =================== Ladenmusik (YouTube oder Spotify, Dauerschleife) =================== */
+var MUS={init:false,yt:null,sp:null,playing:false,last:0,resume:false,apiYT:false,apiSP:false,cur:null};
+function musParse(u){ u=String(u||''); var m=u.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/|live\/)([\w-]{11})/); if(m) return {t:'yt',id:m[1]};
+  m=u.match(/(track|playlist|album)[\/:]([A-Za-z0-9]{22})/); if(m) return {t:'sp',uri:'spotify:'+m[1]+':'+m[2]}; return null; }
+function musCur(){ return S.shopMus||{t:'yt',id:'tOz6OTbOGJI'}; }
 function shopMusicInit(){
   var box=$('shopMusic'); if(!box) return;
-  if(SPst.init){ if(SPst.resume&&SP){ try{ SP.resume(); }catch(e){} SPst.resume=false; } return; }
-  SPst.init=true;
+  if(MUS.init){ if(MUS.resume){ musPlay(); MUS.resume=false; } return; }
+  MUS.init=true;
   box.innerHTML='<details class="panel" style="padding:8px 10px" open><summary class="lab" style="cursor:pointer">🎵 Ladenmusik · Dauerschleife</summary>'+
-    '<div id="spEmbed" style="margin-top:8px;min-height:80px"></div>'+
-    '<div class="row" style="margin-top:6px"><input id="spLink" placeholder="Anderen Spotify-Link einfügen (Lied, Album, Playlist)" style="flex:1;min-width:0"><button class="sm" id="spSet">Übernehmen</button></div>'+
-    '<div class="hint" id="spHint" style="margin-top:4px">Einmal ▶ drücken, dann läuft das Lied in Schleife. Ohne Spotify-Anmeldung im Browser spielt Spotify nur 30 Sekunden Vorschau.</div></details>';
-  if(!navigator.onLine){ $('spHint').textContent='Offline: Spotify braucht Internet.'; }
-  window.onSpotifyIframeApiReady=function(API){
-    API.createController($('spEmbed'),{uri:spUri(),width:'100%',height:80},function(c){ SP=c;
-      c.addListener('playback_update',function(e){ var d=e.data||{}; if(!d.duration) return;
-        if(!d.isPaused){ SPst.playing=true; SPst.last=d.position; return; }
-        var ended=SPst.playing&&SPst.last>d.duration-2500&&(d.position===0||d.position>=d.duration-1500);
-        if(ended){ SPst.last=0; try{ c.seek(0); c.resume(); }catch(err){} } else SPst.playing=false; });
-    }); };
-  var sc=document.createElement('script'); sc.src='https://open.spotify.com/embed/iframe-api/v1'; sc.async=true;
-  sc.onerror=function(){ $('spEmbed').innerHTML=spFallback(); $('spHint').textContent='Spotify-Steuerung nicht ladbar: einfacher Player ohne Dauerschleife.'; };
-  document.head.appendChild(sc);
+    '<div id="musEmbed" style="margin-top:8px"></div>'+
+    '<div class="row" style="margin-top:6px"><input id="musLink" placeholder="YouTube- oder Spotify-Link einfügen" style="flex:1;min-width:0"><button class="sm" id="musSet">Übernehmen</button></div>'+
+    '<div class="hint" id="musHint" style="margin-top:4px">Einmal ▶ drücken, danach läuft es in Schleife.</div></details>';
+  if(!navigator.onLine) $('musHint').textContent='Offline: Musik braucht Internet.';
+  musLoad(musCur());
 }
-function spFallback(){ var p=spUri().split(':'); return '<iframe style="border-radius:12px;border:0;width:100%;height:80px" src="https://open.spotify.com/embed/'+p[1]+'/'+p[2]+'" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'; }
-document.addEventListener('click',function(e){ if(!(e.target.closest&&e.target.closest('#spSet'))) return;
-  var u=spParse($('spLink').value); if(!u){ toast('Kein gültiger Spotify-Link.'); return; }
-  S.shopTrack=u; save(); $('spLink').value=''; SPst.playing=false;
-  if(SP){ try{ SP.loadUri(u); }catch(err){} } else { $('spEmbed').innerHTML=spFallback(); } toast('🎵 Neue Ladenmusik.'); });
-function shopMusicLeave(){ if(SP&&SPst.playing){ try{ SP.pause(); }catch(e){} SPst.resume=true; SPst.playing=false; } }
+function musLoad(m){ MUS.cur=m; MUS.playing=false; MUS.yt=null; MUS.sp=null; var e=$('musEmbed'); if(!e) return;
+  if(m.t==='yt'){
+    e.innerHTML='<div style="position:relative;width:100%;max-width:420px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000"><div id="musEl" style="position:absolute;inset:0;width:100%;height:100%"></div></div>';
+    var mk=function(){ MUS.yt=new YT.Player('musEl',{videoId:m.id,width:'100%',height:'100%',playerVars:{loop:1,playlist:m.id,playsinline:1,rel:0,modestbranding:1},
+      events:{onStateChange:function(ev){ if(ev.data===0){ ev.target.seekTo(0,true); ev.target.playVideo(); } if(ev.data===1) MUS.playing=true; if(ev.data===2) MUS.playing=false; }}}); };
+    if(window.YT&&YT.Player) mk(); else { window.onYouTubeIframeAPIReady=mk; if(!MUS.apiYT){ MUS.apiYT=true; musScript('https://www.youtube.com/iframe_api'); } }
+  } else {
+    e.innerHTML='<div id="musEl" style="min-height:80px"></div>';
+    var mk2=function(API){ API.createController($('musEl'),{uri:m.uri,width:'100%',height:80},function(c){ MUS.sp=c;
+      c.addListener('playback_update',function(x){ var d=x.data||{}; if(!d.duration) return;
+        if(!d.isPaused){ MUS.playing=true; MUS.last=d.position; return; }
+        if(MUS.playing&&MUS.last>d.duration-2500&&(d.position===0||d.position>=d.duration-1500)){ MUS.last=0; try{ c.seek(0); c.resume(); }catch(er){} } else MUS.playing=false; }); }); };
+    if(window.SpIframeAPI) mk2(window.SpIframeAPI); else { window.onSpotifyIframeApiReady=function(API){ window.SpIframeAPI=API; mk2(API); }; if(!MUS.apiSP){ MUS.apiSP=true; musScript('https://open.spotify.com/embed/iframe-api/v1'); } }
+    $('musHint').textContent='Spotify: ohne Anmeldung im Browser nur 30 Sekunden Vorschau.';
+  } }
+function musScript(src){ var sc=document.createElement('script'); sc.src=src; sc.async=true; sc.onerror=function(){ var e=$('musEmbed'), m=MUS.cur; if(!e) return;
+    e.innerHTML=m.t==='yt'?'<iframe style="border:0;border-radius:10px;width:100%;max-width:420px;aspect-ratio:16/9" src="https://www.youtube.com/embed/'+m.id+'?loop=1&playlist='+m.id+'&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'
+      :'<iframe style="border:0;border-radius:12px;width:100%;height:80px" src="https://open.spotify.com/embed/'+m.uri.split(':')[1]+'/'+m.uri.split(':')[2]+'" allow="autoplay; encrypted-media"></iframe>'; };
+  document.head.appendChild(sc); }
+function musPlay(){ try{ if(MUS.yt&&MUS.yt.playVideo) MUS.yt.playVideo(); else if(MUS.sp) MUS.sp.resume(); }catch(e){} }
+function shopMusicLeave(){ if(!MUS.playing) return; try{ if(MUS.yt&&MUS.yt.pauseVideo) MUS.yt.pauseVideo(); else if(MUS.sp) MUS.sp.pause(); }catch(e){} MUS.resume=true; MUS.playing=false; }
+document.addEventListener('click',function(e){ if(!(e.target.closest&&e.target.closest('#musSet'))) return;
+  var m=musParse($('musLink').value); if(!m){ toast('Kein gültiger YouTube- oder Spotify-Link.'); return; }
+  S.shopMus=m; save(); $('musLink').value=''; $('musHint').textContent='Einmal ▶ drücken, danach läuft es in Schleife.'; musLoad(m); toast('🎵 Neue Ladenmusik.'); });
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
