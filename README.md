@@ -21,7 +21,7 @@ Werkzeugkasten für Spielleiter in D&D 5e als einzelne Webseite (`index.html`), 
 - Startmelodie (abschaltbar)
 
 ## Benutzen
-`index.html` im Browser öffnen. Daten werden im Browser gespeichert (localStorage).
+`index.html` im Browser öffnen. Nach dem ersten Besuch funktioniert die Seite auch offline und lässt sich als App auf dem Startbildschirm installieren. Daten werden im Browser gespeichert (localStorage).
 Schriften (Google Fonts) und der Excel-Import (SheetJS über cdnjs) brauchen Internet.
 
 ## Lizenz und Quellen

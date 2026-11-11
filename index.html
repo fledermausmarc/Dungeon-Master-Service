@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dungeon Master Service</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#33462a"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="DM Service">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -2837,6 +2839,7 @@ function enter(withSound){ var sp=$('splash'); if(withSound){ S.sound=true; play
 $('enterSnd').addEventListener('click',function(){ enter(true); });
 $('enterQuiet').addEventListener('click',function(){ enter(false); });
 document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('[data-snd]')){ S.sound=S.sound===false; if(S.sound) playMelody(); sndIcon(); save(); } });
+try{ if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(function(){}); }catch(e){}
 load(); if(location.hash==='#vtt-player'){ vttPlayer(); } else { render(); showView(viewFromHash(),false); sndIcon(); } if(S.sound===false){ $('enterSnd').textContent='Eintreten'; }
 window.__kt={state:function(){return S;},sorted:sorted};
 })();
