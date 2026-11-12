@@ -2678,9 +2678,21 @@ function recPanel(s){
     (words?'<details style="margin-top:6px"><summary class="hint">Transkript ansehen / korrigieren</summary><textarea id="lTr" rows="8" style="width:100%">'+esc(s.tr)+'</textarea></details>':'')+
     '<div class="hint" style="margin-top:6px">Alle am Tisch sollten zustimmen. Die Spracherkennung läuft über den Dienst des Browsers (bei Chrome: Google).</div></div>';
 }
-function aiCall(content){ return fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({messages:[{role:'system',content:'Du bist ein präziser Chronist für eine D&D-Kampagne in der Fantasywelt Aetheria. Antworte auf Deutsch.'},{role:'user',content:content}],model:'openai',referrer:'dungeon-master-service'})})
-  .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); }); }
+function aiFetch(url,opt,ms){ var c=window.AbortController?new AbortController():null; var tm=c?setTimeout(function(){ c.abort(); },ms||60000):0; if(c) opt.signal=c.signal;
+  return fetch(url,opt).then(function(r){ clearTimeout(tm); if(!r.ok) throw new Error('HTTP '+r.status); return r; },function(e){ clearTimeout(tm); throw new Error(e.name==='AbortError'?'Zeitüberschreitung':'Netzwerk'); }); }
+function aiChat(msgs){
+  var key=(S.polKey||'').trim(), body={model:'openai',messages:msgs,referrer:'dungeon-master-service'};
+  var json=function(r){ return r.json().then(function(j){ var t=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content; if(!t) throw new Error('leere Antwort'); return String(t); }); };
+  var tries=[];
+  if(key) tries.push(function(){ return aiFetch('https://gen.pollinations.ai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)}).then(json); });
+  tries.push(function(){ return aiFetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(json); });
+  tries.push(function(){ return aiFetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){ return r.text(); }).then(function(t){ if(!t||/^\s*\{\s*"error"/.test(t)) throw new Error('Fehlerantwort'); return t; }); });
+  if(!key) tries.push(function(){ return aiFetch('https://gen.pollinations.ai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(json); });
+  var errs=[];
+  function next(i){ if(i>=tries.length) return Promise.reject(new Error(errs.join(' / ')||'keine Verbindung'));
+    return tries[i]().catch(function(e){ errs.push(e.message); return new Promise(function(res){ setTimeout(res,i===0?800:2500); }).then(function(){ return next(i+1); }); }); }
+  return next(0); }
+function aiCall(content){ return aiChat([{role:'system',content:'Du bist ein präziser Chronist für eine D&D-Kampagne in der Fantasywelt Aetheria. Antworte auf Deutsch.'},{role:'user',content:content}]); }
 
 var LORE_WORDS=['Aetheria','Gaia','Pandoria','Boraelia','Falkenstein','Morgenhain','Asterhall','Eichenwacht','Caliztán','Rotfels','Ignis','Nyrak','Eldric','Elias','Ser Lavitz','Clemens Ignatio','Kaelos','Harkon','Ostrid','Humara','Undor','Lumena','Semion','Ventra','Floriel','Faunar','Pomaris','Morvan','Wurzeltag','Stammtag','Zweigtag','Blatttag','Kronentag'];
 function vocab(){ var v=LORE_WORDS.slice(); (S.chars||[]).forEach(function(c){ v.push(c.name); if(c.short) v.push(c.short); if(c.player) v.push(c.player); });
@@ -2931,24 +2943,48 @@ var RULES=null, RULES_V='1', RL={loading:false,err:'',busy:false,q:'',kap:'',ope
 var RSTOP=('der die das den dem des ein eine einen einem einer eines und oder aber wenn dann wie was wer wo wann warum wieso weshalb welche welcher welches ich du er sie es wir ihr mein dein sein kann kannst könnte darf muss soll will mit ohne für von zu zum zur auf aus bei nach über unter vor hinter neben zwischen im in an am ist sind war hat habe haben wird werden gibt geht auch noch nur schon nicht kein keine sich man mal bitte genau eigentlich regel regeln funktioniert erkläre erklär')
   .split(' ').reduce(function(o,w){ o[w]=1; return o; },{});
 function rNorm(s){ return String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,' '); }
-function rStems(q){ return rNorm(q).split(' ').filter(function(w){ return w.length>=3&&!RSTOP[w]; })
-  .map(function(w){ return w.length>6?w.slice(0,w.length-2):(w.length>4?w.slice(0,w.length-1):w); }).filter(function(w,i,a){ return a.indexOf(w)===i; }); }
 function loadRules(){ if(RULES||RL.loading) return; RL.loading=true; RL.err='';
   fetch('regeln.json?v='+RULES_V).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
    .then(function(d){ d.forEach(function(e,i){ e.i=i; e.nt=' '+rNorm(e.t)+' '; e.nx=' '+rNorm(e.x)+' '; }); RULES=d; })
    .catch(function(e){ RL.err='Regelwerk nicht ladbar ('+e.message+'). Es liegt als regeln.json auf GitHub und braucht beim ersten Mal Internet.'; })
    .then(function(){ RL.loading=false; if(S.view==='rule') renderRule(); }); }
-function rSearch(q,n,kap){ if(!RULES) return []; var st=rStems(q); if(!st.length) return [];
+var RSYN={status:'zustand',zustaende:'zustand',condition:'zustand',conditions:'zustand',statuseffekt:'zustand',effekt:'zustand',
+ grapple:'gepackt',grappled:'gepackt',greifen:'gepackt',festhalten:'gepackt',ringen:'gepackt',prone:'liegend',umgestossen:'liegend',
+ ac:'ruestungsklasse',rk:'ruestungsklasse',hp:'trefferpunkte',tp:'trefferpunkte',lp:'trefferpunkte',lebenspunkte:'trefferpunkte',leben:'trefferpunkte',
+ save:'rettungswurf',saving:'rettungswurf',rettungswuerfe:'rettungswurf',advantage:'vorteil',disadvantage:'nachteil',
+ bonusaction:'bonusaktion',dash:'spurt',sprint:'spurt',rennen:'spurt',disengage:'rueckzug',dodge:'ausweichen',hide:'verstecken',schleichen:'heimlichkeit',stealth:'heimlichkeit',
+ help:'helfen',opportunity:'gelegenheitsangriffe',aoo:'gelegenheitsangriffe',gelegenheitsangriff:'gelegenheitsangriffe',concentration:'konzentration',
+ slot:'zauberplatz',slots:'zauberplatz',zauberslot:'zauberplatz',zauberslots:'zauberplatz',exhaustion:'erschoepfung',inspiration:'inspiration',
+ crit:'kritischer',krit:'kritischer',kritisch:'kritischer',rage:'kampfrausch',wut:'kampfrausch',sneak:'hinterhaeltiger',hinterhaeltig:'hinterhaeltiger',
+ mastery:'meisterschaft',waffenmeisterschaft:'meisterschaft',cover:'deckung',perception:'wahrnehmung',unconscious:'bewusstlos',ohnmaechtig:'bewusstlos',
+ sterben:'todesrettungswurf',tod:'todesrettungswurf',death:'todesrettungswurf',cantrip:'zaubertrick',cantrips:'zaubertrick',reaction:'reaktion',
+ multiclass:'klassenkombination',multiclassing:'klassenkombination',feat:'talent',feats:'talent',background:'hintergrund',race:'spezies',rasse:'spezies',volk:'spezies',
+ darkvision:'dunkelsicht',invisible:'unsichtbar',blinded:'blind',charmed:'bezaubert',frightened:'veraengstigt',angst:'veraengstigt',furcht:'veraengstigt',
+ poisoned:'vergiftet',gift:'vergiftet',restrained:'festgesetzt',stunned:'betaeubt',paralyzed:'gelaehmt',petrified:'versteinert',incapacitated:'kampfunfaehig',
+ deafened:'taub',rast:'rast',ruhe:'rast',heilen:'heilung',initiative:'initiative',ueberrascht:'ueberraschung',surprise:'ueberraschung',fallen:'sturz',fallschaden:'sturz'};
+function rStemOne(w){ if(w.length<6) return w; var m=w.match(/^(.{4,}?)(ungen|ung|en|er|es|e|n)$/); if(m) return m[1];
+  if(/[^u]s$/.test(w)) return w.slice(0,-1); return w; }
+function rTerms(q){ var out=[];
+  rNorm(q).split(' ').forEach(function(w){ if(w.length<2||RSTOP[w]) return; if(w.length<3&&!RSYN[w]) return;
+    var v=[w]; if(RSYN[w]) v.push(RSYN[w]); var st=rStemOne(w); if(st!==w) v.push(st);
+    out.push(v.filter(function(x,i,a){ return a.indexOf(x)===i; })); });
+  return out; }
+function rStems(q){ var a=[]; rTerms(q).forEach(function(v){ v.forEach(function(x){ if(a.indexOf(x)<0) a.push(x); }); }); return a; }
+function rCount(hay,re,max){ re.lastIndex=0; var c=0; while(c<max&&re.exec(hay)) c++; return c; }
+function rSearch(q,n,kap){ if(!RULES) return []; var T=rTerms(q); if(!T.length) return [];
+  var R=T.map(function(v){ return v.map(function(x,j){ var base=j===0||RSYN[v[0]]===x;
+    return {w:base?1:.55, ex:new RegExp(' '+x+'(e|en|er|es|n|s|ungen|ung)? ','g'), pre:x.length>=5?new RegExp(' '+x,'g'):null}; }); });
   var res=[];
   RULES.forEach(function(e){ if(kap&&e.k!==kap) return; var sc=0, hit=0;
-    st.forEach(function(s){ var inT=e.nt.indexOf(' '+s)>=0, c=0, p=-1;
-      if(inT){ sc+=14; if(e.nt.indexOf(' '+s)===0) sc+=6; }
-      while(c<6&&(p=e.nx.indexOf(' '+s,p+1))>=0) c++;
-      sc+=c*1.6; if(inT||c) hit++; });
-    if(!hit) return; sc*=hit/st.length; if(hit===st.length) sc+=8;
-    if(e.k==='Regelglossar'||e.k==='Spielregeln') sc*=1.25;
-    sc-=Math.min(4,e.x.length/4000);
-    res.push([sc,e]); });
+    R.forEach(function(vs){ var best=0;
+      vs.forEach(function(r){ var s=0;
+        if(rCount(e.nt,r.ex,1)) s+=22; else if(r.pre&&rCount(e.nt,r.pre,1)) s+=9;
+        var c=rCount(e.nx,r.ex,6); s+=c*2; if(!c&&r.pre) s+=rCount(e.nx,r.pre,4)*0.7;
+        s*=r.w; if(s>best) best=s; });
+      if(best>0){ sc+=best; hit++; } });
+    if(!hit) return; sc*=hit/R.length; if(hit===R.length) sc+=8;
+    if(e.k==='Regelglossar'||e.k==='Spielregeln') sc*=1.3;
+    sc-=Math.min(3,e.x.length/5000); res.push([sc,e]); });
   res.sort(function(a,b){ return b[0]-a[0]; });
   return res.slice(0,n||12).map(function(r){ return r[1]; }); }
 function rHi(html,q){ var st=rStems(q); if(!st.length) return html;
@@ -2969,9 +3005,9 @@ function mdLite(t){
 function rExcerpt(e,q,len){ var x=e.x.replace(/\n+/g,' '), st=rStems(q), n=rNorm(x), p=-1;
   st.some(function(s){ p=n.indexOf(' '+s); return p>=0; });
   var a=Math.max(0,(p>=0?p:0)-80); var s=x.slice(a,a+(len||260)); return (a>0?'… ':'')+s+(a+(len||260)<x.length?' …':''); }
-var RSYS='Du bist der „Regelalmanach“, ein Regelexperte für Dungeons & Dragons 5.5e (Regeln von 2024). Antworte auf Deutsch, kurz und präzise wie ein erfahrener Spielleiter: höchstens etwa 120 Wörter, gern mit Stichpunkten. Stütze dich zuerst auf die mitgelieferten Auszüge aus dem SRD 5.2.1 und nenne die genutzte Fundstelle in eckigen Klammern mit ihrem exakten Titel, z. B. [Verstecken]. Decken die Auszüge die Frage nicht ab, antworte aus deinem Wissen über die Regeln von 2024 und kennzeichne das mit „(nicht im SRD)“. Erfinde keine Regeln; wenn etwas Auslegungssache ist, sag das und gib eine Empfehlung für den SL. Verwende die deutschen Regelbegriffe.';
+var RSYS='Du bist der „Regelalmanach“: ein freundlicher, kompetenter Gesprächspartner für einen Spielleiter von Dungeons & Dragons 5.5e (Regeln von 2024). Du kannst frei mit ihm reden: Regeln erklären, Beispiele durchspielen, knifflige Situationen am Spieltisch auflösen, Hausregeln vorschlagen, Ideen liefern und Rückfragen beantworten. Antworte auf Deutsch, so ausführlich wie nötig und so knapp wie möglich, gern mit Stichpunkten. Bei Regelfragen stützt du dich zuerst auf die mitgelieferten Auszüge aus dem SRD 5.2.1 und nennst die genutzte Fundstelle in eckigen Klammern mit ihrem exakten Titel, z. B. [Verstecken [Aktion]]. Was nicht in den Auszügen steht, beantwortest du aus deinem Wissen über die Regeln von 2024 und kennzeichnest es mit „(nicht im SRD)“. Erfinde keine offiziellen Regeln; eigene Vorschläge kennzeichnest du als Empfehlung. Verwende die deutschen Regelbegriffe. Passen die Auszüge nicht zur Frage, ignoriere sie einfach.';
 function ruleAsk(q){ q=String(q||'').trim(); if(!q) return; if(!S.rchat) S.rchat=[];
-  var hist=S.rchat.slice(-6), prevQ=''; for(var j=S.rchat.length-1;j>=0;j--) if(S.rchat[j].r==='u'){ prevQ=S.rchat[j].x; break; }
+  var hist=S.rchat.slice(-10), prevQ=''; for(var j=S.rchat.length-1;j>=0;j--) if(S.rchat[j].r==='u'){ prevQ=S.rchat[j].x; break; }
   var hits=rSearch(q,6); if(hits.length<2&&prevQ) hits=hits.concat(rSearch(prevQ+' '+q,6)).filter(function(e,i,a){ return a.indexOf(e)===i; }).slice(0,6);
   S.rchat.push({r:'u',x:q}); var msg={r:'a',q:q,src:hits.map(function(e){ return e.i; }),x:'',state:'wait'}; S.rchat.push(msg);
   if(S.rchat.length>60) S.rchat=S.rchat.slice(-60); save(); renderRule(); rScroll();
@@ -2981,13 +3017,11 @@ function ruleAsk(q){ q=String(q||'').trim(); if(!q) return; if(!S.rchat) S.rchat
   hist.forEach(function(m){ if(m.r==='u') msgs.push({role:'user',content:m.x}); else if(m.x) msgs.push({role:'assistant',content:m.x}); });
   msgs.push({role:'user',content:'Frage: '+q+'\n\nAuszüge aus dem SRD 5.2.1:'+(ctx||' (keine passenden Auszüge gefunden)')});
   var go=function(){ RL.busy=true; RL.last=Date.now();
-    fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,model:'openai',referrer:'dungeon-master-service'})})
-     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
-     .then(function(t){ msg.x=t.trim(); msg.state='ok'; })
+    aiChat(msgs).then(function(t){ msg.x=t.trim(); msg.state='ok'; })
      .catch(function(e){ msg.state='err'; msg.err=e.message; })
      .then(function(){ RL.busy=false; save(); if(S.view==='rule'){ renderRule(); rScroll(); } }); };
-  var wt=RL.last?Math.max(0,15500-(Date.now()-RL.last)):0;
-  if(RL.busy||wt){ msg.state='queue'; renderRule(); setTimeout(function(){ msg.state='wait'; renderRule(); go(); },RL.busy?16000:wt); } else go(); }
+  var wt=(RL.last&&!(S.polKey||'').trim())?Math.max(0,15500-(Date.now()-RL.last)):0;
+  if(RL.busy||wt){ msg.state='queue'; renderRule(); setTimeout(function(){ msg.state='wait'; renderRule(); go(); },RL.busy?((S.polKey||'').trim()?3000:16000):wt); } else go(); }
 function rScroll(){ setTimeout(function(){ var c=$('rchat'); if(c) c.scrollTop=c.scrollHeight; var b=document.getElementById('rIn'); if(b) b.scrollIntoView({block:'nearest'}); },30); }
 function rSrcChips(ids){ return (ids||[]).length?'<div class="rsrcs">'+ids.slice(0,6).map(function(i){ var e=RULES&&RULES[i]; return e?'<span class="rsrc" data-act="ropen" data-k="'+i+'">📖 '+esc(e.t.split(' › ').pop())+'</span>':''; }).join('')+'</div>':''; }
 function renderRule(){
@@ -3014,7 +3048,8 @@ function renderRule(){
       if(m.state!=='ok'&&RULES&&m.src&&m.src[0]!=null){ var e=RULES[m.src[0]]; body+='<div class="rfund"><b>'+esc(e.t)+'</b> <small>· '+esc(e.k)+'</small><div>'+rHi(esc(rExcerpt(e,m.q,320)),m.q)+'</div></div>'; }
       h+='<div class="rb ra">'+body+rSrcChips(m.src)+(m.state==='err'?'<button class="sm" data-act="rretry" data-k="'+esc(m.q)+'" style="margin-top:6px">↻ Nochmal fragen</button>':'')+'</div>'; });
     h+='</div><div class="row" style="margin-top:8px"><textarea id="rIn" rows="2" placeholder="Deine Regelfrage …" style="flex:1;min-width:0;resize:vertical"></textarea><button class="pri" data-act="rask" style="padding:0 16px">➤</button></div>'+
-      (S.rchat.length?'<div style="text-align:right;margin-top:6px"><button class="sm" data-act="rclear">🧹 Chat leeren</button></div>':'')+'</div>';
+      '<div class="row" style="margin-top:8px;align-items:center">'+(S.rchat.length?'<button class="sm" data-act="rclear">🧹 Chat leeren</button>':'')+'<span class="sp" style="flex:1"></span><button class="sm" data-act="rkey">🔑 KI-Schlüssel'+((S.polKey||'').trim()?' ✓':'')+'</button></div>'+
+      (RL.keyOpen?'<div class="rfund" style="margin-top:8px">Ohne Schlüssel nutzt der Almanach den kostenlosen, anonymen Zugang von Pollinations. Der ist langsam, erlaubt nur etwa eine Frage alle 15 Sekunden und fällt manchmal aus. Mit einem kostenlosen Schlüssel von <b>enter.pollinations.ai</b> läuft es stabiler und ohne Wartezeit. Nimm einen <b>öffentlichen Schlüssel (pk_…)</b>, keinen geheimen.<div class="row" style="margin-top:6px"><input id="rKey" value="'+esc(S.polKey||'')+'" placeholder="pk_…" style="flex:1;min-width:0"><button class="sm pri" data-act="rkeySave">Speichern</button></div><div class="hint" style="margin-top:4px">Der Schlüssel wird nur auf diesem Gerät gespeichert und gilt auch für Loreyer und Mystery Shop.</div></div>':'')+'</div>';
   } else {
     var res=RL.q?rSearch(RL.q,25,RL.kap):[];
     h+='<div class="panel"><div class="row"><input id="rQ" value="'+esc(RL.q)+'" placeholder="Schlagwort, z. B. Deckung, Gepackt, Feuerball …" style="flex:1;min-width:0"><button class="pri" data-act="rsearch">🔎</button></div>'+
@@ -3039,6 +3074,8 @@ document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.
   else if(a==='rask'){ ruleAsk($('rIn').value); }
   else if(a==='rex'||a==='rretry'){ ruleAsk(k); }
   else if(a==='rclear'){ S.rchat=[]; save(); renderRule(); }
+  else if(a==='rkey'){ RL.keyOpen=!RL.keyOpen; renderRule(); }
+  else if(a==='rkeySave'){ S.polKey=($('rKey').value||'').trim(); save(); RL.keyOpen=false; renderRule(); toast(S.polKey?'🔑 Schlüssel gespeichert.':'Schlüssel entfernt.'); }
   else if(a==='rsearch'){ RL.q=$('rQ').value; RL.open=null; renderRule(); }
   else if(a==='rkap'){ RL.kap=k; RL.q=$('rQ')?$('rQ').value:RL.q; renderRule(); }
   else if(a==='rtog'){ RL.open=RL.open===+k?null:+k; renderRule(); }
