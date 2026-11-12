@@ -158,6 +158,18 @@
   .hubcard{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px;border-radius:16px;background:var(--panel);border:2px solid var(--edge);box-shadow:0 4px 14px rgba(90,60,20,.15);transition:transform .15s,border-color .15s}
   .hubcard:hover{transform:translateY(-3px);border-color:var(--gold)}
   .hubcard .hi{font-size:44px} .hubcard b{font-family:Cinzel,serif;font-size:21px;color:#4a3410;letter-spacing:.05em} .hubcard small{color:var(--muted);font-size:14px;line-height:1.35}
+  .rchat{max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px}
+  .rb{padding:9px 12px;border-radius:14px;line-height:1.45;max-width:92%} .rb p{margin:0 0 6px} .rb ul{margin:4px 0 6px 18px;padding:0}
+  .ru{align-self:flex-end;background:#33462a;color:#f3ead2;border-bottom-right-radius:4px}
+  .ra{align-self:flex-start;background:rgba(255,250,235,.9);border:1px solid var(--edge);border-bottom-left-radius:4px}
+  .rsrcs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px} .rsrc{display:inline-block;font-size:12.5px;padding:3px 8px;border-radius:999px;background:#efe3c2;border:1px solid var(--edge);cursor:pointer;color:#4a3410}
+  .rsrc:hover{border-color:var(--gold)} .rfund{margin-top:6px;padding:6px 8px;border-left:3px solid var(--gold);background:rgba(240,228,196,.5);font-size:14px}
+  .rres{padding:8px 4px;border-bottom:1px solid var(--edge)} .rres .rex{font-size:13.5px;color:var(--muted);margin-top:2px} .rres.op{background:rgba(240,228,196,.35)}
+  .rfull{font-size:14.5px;line-height:1.5;margin-top:6px} .rfull p{margin:0 0 7px} .rh{font-family:Cinzel,serif;font-weight:700;margin:8px 0 4px;color:#4a3410}
+  .rtw{overflow-x:auto;margin:6px 0} .rtab{border-collapse:collapse;font-size:13px} .rtab td{border:1px solid var(--edge);padding:3px 6px;vertical-align:top} .rtab tr:first-child td{font-weight:700;background:#efe3c2}
+  mark{background:#f5d66b;padding:0 1px;border-radius:2px}
+  .rmodal{position:fixed;inset:0;z-index:60;background:rgba(30,25,10,.55);display:flex;align-items:center;justify-content:center;padding:12px}
+  .rmodal .box{background:var(--panel,#f7efd9);border:2px solid var(--gold);border-radius:14px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;padding:14px}
   .hubpage{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:14px 12px 60px}
   .hubtitle{font-family:Cinzel,serif;font-size:26px;color:#4a3410;margin:4px 0 12px;display:flex;gap:10px;align-items:center}
   .panel{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(90,60,20,.12)}
@@ -347,6 +359,7 @@
       <button class="hubcard" data-hub="quest"><span class="hi">📜</span><b>Questmaster</b><small>Quests und Rätsel auf Knopfdruck</small></button>
       <button class="hubcard" data-hub="lore"><span class="hi">⚖️</span><b>Loreyer</b><small>Sitzungsnotizen und Recap für die nächste Runde</small></button>
       <button class="hubcard" data-hub="shop"><span class="hi">🎁</span><b>Mystery Shop</b><small>Zum Wunderbaren Unfug: Truhen und unnütze Magie</small></button>
+      <button class="hubcard" data-hub="rule"><span class="hi">📖</span><b>Regelalmanach</b><small>Regeln 5.5e durchsuchen und Regelfragen im Chat stellen</small></button>
       <button class="hubcard" data-hub="vtt"><span class="hi">📺</span><b>VTT Caster</b><small>Karten und Videos auf den zweiten Bildschirm, mit Nebel des Krieges</small></button>
     </div></div>
 </div>
@@ -374,6 +387,10 @@
 <div id="view-vtt" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
   <div class="hubpage wide" id="vttBody"></div>
+</div>
+<div id="view-rule" class="view" hidden>
+  <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <div class="hubpage" id="ruleBody"></div>
 </div>
 <div id="view-cal" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
@@ -1709,13 +1726,13 @@ function renderScene(){
 }
 
 /* =================== HUBS =================== */
-var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop',vtt:'vtt-caster'};
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop',vtt:'vtt-caster',rule:'regelalmanach'};
 function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
 function showView(v,push){
-  ['hub','fight','npc','cal','quest','lore','char','shop','vtt'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  ['hub','fight','npc','cal','quest','lore','char','shop','vtt','rule'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
-  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='vtt') renderVtt();
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='rule') renderRule(); else if(v==='vtt') renderVtt();
   if(v==='shop') shopMusicInit(); else shopMusicLeave();
   window.scrollTo(0,0); save();
 }
@@ -2908,6 +2925,128 @@ function shopMusicLeave(){ if(!MUS.playing) return; try{ if(MUS.yt&&MUS.yt.pause
 document.addEventListener('click',function(e){ if(!(e.target.closest&&e.target.closest('#musSet'))) return;
   var m=musParse($('musLink').value); if(!m){ toast('Kein gültiger YouTube- oder Spotify-Link.'); return; }
   S.shopMus=m; save(); $('musLink').value=''; $('musHint').textContent='Einmal ▶ drücken, danach läuft es in Schleife.'; musLoad(m); toast('🎵 Neue Ladenmusik.'); });
+
+/* =================== REGELALMANACH (SRD 5.2.1, deutsch) =================== */
+var RULES=null, RULES_V='1', RL={loading:false,err:'',busy:false,q:'',kap:'',open:null,mode:'chat'};
+var RSTOP=('der die das den dem des ein eine einen einem einer eines und oder aber wenn dann wie was wer wo wann warum wieso weshalb welche welcher welches ich du er sie es wir ihr mein dein sein kann kannst könnte darf muss soll will mit ohne für von zu zum zur auf aus bei nach über unter vor hinter neben zwischen im in an am ist sind war hat habe haben wird werden gibt geht auch noch nur schon nicht kein keine sich man mal bitte genau eigentlich regel regeln funktioniert erkläre erklär')
+  .split(' ').reduce(function(o,w){ o[w]=1; return o; },{});
+function rNorm(s){ return String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,' '); }
+function rStems(q){ return rNorm(q).split(' ').filter(function(w){ return w.length>=3&&!RSTOP[w]; })
+  .map(function(w){ return w.length>6?w.slice(0,w.length-2):(w.length>4?w.slice(0,w.length-1):w); }).filter(function(w,i,a){ return a.indexOf(w)===i; }); }
+function loadRules(){ if(RULES||RL.loading) return; RL.loading=true; RL.err='';
+  fetch('regeln.json?v='+RULES_V).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+   .then(function(d){ d.forEach(function(e,i){ e.i=i; e.nt=' '+rNorm(e.t)+' '; e.nx=' '+rNorm(e.x)+' '; }); RULES=d; })
+   .catch(function(e){ RL.err='Regelwerk nicht ladbar ('+e.message+'). Es liegt als regeln.json auf GitHub und braucht beim ersten Mal Internet.'; })
+   .then(function(){ RL.loading=false; if(S.view==='rule') renderRule(); }); }
+function rSearch(q,n,kap){ if(!RULES) return []; var st=rStems(q); if(!st.length) return [];
+  var res=[];
+  RULES.forEach(function(e){ if(kap&&e.k!==kap) return; var sc=0, hit=0;
+    st.forEach(function(s){ var inT=e.nt.indexOf(' '+s)>=0, c=0, p=-1;
+      if(inT){ sc+=14; if(e.nt.indexOf(' '+s)===0) sc+=6; }
+      while(c<6&&(p=e.nx.indexOf(' '+s,p+1))>=0) c++;
+      sc+=c*1.6; if(inT||c) hit++; });
+    if(!hit) return; sc*=hit/st.length; if(hit===st.length) sc+=8;
+    if(e.k==='Regelglossar'||e.k==='Spielregeln') sc*=1.25;
+    sc-=Math.min(4,e.x.length/4000);
+    res.push([sc,e]); });
+  res.sort(function(a,b){ return b[0]-a[0]; });
+  return res.slice(0,n||12).map(function(r){ return r[1]; }); }
+function rHi(html,q){ var st=rStems(q); if(!st.length) return html;
+  return html.replace(/(>|^)([^<]+)/g,function(m,a,txt){ return a+txt.replace(/[A-Za-zÄÖÜäöüß]{3,}/g,function(w){ var n=rNorm(w).trim(); return st.some(function(s){ return n.indexOf(s)===0; })?'<mark>'+w+'</mark>':w; }); }); }
+function mdLite(t){
+  var L=String(t||'').split('\n'), h='', inT=false, inU=false;
+  function inl(s){ return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*]+)\*/g,'<i>$1</i>').replace(/\[([^\]]{2,80})\]/g,'<span class="rsrc" data-act="ropenT" data-k="$1">📖 $1</span>'); }
+  L.forEach(function(l){
+    if(/^\s*\|/.test(l)){ if(/^\s*\|[\s:\-|]+\|\s*$/.test(l)) return; if(!inT){ if(inU){h+='</ul>';inU=false;} h+='<div class="rtw"><table class="rtab">'; inT=true; }
+      h+='<tr>'+l.trim().replace(/^\||\|$/g,'').split('|').map(function(c){ return '<td>'+inl(c.trim())+'</td>'; }).join('')+'</tr>'; return; }
+    if(inT){ h+='</table></div>'; inT=false; }
+    var m=l.match(/^\s*[-*•]\s+(.*)/);
+    if(m){ if(!inU){ h+='<ul>'; inU=true; } h+='<li>'+inl(m[1])+'</li>'; return; }
+    if(inU){ h+='</ul>'; inU=false; }
+    m=l.match(/^#{1,6}\s+(.*)/); if(m){ h+='<div class="rh">'+inl(m[1])+'</div>'; return; }
+    if(l.trim()) h+='<p>'+inl(l)+'</p>'; });
+  if(inT) h+='</table></div>'; if(inU) h+='</ul>'; return h; }
+function rExcerpt(e,q,len){ var x=e.x.replace(/\n+/g,' '), st=rStems(q), n=rNorm(x), p=-1;
+  st.some(function(s){ p=n.indexOf(' '+s); return p>=0; });
+  var a=Math.max(0,(p>=0?p:0)-80); var s=x.slice(a,a+(len||260)); return (a>0?'… ':'')+s+(a+(len||260)<x.length?' …':''); }
+var RSYS='Du bist der „Regelalmanach“, ein Regelexperte für Dungeons & Dragons 5.5e (Regeln von 2024). Antworte auf Deutsch, kurz und präzise wie ein erfahrener Spielleiter: höchstens etwa 120 Wörter, gern mit Stichpunkten. Stütze dich zuerst auf die mitgelieferten Auszüge aus dem SRD 5.2.1 und nenne die genutzte Fundstelle in eckigen Klammern mit ihrem exakten Titel, z. B. [Verstecken]. Decken die Auszüge die Frage nicht ab, antworte aus deinem Wissen über die Regeln von 2024 und kennzeichne das mit „(nicht im SRD)“. Erfinde keine Regeln; wenn etwas Auslegungssache ist, sag das und gib eine Empfehlung für den SL. Verwende die deutschen Regelbegriffe.';
+function ruleAsk(q){ q=String(q||'').trim(); if(!q) return; if(!S.rchat) S.rchat=[];
+  var hist=S.rchat.slice(-6), prevQ=''; for(var j=S.rchat.length-1;j>=0;j--) if(S.rchat[j].r==='u'){ prevQ=S.rchat[j].x; break; }
+  var hits=rSearch(q,6); if(hits.length<2&&prevQ) hits=hits.concat(rSearch(prevQ+' '+q,6)).filter(function(e,i,a){ return a.indexOf(e)===i; }).slice(0,6);
+  S.rchat.push({r:'u',x:q}); var msg={r:'a',q:q,src:hits.map(function(e){ return e.i; }),x:'',state:'wait'}; S.rchat.push(msg);
+  if(S.rchat.length>60) S.rchat=S.rchat.slice(-60); save(); renderRule(); rScroll();
+  if(!navigator.onLine){ msg.state='off'; save(); renderRule(); return; }
+  var ctx='', tot=0; hits.forEach(function(e){ if(tot>7000) return; var x=e.x.slice(0,1600); tot+=x.length; ctx+='\n### ['+e.t+'] ('+e.k+')\n'+x+'\n'; });
+  var msgs=[{role:'system',content:RSYS}];
+  hist.forEach(function(m){ if(m.r==='u') msgs.push({role:'user',content:m.x}); else if(m.x) msgs.push({role:'assistant',content:m.x}); });
+  msgs.push({role:'user',content:'Frage: '+q+'\n\nAuszüge aus dem SRD 5.2.1:'+(ctx||' (keine passenden Auszüge gefunden)')});
+  var go=function(){ RL.busy=true; RL.last=Date.now();
+    fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,model:'openai',referrer:'dungeon-master-service'})})
+     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+     .then(function(t){ msg.x=t.trim(); msg.state='ok'; })
+     .catch(function(e){ msg.state='err'; msg.err=e.message; })
+     .then(function(){ RL.busy=false; save(); if(S.view==='rule'){ renderRule(); rScroll(); } }); };
+  var wt=RL.last?Math.max(0,15500-(Date.now()-RL.last)):0;
+  if(RL.busy||wt){ msg.state='queue'; renderRule(); setTimeout(function(){ msg.state='wait'; renderRule(); go(); },RL.busy?16000:wt); } else go(); }
+function rScroll(){ setTimeout(function(){ var c=$('rchat'); if(c) c.scrollTop=c.scrollHeight; var b=document.getElementById('rIn'); if(b) b.scrollIntoView({block:'nearest'}); },30); }
+function rSrcChips(ids){ return (ids||[]).length?'<div class="rsrcs">'+ids.slice(0,6).map(function(i){ var e=RULES&&RULES[i]; return e?'<span class="rsrc" data-act="ropen" data-k="'+i+'">📖 '+esc(e.t.split(' › ').pop())+'</span>':''; }).join('')+'</div>':''; }
+function renderRule(){
+  var b=$('ruleBody'); if(!b) return; if(!RULES&&!RL.err) loadRules();
+  if(S.rchat===undefined) S.rchat=[];
+  var kaps=RULES?RULES.reduce(function(a,e){ if(a.indexOf(e.k)<0) a.push(e.k); return a; },[]):[];
+  var h='<div class="panel"><h2 style="margin:0 0 6px">📖 Regelalmanach</h2><div class="seg">'+
+    '<button class="'+(RL.mode==='chat'?'on':'')+'" data-act="rmode" data-k="chat">💬 Frag den Almanach</button><button class="'+(RL.mode==='search'?'on':'')+'" data-act="rmode" data-k="search">🔎 Schlagwortsuche</button></div>';
+  if(RL.err) h+='<div class="hint" style="color:#a33;margin-top:8px">'+esc(RL.err)+'</div>';
+  else if(!RULES) h+='<div class="hint" style="margin-top:8px">📚 Lade das Regelwerk …</div>';
+  h+='</div>';
+  if(RL.mode==='chat'){
+    h+='<div class="panel"><div id="rchat" class="rchat">';
+    if(!S.rchat.length) h+='<div class="hint">Stell eine Regelfrage, z. B. „Wie funktioniert Verstecken?“, „Was macht Gepackt?“ oder „Darf ich nach dem Spurt noch angreifen?“. Die Antwort stützt sich auf das deutsche SRD 5.2.1. Nachfragen gehen auch.</div>'+
+      '<div class="rsrcs" style="margin-top:8px">'+['Wie funktioniert Verstecken?','Konzentration','Gelegenheitsangriff','Bewusstlos und Todesrettungswürfe','Kurze und lange Rast','Waffenmeisterschaft Umstoßen'].map(function(x){ return '<span class="rsrc" data-act="rex" data-k="'+esc(x)+'">'+esc(x)+'</span>'; }).join('')+'</div>';
+    S.rchat.forEach(function(m){
+      if(m.r==='u'){ h+='<div class="rb ru">'+esc(m.x)+'</div>'; return; }
+      var body='';
+      if(m.state==='ok') body=mdLite(m.x);
+      else if(m.state==='wait') body='<div class="hint">🤔 Der Almanach blättert …</div>';
+      else if(m.state==='queue') body='<div class="hint">⏳ Kurz warten, der KI-Dienst erlaubt nur eine Frage alle 15 Sekunden …</div>';
+      else if(m.state==='off') body='<div class="hint">📴 Offline: keine KI-Antwort, aber hier die besten Fundstellen:</div>';
+      else body='<div class="hint" style="color:#a33">KI nicht erreichbar ('+esc(m.err||'')+'). Hier die besten Fundstellen:</div>';
+      if(m.state!=='ok'&&RULES&&m.src&&m.src[0]!=null){ var e=RULES[m.src[0]]; body+='<div class="rfund"><b>'+esc(e.t)+'</b> <small>· '+esc(e.k)+'</small><div>'+rHi(esc(rExcerpt(e,m.q,320)),m.q)+'</div></div>'; }
+      h+='<div class="rb ra">'+body+rSrcChips(m.src)+(m.state==='err'?'<button class="sm" data-act="rretry" data-k="'+esc(m.q)+'" style="margin-top:6px">↻ Nochmal fragen</button>':'')+'</div>'; });
+    h+='</div><div class="row" style="margin-top:8px"><textarea id="rIn" rows="2" placeholder="Deine Regelfrage …" style="flex:1;min-width:0;resize:vertical"></textarea><button class="pri" data-act="rask" style="padding:0 16px">➤</button></div>'+
+      (S.rchat.length?'<div style="text-align:right;margin-top:6px"><button class="sm" data-act="rclear">🧹 Chat leeren</button></div>':'')+'</div>';
+  } else {
+    var res=RL.q?rSearch(RL.q,25,RL.kap):[];
+    h+='<div class="panel"><div class="row"><input id="rQ" value="'+esc(RL.q)+'" placeholder="Schlagwort, z. B. Deckung, Gepackt, Feuerball …" style="flex:1;min-width:0"><button class="pri" data-act="rsearch">🔎</button></div>'+
+      '<div class="seg" style="flex-wrap:wrap;margin-top:8px"><button class="'+(!RL.kap?'on':'')+'" data-act="rkap" data-k="">Alle</button>'+kaps.map(function(k){ return '<button class="'+(RL.kap===k?'on':'')+'" data-act="rkap" data-k="'+esc(k)+'">'+esc(k)+'</button>'; }).join('')+'</div>';
+    if(RL.q&&RULES) h+='<div class="hint" style="margin-top:6px">'+(res.length?res.length+(res.length===25?'+':'')+' Treffer':'Keine Treffer. Versuch ein anderes Wort oder frag den Almanach im Chat.')+'</div>';
+    res.forEach(function(e){ var op=RL.open===e.i;
+      h+='<div class="rres'+(op?' op':'')+'"><div data-act="rtog" data-k="'+e.i+'" style="cursor:pointer"><b>'+rHi(esc(e.t),RL.q)+'</b> <small class="hint">· '+esc(e.k)+'</small>'+(op?'':'<div class="rex">'+rHi(esc(rExcerpt(e,RL.q,200)),RL.q)+'</div>')+'</div>'+
+        (op?'<div class="rfull">'+rHi(mdLite(e.x),RL.q)+'<div class="row" style="margin-top:6px"><button class="sm" data-act="raskE" data-k="'+e.i+'">💬 Dazu fragen</button></div></div>':'')+'</div>'; });
+    h+='</div>';
+  }
+  h+='<div class="hint" style="margin:10px 4px;font-size:11px">Dieses Werk enthält Material aus dem Systemreferenzdokument 5.2.1 („SRD 5.2.1“) von Wizards of the Coast LLC, verfügbar unter https://www.dndbeyond.com/srd. Das SRD 5.2.1 ist lizenziert gemäß Creative Commons Namensnennung 4.0 International Public License (verfügbar unter https://creativecommons.org/licenses/by/4.0/legalcode.de). Deutsche Fassung: netzrenner/dnd.srd.5.2.1-de. KI-Antworten können Fehler enthalten.</div>';
+  b.innerHTML=h;
+  if(RL.modal!=null&&RULES){ var e2=RULES[RL.modal]; var md=document.createElement('div'); md.className='rmodal'; md.setAttribute('data-act','rclose');
+    md.innerHTML='<div class="box"><div class="row" style="align-items:center"><b style="flex:1;font-family:Cinzel,serif">'+esc(e2.t)+'</b><button class="sm" data-act="rclose">✕</button></div><div class="hint">'+esc(e2.k)+'</div><div class="rfull">'+mdLite(e2.x)+'</div></div>';
+    b.appendChild(md); }
+}
+document.addEventListener('keydown',function(e){
+  if(e.target&&e.target.id==='rIn'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); var v=e.target.value; ruleAsk(v); }
+  if(e.target&&e.target.id==='rQ'&&e.key==='Enter'){ RL.q=e.target.value; RL.open=null; renderRule(); var q=$('rQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } } });
+document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-act]'); if(!t||!$('view-rule')||$('view-rule').hidden) return; var a=t.dataset.act, k=t.dataset.k;
+  if(a==='rmode'){ RL.mode=k; renderRule(); }
+  else if(a==='rask'){ ruleAsk($('rIn').value); }
+  else if(a==='rex'||a==='rretry'){ ruleAsk(k); }
+  else if(a==='rclear'){ S.rchat=[]; save(); renderRule(); }
+  else if(a==='rsearch'){ RL.q=$('rQ').value; RL.open=null; renderRule(); }
+  else if(a==='rkap'){ RL.kap=k; RL.q=$('rQ')?$('rQ').value:RL.q; renderRule(); }
+  else if(a==='rtog'){ RL.open=RL.open===+k?null:+k; renderRule(); }
+  else if(a==='ropen'){ RL.modal=+k; renderRule(); }
+  else if(a==='ropenT'){ if(!RULES) return; var n=rNorm(k).trim(), f=null; RULES.some(function(x){ if(rNorm(x.t).trim()===n||rNorm(x.t.split(' › ').pop()).trim()===n){ f=x; return true; } });
+    if(!f){ var r=rSearch(k,1); f=r[0]; } if(f){ RL.modal=f.i; renderRule(); } }
+  else if(a==='rclose'){ if(t.classList.contains('rmodal')&&e.target!==t) return; RL.modal=null; renderRule(); }
+  else if(a==='raskE'){ var en=RULES[+k]; RL.mode='chat'; renderRule(); var i=$('rIn'); if(i){ i.value='Erklär mir „'+en.t.split(' › ').pop()+'“ kurz und mit Beispiel.'; i.focus(); } } });
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){

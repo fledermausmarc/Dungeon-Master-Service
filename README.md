@@ -30,3 +30,10 @@ verfügbar unter https://dnd.wizards.com/resources/systems-reference-document.
 Das SRD 5.1 steht unter der Creative Commons Attribution 4.0 International License
 (https://creativecommons.org/licenses/by/4.0/legalcode). Die deutschen Namen sind eigene Übersetzungen.
 Mit „Eigenkreation“ markierte Monster, die Kampfgründe und die Ereignistabellen sind eigene Inhalte.
+
+
+## Regelalmanach
+
+Schlagwortsuche und Regel-Chat über das deutsche SRD 5.2.1 (`regeln.json`).
+
+Dieses Werk enthält Material aus dem Systemreferenzdokument 5.2.1 („SRD 5.2.1“) von Wizards of the Coast LLC, verfügbar unter https://www.dndbeyond.com/srd. Das SRD 5.2.1 ist lizenziert gemäß Creative Commons Namensnennung 4.0 International Public License (verfügbar unter https://creativecommons.org/licenses/by/4.0/legalcode.de). Deutsche Markdown-Fassung: https://github.com/netzrenner/dnd.srd.5.2.1-de
