@@ -279,7 +279,7 @@
   .vtools{margin-top:10px} .vsize{margin:6px 0 0;align-items:center} .vsize input[type=range]{flex:1;min-width:120px} .vcanvas{margin-top:10px;display:flex;justify-content:center;background:#1d160e;border-radius:12px;padding:8px;overflow:hidden}
   #vttCv{touch-action:none;border-radius:6px;max-width:100%;cursor:crosshair}
   body.vtt-player{background:#000!important;overflow:hidden} body.vtt-player::before{display:none}
-  #pv{position:fixed;inset:0;background:#000;overflow:hidden} #pwrap{position:absolute;left:0;top:0;transform-origin:0 0}
+  #pv{position:fixed;inset:0;background:#000;overflow:hidden} #pstage{position:absolute;left:0;top:0;overflow:hidden;transform-origin:0 0} #pwrap{position:absolute;left:0;top:0;transform-origin:0 0}
   .pmedia{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
   #pfog{position:absolute;left:0;top:0;width:100%;height:100%;filter:blur(6px)}
   #pmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cbb88f;font-family:Cinzel,serif;font-size:24px}
@@ -2759,16 +2759,18 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-act
 document.addEventListener('change',function(e){ if(e.target.id==='lTr'){ var s=curSession(); s.tr=e.target.value; save(); } });
 
 /* =================== VTT Caster =================== */
-var VTT={bc:null,scenes:[],cur:-1,mode:'reveal',brush:50,aspect:16/9,view:null,connected:false,win:null,sound:false,fogT:null,drag:null,hover:null};
+var VTT={rot:0,bc:null,scenes:[],cur:-1,mode:'reveal',brush:50,aspect:16/9,view:null,connected:false,win:null,sound:false,fogT:null,drag:null,hover:null};
 function vttBC(){ if(!VTT.bc){ try{ VTT.bc=new BroadcastChannel('dms-vtt'); VTT.bc.onmessage=function(ev){ var m=ev.data||{};
-  if(m.t==='hello'){ VTT.connected=true; if(m.aspect&&Math.abs(m.aspect-VTT.aspect)>0.01){ VTT.aspect=m.aspect; } vttSendAll(); vttStatus(); vttDraw(); }
+  if(m.t==='hello'){ VTT.connected=true; if((m.rot||0)!==VTT.rot){ vttPost({t:'rot',rot:VTT.rot}); vttStatus(); return; } if(m.aspect&&Math.abs(m.aspect-VTT.aspect)>0.01){ VTT.aspect=m.aspect; } vttSendAll(); vttStatus(); vttDraw(); }
   if(m.t==='bye'){ VTT.connected=false; vttStatus(); } }; }catch(e){} } return VTT.bc; }
 function vttPost(m){ var b=vttBC(); if(b) try{ b.postMessage(m); }catch(e){} }
 function vttScene(){ return VTT.scenes[VTT.cur]||null; }
-function vttSendAll(){ var sc=vttScene(); if(!sc){ vttPost({t:'clear'}); return; }
+function vttSendAll(){ vttPost({t:'rot',rot:VTT.rot}); var sc=vttScene(); if(!sc){ vttPost({t:'clear'}); return; }
   vttPost({t:'media',blob:sc.file,kind:sc.kind,w:sc.w,h:sc.h}); vttSendFog(true); vttPost({t:'pl',pl:sc.pl}); vttPost({t:'sound',on:VTT.sound}); }
 function vttSendFog(now){ var sc=vttScene(); if(!sc) return; clearTimeout(VTT.fogT);
   VTT.fogT=setTimeout(function(){ sc.fog.toBlob(function(b){ vttPost({t:'fog',blob:b}); },'image/png'); }, now?0:120); }
+function vttSetRot(r){ var old=VTT.rot; if(r===old) return; if((r%180)!==(old%180)) VTT.aspect=1/VTT.aspect; VTT.rot=r; try{ S.vttRot=r; save(); }catch(e){}
+  VTT.scenes.forEach(function(sc){ sc.pl=vttFit(sc,false); }); vttSendAll(); renderVtt(); }
 function vttStatus(){ var el=$('vttStat'); if(el) el.innerHTML=VTT.connected?'🟢 Castschirm verbunden':'⚪ Kein Castschirm'; }
 function vttOpen(){
   var url=location.href.split('#')[0]+'#vtt-player', feat='width=1280,height=720';
@@ -2843,10 +2845,13 @@ function vttBind(){
 function vttZoom(f){ var sc=vttScene(); if(!sc) return; var fw=vttFitW(sc,false); sc.pl.iw=Math.max(fw*0.1,Math.min(fw*8,sc.pl.iw*f)); vttPost({t:'pl',pl:sc.pl}); vttDraw(); }
 function vttSetSize(pct){ var sc=vttScene(); if(!sc) return; sc.pl.iw=vttFitW(sc,false)*pct/100; vttPost({t:'pl',pl:sc.pl}); vttDraw(); }
 function renderVtt(){
+  if(!VTT.rotInit){ VTT.rotInit=true; var r0=S.vttRot||0; if(r0%180) VTT.aspect=1/VTT.aspect; VTT.rot=r0; }
   vttBC(); var sc=vttScene();
   var h='<div class="hubtitle"><span>📺</span> VTT Caster</div>'+
    '<div class="panel"><div class="row" style="margin:0"><button class="pri" data-act="vopen">📺 Castschirm öffnen</button><span id="vttStat" class="hint"></span>'+
    '<label class="vbtn">＋ Bild / Video<input type="file" id="vttFile" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple hidden></label></div>'+
+   '<div class="row" style="margin:8px 0 0;align-items:center;flex-wrap:wrap"><span class="lab" style="margin:0">Castschirm</span><div class="seg" style="margin:0">'+[[0,'▭ Quer'],[90,'▯ Hochkant ↻'],[270,'▯ Hochkant ↺'],[180,'⟲ Kopfüber']].map(function(o){ return '<button class="sm'+(VTT.rot===o[0]?' on':'')+'" data-act="vrot" data-r="'+o[0]+'">'+o[1]+'</button>'; }).join('')+'</div></div>'+
+   (VTT.rot%180?'<div class="hint" style="margin-top:4px">Das Bild wird auf dem Castschirm um 90° gedreht ausgegeben. Stell den Bildschirm so hin, dass oben im goldenen Rahmen auch für die Spieler oben ist. Falls es falsch herum steht: die andere Richtung wählen.</div>':'')+
    (VTT.scenes.length?'<div class="vscenes">'+VTT.scenes.map(function(s,i){ return '<button class="'+(i===VTT.cur?'on':'')+'" data-act="vsel" data-i="'+i+'">'+(s.kind==='video'?'🎞️ ':'🖼️ ')+esc(s.name)+'</button>'; }).join('')+'</div>':'')+'</div>'+
    (sc?'<div class="panel vtools"><div class="seg">'+[['reveal','👁 Aufdecken'],['hide','🌫 Verdecken'],['rect','▭ Rechteck aufdecken'],['move','✋ Bild verschieben']].map(function(m){ return '<button class="sm'+(VTT.mode===m[0]?' on':'')+'" data-act="vmode" data-m="'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'+
      '<div class="row" style="margin:6px 0 0"><label class="hint">Pinsel <input type="range" id="vttBrush" min="10" max="200" value="'+VTT.brush+'"></label>'+
@@ -2861,6 +2866,7 @@ function renderVtt(){
 document.addEventListener('click',function(e){ var t=e.target.closest('[data-act]'); if(!t) return; var sc=vttScene();
   switch(t.dataset.act){
     case 'vopen': vttOpen(); break;
+    case 'vrot': vttSetRot(parseInt(t.dataset.r,10)); break;
     case 'vsel': VTT.cur=parseInt(t.dataset.i,10); vttSendAll(); renderVtt(); break;
     case 'vmode': VTT.mode=t.dataset.m; renderVtt(); break;
     case 'vfog': if(sc){ var g=sc.fog.getContext('2d'); if(t.dataset.v==='1'){ g.fillStyle='#000'; g.fillRect(0,0,sc.fog.width,sc.fog.height); } else g.clearRect(0,0,sc.fog.width,sc.fog.height); vttSendFog(true); vttDraw(); } break;
@@ -2877,11 +2883,15 @@ window.addEventListener('resize',function(){ if(S&&S.view==='vtt') vttDraw(); })
 function vttPlayer(){
   document.body.className='vtt-player'; ['splash','fab'].forEach(function(id){ var el=$(id); if(el) el.style.display='none'; });
   [].forEach.call(document.querySelectorAll('.view'),function(v){ v.hidden=true; });
-  var root=document.createElement('div'); root.id='pv'; root.innerHTML='<div id="pwrap"></div><div id="pmsg">🌳 Warte auf den Spielleiter …</div><button id="pfs">⛶ Vollbild</button><div id="ptap" hidden>🔊 Tippen für Ton</div>';
+  var root=document.createElement('div'); root.id='pv'; root.innerHTML='<div id="pstage"><div id="pwrap"></div><div id="pmsg">🌳 Warte auf den Spielleiter …</div></div><button id="pfs">⛶ Vollbild</button><div id="ptap" hidden>🔊 Tippen für Ton</div>';
   document.body.appendChild(root); document.title='Castschirm · Dungeon Master Service';
   var wrap=$('pwrap'), media=null, fog=document.createElement('canvas'), W=1, H=1, pl=null, bc=new BroadcastChannel('dms-vtt'), wantSound=false; fog.id='pfog';
-  function hello(){ bc.postMessage({t:'hello',aspect:innerWidth/innerHeight}); }
-  function layout(){ if(!pl) return; var u=innerWidth/1000, sc=pl.iw/W*u, ih=pl.iw*H/W, x=(pl.ix-pl.iw/2)*u, y=(pl.iy-ih/2)*u;
+  var rot=0, stage=$('pstage');
+  function LW(){ return rot%180?innerHeight:innerWidth; } function LH(){ return rot%180?innerWidth:innerHeight; }
+  function applyRot(){ stage.style.width=LW()+'px'; stage.style.height=LH()+'px';
+    stage.style.transform=rot===90?'translate('+innerWidth+'px,0) rotate(90deg)':rot===270?'translate(0,'+innerHeight+'px) rotate(-90deg)':rot===180?'translate('+innerWidth+'px,'+innerHeight+'px) rotate(180deg)':'none'; }
+  function hello(){ applyRot(); bc.postMessage({t:'hello',aspect:LW()/LH(),rot:rot}); }
+  function layout(){ if(!pl) return; var u=LW()/1000, sc=pl.iw/W*u, ih=pl.iw*H/W, x=(pl.ix-pl.iw/2)*u, y=(pl.iy-ih/2)*u;
     wrap.style.width=W+'px'; wrap.style.height=H+'px'; wrap.style.transform='translate('+x+'px,'+y+'px) scale('+sc+')'; }
   function trySound(){ if(media&&media.tagName==='VIDEO'){ media.muted=!wantSound; var p=media.play(); if(p&&p.catch) p.catch(function(){ if(wantSound){ media.muted=true; media.play(); $('ptap').hidden=false; } }); } }
   bc.onmessage=function(ev){ var m=ev.data||{};
@@ -2894,6 +2904,7 @@ function vttPlayer(){
         var g=fog.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,fog.width,fog.height); g.clearRect(pad,pad,bm.width,bm.height); g.drawImage(bm,pad,pad);
         fog.style.left=(-pad/bm.width*100)+'%'; fog.style.top=(-pad/bm.height*100)+'%'; fog.style.width=(fog.width/bm.width*100)+'%'; fog.style.height=(fog.height/bm.height*100)+'%'; }); }
     if(m.t==='pl'){ pl=m.pl; layout(); }
+    if(m.t==='rot'&&m.rot!==rot){ rot=m.rot||0; hello(); layout(); }
     if(m.t==='sound'){ wantSound=m.on; trySound(); } };
   window.addEventListener('resize',function(){ hello(); layout(); });
   window.addEventListener('beforeunload',function(){ bc.postMessage({t:'bye'}); });
