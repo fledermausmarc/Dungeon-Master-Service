@@ -149,6 +149,7 @@
   #fab{display:none}
   body:not(.v-fight) #fab{display:none!important}
   .view[hidden]{display:none!important}
+  #view-map:not([hidden]){display:flex;flex-direction:column;height:100vh;height:100dvh}
   .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#3b5130,#2c3c24);border-bottom:3px solid #b8913f;box-shadow:0 2px 10px rgba(40,30,10,.25);padding:8px 12px;display:flex;gap:8px;align-items:center}
   .topbar .sp{flex:1} .topbar button{background:#f4ecd6;border-color:#b8913f}
   .hubhome{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 14px 40px;text-align:center}
@@ -359,6 +360,7 @@
       <button class="hubcard" data-hub="quest"><span class="hi">📜</span><b>Questmaster</b><small>Quests und Rätsel auf Knopfdruck</small></button>
       <button class="hubcard" data-hub="lore"><span class="hi">⚖️</span><b>Loreyer</b><small>Sitzungsnotizen und Recap für die nächste Runde</small></button>
       <button class="hubcard" data-hub="shop"><span class="hi">🎁</span><b>Mystery Shop</b><small>Zum Wunderbaren Unfug: Truhen und unnütze Magie</small></button>
+      <button class="hubcard" data-hub="map"><span class="hi">🗺️</span><b>Kartenschmiede</b><small>Karten für Region, Kontinent, Stadt, Viertel und Dungeon stempeln und bearbeiten</small></button>
       <button class="hubcard" data-hub="rule"><span class="hi">📖</span><b>Regelalmanach</b><small>Regeln 5.5e durchsuchen und Regelfragen im Chat stellen</small></button>
       <button class="hubcard" data-hub="vtt"><span class="hi">📺</span><b>VTT Caster</b><small>Karten und Videos auf den zweiten Bildschirm, mit Nebel des Krieges</small></button>
     </div></div>
@@ -387,6 +389,10 @@
 <div id="view-vtt" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
   <div class="hubpage wide" id="vttBody"></div>
+</div>
+<div id="view-map" class="view" hidden>
+  <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
+  <iframe id="mapFrame" title="Kartenschmiede" style="display:block;width:100%;flex:1;min-height:0;border:0;background:#2b2418" allow="fullscreen"></iframe>
 </div>
 <div id="view-rule" class="view" hidden>
   <div class="topbar"><span class="brand"><span class="gaiah"></span><span class="bt">DUNGEON MASTER<small>SERVICE</small></span></span><span class="sp"></span><button data-hub="hub">⌂ Übersicht</button><button data-snd title="Startmelodie an/aus">🔊</button></div>
@@ -1726,13 +1732,13 @@ function renderScene(){
 }
 
 /* =================== HUBS =================== */
-var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop',vtt:'vtt-caster',rule:'regelalmanach'};
+var VIEWS={hub:'',fight:'fight-club',npc:'npcfindr',cal:'kalender',quest:'questmaster',lore:'loreyer',char:'charakteristico',shop:'mystery-shop',vtt:'vtt-caster',rule:'regelalmanach',map:'kartenschmiede'};
 function viewFromHash(){ var hsh=(location.hash||'').replace('#',''); for(var k in VIEWS) if(VIEWS[k]&&VIEWS[k]===hsh) return k; return 'hub'; }
 function showView(v,push){
-  ['hub','fight','npc','cal','quest','lore','char','shop','vtt','rule'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
+  ['hub','fight','npc','cal','quest','lore','char','shop','vtt','rule','map'].forEach(function(k){ $('view-'+k).hidden=(k!==v); });
   document.body.className='v-'+v; S.view=v;
   if(push!==false){ try{ var target=VIEWS[v]?'#'+VIEWS[v]:' '; if(location.hash!==target.trim()) history.replaceState(null,'',VIEWS[v]?'#'+VIEWS[v]:location.pathname+location.search); }catch(e){} }
-  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='rule') renderRule(); else if(v==='vtt') renderVtt();
+  if(v==='fight') render(); else if(v==='npc') renderNpc(); else if(v==='cal') renderCal(); else if(v==='quest') renderQuest(); else if(v==='lore') renderLore(); else if(v==='char') renderChars(); else if(v==='shop') renderShop(); else if(v==='rule') renderRule(); else if(v==='map'){ var mf=$('mapFrame'); if(mf&&!mf.src) mf.src='kartenschmiede.html'; } else if(v==='vtt') renderVtt();
   if(v==='shop') shopMusicInit(); else shopMusicLeave();
   window.scrollTo(0,0); save();
 }

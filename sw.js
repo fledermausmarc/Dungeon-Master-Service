@@ -1,6 +1,6 @@
 /* Dungeon Master Service: Offline-Speicher */
-const CACHE = 'dms-v8';
-const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './regeln.json?v=1'];
+const CACHE = 'dms-v9';
+const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './regeln.json?v=1', './kartenschmiede.html'];
 const EXTERN = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];
 
 self.addEventListener('install', e => {

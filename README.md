@@ -37,3 +37,8 @@ Mit „Eigenkreation“ markierte Monster, die Kampfgründe und die Ereignistabe
 Schlagwortsuche und Regel-Chat über das deutsche SRD 5.2.1 (`regeln.json`).
 
 Dieses Werk enthält Material aus dem Systemreferenzdokument 5.2.1 („SRD 5.2.1“) von Wizards of the Coast LLC, verfügbar unter https://www.dndbeyond.com/srd. Das SRD 5.2.1 ist lizenziert gemäß Creative Commons Namensnennung 4.0 International Public License (verfügbar unter https://creativecommons.org/licenses/by/4.0/legalcode.de). Deutsche Markdown-Fassung: https://github.com/netzrenner/dnd.srd.5.2.1-de
+
+
+## Kartenschmiede
+
+Karten für Region, Kontinent, Stadt, Stadtviertel und Dungeon erzeugen, bestehende Karten laden und mit Stempeln, Wegen, Texten und Raster ergänzen (`kartenschmiede.html`, auch einzeln aufrufbar).
