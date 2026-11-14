@@ -65,7 +65,9 @@
   .hp .cur{width:64px;text-align:center;font-weight:700;font-size:17px}
   .hp .max{width:64px;text-align:center;color:var(--muted)}
   .bar{height:9px;background:#fffaf0;border:1px solid var(--edge);border-radius:6px;overflow:hidden;margin-top:6px}
-  .bar>i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s}
+  .bar{display:flex} .bar>i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s} .bar>b{display:block;height:100%;background:#5b8fd6}
+  .thp{gap:4px} .thp input{width:46px;padding:0 3px} .thp.on{background:#dfe9fb;border-color:#5b8fd6;color:#24467a}
+  .saves{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px} .saves .svl{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted,#7a6a4e)} .saves .sv{min-height:24px;padding:0 7px;font-size:12px} .saves .sv b{font-weight:700} .saves .ed{opacity:.6} .svin{display:inline-flex;align-items:center;gap:2px;font-size:11px} .svin input{width:42px;padding:0 3px;min-height:24px}
   .dmg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
   .dmg input{width:70px}
   #tip{position:fixed;z-index:300;max-width:min(400px,92vw);max-height:62vh;overflow:auto;background:#fbf5e4;border:1px solid #b8913f;border-radius:10px;box-shadow:0 8px 26px rgba(40,30,10,.38);padding:8px 11px;font-size:13px;line-height:1.42;color:#3a2a1c;display:none;text-align:left;font-family:inherit}
@@ -493,6 +495,7 @@ function uniqueName(base){
 function addCombatant(o){
   var c={id:S.nextId++,order:S.order++,name:o.name,baseName:o.baseName||o.name,side:o.side,ini:o.ini||0,bonus:o.bonus||0,
     hp:o.hp,max:o.hp,ac:o.ac,conditions:[],actions:o.actions||[],ready:{},leg:o.legendary||0,legUsed:0,notes:o.notes||'',type:o.type||'',open:(o.side==='monster'),last:null,t:o.t||'',cr:o.cr||'',xp:(o.xp!=null?o.xp:null),imgKey:o.imgKey||'',spells:o.spells?JSON.parse(JSON.stringify(o.spells)):null,env:o.env||null,crowd:o.crowd||null};
+  c.thp=0; if(o.saves){ c.saves=o.saves.slice(); c.savesSrc=o.savesSrc||''; }
   S.combatants.push(c); return c;
 }
 function addMonster(m,count,rollIni){
@@ -503,7 +506,7 @@ function addMonster(m,count,rollIni){
     if(existing>0&&i===0){ // rename first if unnumbered
       var first=S.combatants.find(function(c){return c.baseName===m.name&&c.name===m.name;}); if(first) first.name=m.name+' 1'; }
     addCombatant({name:nm,baseName:m.name,side:'monster',ini:rollIni?d(20)+m.bonus:0,bonus:m.bonus,hp:m.hp,ac:m.ac,
-      actions:JSON.parse(JSON.stringify(m.actions||[])),legendary:m.legendary,notes:m.notes,type:m.type,t:m.t,cr:m.cr,xp:(m.xp!=null?m.xp:(m.cr&&XP[m.cr]!=null?XP[m.cr]:null)),imgKey:m.imgKey||('m:'+norm(m.name)),spells:m.spells||null});
+      actions:JSON.parse(JSON.stringify(m.actions||[])),legendary:m.legendary,notes:m.notes,type:m.type,t:m.t,cr:m.cr,xp:(m.xp!=null?m.xp:(m.cr&&XP[m.cr]!=null?XP[m.cr]:null)),imgKey:m.imgKey||('m:'+norm(m.name)),spells:m.spells||null,saves:m.saves||null,savesSrc:m.savesSrc||''});
   }
 }
 
@@ -563,13 +566,21 @@ function cardHtml(c){
      '<button class="sm danger" data-act="del" data-id="'+c.id+'" title="Entfernen">✕</button></div>'+
    '<div class="hp"><button class="sm" data-act="hp" data-d="-5" data-id="'+c.id+'">−5</button><button class="sm" data-act="hp" data-d="-1" data-id="'+c.id+'">−1</button>'+
      '<input class="cur" type="number" data-f="hp" data-id="'+c.id+'" value="'+c.hp+'"><span>/</span><input class="max" type="number" data-f="max" data-id="'+c.id+'" value="'+c.max+'">'+
+     '<span class="chip thp'+((c.thp||0)>0?' on':'')+'" title="Temporäre Trefferpunkte: werden bei Schaden zuerst abgezogen">Temp <input type="number" min="0" data-f="thp" data-id="'+c.id+'" value="'+(c.thp||0)+'"></span>'+
      '<button class="sm" data-act="hp" data-d="1" data-id="'+c.id+'">+1</button><button class="sm" data-act="hp" data-d="5" data-id="'+c.id+'">+5</button>'+
      (down?'<span class="chip"><b>0 TP</b></span>':'')+'</div>'+
-   '<div class="bar"><i style="width:'+pct+'%;background:'+col+'"></i></div>'+
+   '<div class="bar"><i style="width:'+pct+'%;background:'+col+'"></i>'+((c.thp||0)>0?'<b style="width:'+Math.min(100-pct,Math.round(c.thp/Math.max(1,c.max)*100))+'%"></b>':'')+'</div>'+
+   (c.side==='monster'?savesHtml(c):'')+
    '<div class="dmg"><input type="number" min="0" placeholder="Menge" data-amt="'+c.id+'"><button class="sm danger" data-act="dmg" data-id="'+c.id+'">Schaden</button><button class="sm" data-act="heal" data-id="'+c.id+'">Heilen</button>'+last+'</div>'+
    '<div class="conds">'+conds+'<select data-act="addcond" data-id="'+c.id+'"><option value="">+ Zustand</option>'+CONDITIONS.map(function(k){return '<option>'+k+'</option>';}).join('')+'</select></div>'+
    notes+acts+'</div></div>';
 }
+function savesHtml(c){
+  if(c.saveEdit) return '<div class="saves"><span class="svl">RW</span>'+SVN.map(function(n,i){ return '<label class="svin">'+n+'<input type="number" data-f="sv'+i+'" data-id="'+c.id+'" value="'+((c.saves||[])[i]!=null?c.saves[i]:0)+'"></label>'; }).join('')+'<button class="sm" data-act="saveedit" data-id="'+c.id+'">✓</button></div>';
+  if(!c.saves) return '<div class="saves"><span class="svl">RW</span><button class="sm sv" data-act="saveedit" data-id="'+c.id+'">✎ Rettungswürfe eintragen</button></div>';
+  return '<div class="saves"><span class="svl" title="Rettungswürfe – antippen zum Würfeln. Quelle: '+esc(c.savesSrc||'eigene Werte')+'">RW</span>'+SVN.map(function(n,i){ var v=c.saves[i]; return '<button class="sm sv" data-act="save" data-id="'+c.id+'" data-k="'+i+'" title="'+n+'-Rettungswurf würfeln">'+n+' <b>'+(v>=0?'+':'')+v+'</b></button>'; }).join('')+'<button class="sm sv ed" data-act="saveedit" data-id="'+c.id+'" title="Werte ändern">✎</button></div>';
+}
+function dealDmg(c,v){ var t=c.thp||0, a=Math.min(t,Math.max(0,v)); c.thp=t-a; setHp(c,c.hp-(v-a)); return a; }
 function render(){
   $('roundNo').textContent=S.round; $('objBar').innerHTML=objBarHtml(); $('fabRound').textContent=S.round;
   var list=$('list'), before={};
@@ -1044,6 +1055,10 @@ Zombie|Zombie|1/4|T|8|22|-2||Hieb +3 1d6+1 Wucht
 *|Schattenpirscher|3|U|14|45|4||2x Schattenklinge +6 1d6+4 Nekrotisch
 *|Schwefelteufelchen|1/2|U|13|14|3||Krallen +5 1d4+3 Feuer;!Schwefelatem KON 11 2d6 Feuer 6
 `;
+/* Rettungswürfe [STÄ,GES,KON,INT,WEI,CHA]: SRD 5.2.1 (CC-BY-4.0); mit * markierte nur im SRD 5.1 = Attributsmodifikatoren */
+var MSAVES={"Marilith":[9,5,10,4,8,10],"Gold Dragon Wyrmling":[4,4,3,2,2,3],"Scorpion":[-4,0,-1,-5,-1,-4],"Bandit":[0,1,1,0,0,0],"Swarm of Ravens":[-2,2,1,-3,1,-2],"Ancient Bronze Dragon":[9,7,8,4,10,7],"Ice Devil":[5,7,9,4,7,9],"Wight":[2,2,3,0,1,2],"Polar Bear":[5,2,3,-4,1,-2],"Xorn":[3,0,6,0,0,0],"Bandit Captain":[4,5,2,2,2,2],"Half-Dragon":[4,5,3,0,5,2],"Azer":[3,1,4,1,1,0],"Sahuagin":[1,0,1,1,1,-1],"Bone Devil":[8,3,4,5,6,7],"Solar":[8,6,8,7,7,10],"Swarm of Quippers":[1,3,-1,-5,-2,-4],"Cultist":[0,1,0,0,2,0],"Behir":[6,3,4,-2,2,1],"Adult Red Dragon":[8,6,7,3,7,6],"Badger":[0,0,3,-4,1,-3],"Ogre Zombie":[4,-2,4,-4,0,-3],"Adult Bronze Dragon":[7,5,6,3,7,5],"Black Pudding":[3,-3,3,-5,-2,-5],"Giant Lizard":[2,3,1,-4,0,-3],"Adult Brass Dragon":[6,5,5,2,6,3],"Shrieker":[-5,-5,0,-5,-4,-5],"Giant Vulture":[2,0,3,-2,1,-2],"Giant Rat":[-2,5,0,-4,0,-3],"Night Hag":[4,2,3,3,2,3],"Crocodile":[2,0,3,-4,0,-3],"Cult Fanatic":[0,2,1,0,4,1],"Will-o'-Wisp":[-5,9,0,1,2,0],"Flesh Golem":[4,-1,4,-2,0,-3],"Mummy Lord":[4,0,3,5,9,3],"Wolf":[2,2,1,-4,1,-2],"Adult White Dragon":[6,5,6,-1,6,1],"Ghast":[3,3,0,0,2,-1],"Rakshasa":[2,3,4,1,3,5],"Adult Blue Dragon":[7,5,6,3,7,5],"Imp":[-2,3,1,0,1,2],"Ice Mephit":[-2,1,0,-1,0,1],"Octopus":[-3,2,0,-4,0,-3],"Water Weird":[3,3,1,0,0,0],"Ochre Jelly":[2,-2,2,-4,-2,-5],"Goat":[2,0,0,-4,0,-3],"Giant Shark":[6,0,5,-5,0,-3],"Androsphinx":[6,6,11,9,12,4],"Satyr":[1,3,0,1,0,2],"Tarrasque":[10,9,10,5,9,9],"Ancient Gold Dragon":[10,9,9,4,10,9],"Lion":[3,2,0,-4,1,-1],"Axe Beak":[2,1,1,-4,0,-3],"Steam Mephit":[-3,0,0,0,0,1],"Sea Hag":[3,1,3,1,1,1],"Guardian Naga":[4,8,7,7,8,8],"Red Dragon Wyrmling":[4,2,3,1,2,2],"Plesiosaurus":[4,2,3,-4,1,-3],"Gnoll":[2,1,0,-2,0,-2],"Half-Red Dragon Veteran":[3,1,2,0,0,0],"Ghost":[-2,1,0,0,1,3],"Hill Giant":[5,-1,4,-3,-1,-2],"Ankylosaurus":[6,0,2,-4,1,-3],"Couatl":[3,5,5,4,7,4],"Wereboar":[3,0,2,0,0,-1],"Giant Spider":[2,3,1,-4,0,-3],"Giant Ape":[6,2,4,-3,1,-2],"Mastiff":[1,2,1,-4,3,-2],"Raven":[-4,2,0,-3,1,-2],"Vampire":[4,9,9,3,7,9],"Water Elemental":[4,2,4,-3,0,-1],"Werewolf":[3,2,2,0,0,0],"Bat":[-4,2,-1,-4,1,-3],"Mage":[-1,2,0,6,4,0],"Brass Dragon Wyrmling":[2,2,1,0,2,1],"Drider":[3,4,4,1,3,1],"Ancient Black Dragon":[8,9,7,3,9,6],"Minotaur Skeleton":[4,0,2,-2,-1,-3],"Grimlock":[3,1,1,-1,-1,-2],"Druid":[0,1,1,1,3,0],"Stone Golem":[6,-1,5,-4,0,-5],"Treant":[6,-1,5,1,3,1],"Vampire Spawn":[3,6,3,0,3,1],"Ettin":[5,-1,3,-2,0,-1],"Giant Wasp":[0,2,0,-5,0,-4],"Harpy":[1,1,1,-2,0,1],"Dragon Turtle":[7,0,11,0,7,1],"Owlbear":[5,1,3,-4,1,-2],"Planetar":[12,5,12,4,11,12],"Swarm of Bats":[-3,2,0,-4,1,-3],"Silver Dragon Wyrmling":[4,2,3,1,2,2],"Swarm of Insects":[-4,1,2,-5,-2,-5],"Awakened Shrub":[-4,-1,0,0,0,-2],"Ankheg":[3,0,2,-5,1,-2],"Lamia":[3,1,2,2,2,3],"Spirit Naga":[4,6,5,3,5,6],"Gorgon":[5,0,4,-4,1,-2],"Giant Crab":[1,1,0,-5,-1,-4],"Griffon":[4,2,3,-4,1,-1],"Black Bear":[2,1,2,-4,1,-2],"Invisible Stalker":[3,4,2,0,2,0],"Minotaur":[4,0,3,-2,3,-1],"Blood Hawk":[-2,2,0,-4,2,-3],"Swarm of Rats":[-1,2,-1,-4,0,-4],"Doppelganger":[0,4,2,0,1,2],"Giant Hyena":[3,2,2,-4,1,-2],"Priest":[3,0,1,1,3,1],"Gelatinous Cube":[2,-4,5,-5,-2,-5],"Adult Green Dragon":[6,6,5,4,7,4],"Noble":[0,1,0,1,2,3],"Frog":[-5,1,-1,-5,-1,-4],"Otyugh":[3,0,7,-2,1,-2],"Dire Wolf":[3,2,2,-4,1,-2],"Berserker":[3,1,3,-1,0,-1],"Triceratops":[6,-1,3,-4,0,-3],"Homunculus":[-3,2,2,0,2,0],"Hyena":[0,1,1,-4,1,-3],"Ogre":[4,-1,3,-3,-2,-2],"Tribal Warrior":[1,0,0,-1,0,-1],"Merfolk":[0,1,1,0,0,1],"Orc":[3,1,3,-2,0,0],"Giant Fire Beetle":[-1,0,1,-5,-2,-4],"Reef Shark":[2,2,1,-5,0,-3],"Death Dog":[2,2,2,-4,1,-2],"Hell Hound":[3,1,2,-2,1,-2],"Panther":[2,3,0,-4,2,-2],"Gibbering Mouther":[0,-1,3,-4,0,-2],"Awakened Tree":[4,-2,2,0,0,-2],"Giant Elk":[6,6,2,-2,2,0],"Cat":[-4,4,0,-4,1,-2],"Nalfeshnee":[5,0,11,9,6,7],"Chimera":[4,0,4,-4,2,0],"Scout":[0,2,1,0,1,0],"Crab":[-2,0,1,-5,-1,-4],"Djinni":[5,6,6,2,7,5],"Rhinoceros":[5,-1,2,-4,1,-2],"Giant Bat":[2,3,0,-4,1,-2],"Pit Fiend":[8,8,7,6,10,7],"Skeleton":[0,3,2,-2,-1,-3],"Giant Eagle":[3,3,1,-1,2,0],"Air Elemental":[2,5,2,-2,0,-2],"Young Green Dragon":[4,4,3,3,4,2],"Young Bronze Dragon":[5,3,4,2,4,3],"Draft Horse":[4,0,2,-4,0,-2],"Ancient Silver Dragon":[10,7,9,4,9,8],"Poisonous Snake":[-4,2,0,-5,0,-4],"Hobgoblin":[1,1,1,0,0,-1],"Pseudodragon":[-2,2,1,0,1,0],"Giant Goat":[5,1,1,-4,1,-2],"Lizardfolk":[2,0,1,-2,1,-2],"Nightmare":[4,2,3,0,1,2],"Rust Monster":[1,1,1,-4,1,-2],"Giant Frog":[1,1,0,-4,0,-4],"Tyrannosaurus Rex":[10,0,4,-4,4,-1],"Green Hag":[4,1,3,1,2,2],"Gladiator":[7,5,6,0,4,2],"Spy":[0,2,0,1,2,3],"Giant Boar":[5,0,3,-4,-2,-3],"Hunter Shark":[4,2,2,-5,0,-3],"Constrictor Snake":[2,2,1,-5,0,-4],"Thug":[2,1,2,0,0,0],"Ancient Red Dragon":[10,7,9,4,9,8],"Young Blue Dragon":[5,4,4,2,5,3],"Salamander":[4,2,2,0,0,1],"Allosaurus":[4,1,3,-4,1,-3],"Vulture":[-2,0,1,-4,1,-3],"Commoner":[0,0,0,0,0,0],"White Dragon Wyrmling":[2,2,2,-3,2,0],"Blink Dog":[1,3,1,0,1,0],"Pony":[4,0,1,-4,0,-2],"Elephant":[6,-1,3,-4,0,-2],"Bulette":[4,0,5,-4,0,-3],"Frost Giant":[6,-1,8,-1,3,4],"Earth Elemental":[5,-1,5,-3,0,-3],"Cloud Giant":[8,0,10,1,7,3],"Young Silver Dragon":[6,4,5,2,4,4],"Clay Golem":[5,-1,4,-4,-1,-5],"Chuul":[4,0,3,-3,0,-3],"Weasel":[-4,3,-1,-4,1,-4],"Iron Golem":[7,-1,5,-4,0,-5],"Kobold":[-2,2,-1,-1,-2,-1],"Barbed Devil":[6,3,7,1,5,5],"Roper":[4,-1,3,-2,3,-2],"Young Gold Dragon":[6,6,5,3,5,5],"Giant Centipede":[-3,2,1,-5,-2,-4],"Fire Elemental":[0,3,3,-2,0,-2],"Stone Giant":[6,5,8,0,4,-1],"Deer":[0,3,0,-4,2,-3],"Weretiger":[3,2,3,0,1,0],"Mule":[4,0,1,-4,0,-3],"Deep Gnome":[2,2,2,1,0,-1],"Glabrezu":[9,2,9,4,7,7],"Shield Guardian":[4,-1,4,-2,0,-4],"Fire Giant":[7,3,10,0,2,5],"Flying Snake":[-3,2,0,-4,1,-3],"Medusa":[0,3,3,1,4,2],"Centaur":[4,2,2,-1,1,0],"Giant Badger":[1,0,3,-4,1,-3],"Giant Scorpion":[3,1,2,-5,-1,-4],"Worg":[3,1,1,-2,0,-1],"Wyvern":[4,0,3,-3,1,-2],"Adult Silver Dragon":[8,5,7,3,6,6],"Deva":[4,4,4,3,9,9],"Magma Mephit":[-1,1,1,-2,0,0],"Dretch":[1,0,1,-3,-1,-4],"Wererat":[0,3,1,0,0,-1],"Ape":[3,2,2,-2,1,-2],"Specter":[-5,2,0,0,0,0],"Gray Ooze":[1,-2,3,-5,-2,-4],"Gargoyle":[2,0,3,-2,0,-2],"Balor":[8,2,12,5,9,6],"Jackal":[-1,2,0,-4,1,-2],"Black Dragon Wyrmling":[2,4,1,0,2,1],"Dryad":[0,1,0,2,2,4],"Purple Worm":[9,-2,11,-5,4,-3],"Oni":[4,3,6,2,4,5],"Efreeti":[6,1,7,3,6,8],"Riding Horse":[3,1,1,-4,0,-2],"Giant Toad":[2,1,1,-4,0,-4],"Hezrou":[7,3,8,-3,4,1],"Ancient Brass Dragon":[8,6,7,3,8,6],"Troll":[4,1,5,-2,-1,-2],"Giant Poisonous Snake":[0,4,1,-4,0,-4],"Young White Dragon":[4,3,4,2,3,1],"Camel":[2,-1,5,-4,0,-3],"Storm Giant":[14,2,10,3,10,9],"Green Dragon Wyrmling":[2,3,1,2,2,1],"Sprite":[-4,4,0,2,1,0],"Magmin":[-2,2,1,-1,0,0],"Young Red Dragon":[6,4,5,2,4,4],"Zombie":[1,-2,3,-4,0,-3],"Duergar":[2,0,2,0,0,-1],"Gynosphinx":[4,2,3,4,4,4],"Mammoth":[10,-1,8,-4,0,-2],"Cloaker":[3,2,1,1,2,-2],"Darkmantle":[3,1,1,-4,0,-3],"Pegasus":[4,4,5,0,4,3],"Blue Dragon Wyrmling":[3,2,2,1,2,2],"Mimic":[3,1,2,-3,1,-1],"Killer Whale":[4,2,1,-4,1,-2],"Hippogriff":[3,1,1,-4,1,-1],"Assassin":[0,7,2,6,0,0],"Elk":[3,0,0,-4,0,-2],"Bronze Dragon Wyrmling":[3,2,2,1,2,2],"Adult Copper Dragon":[6,6,5,4,7,4],"Ettercap":[2,2,1,-2,1,-1],"Adult Gold Dragon":[8,8,7,3,8,7],"Hydra":[5,1,5,-4,0,-2],"Chain Devil":[4,2,7,0,4,2],"Remorhaz":[7,1,5,-3,0,-3],"Warhorse Skeleton":[4,1,2,-4,-1,-3],"Ancient White Dragon":[8,6,8,0,7,4],"Shadow":[-2,2,1,-2,0,-1],"Hawk":[-3,3,-1,-4,2,-2],"Bugbear":[2,2,1,-1,0,-1],"Rug of Smothering":[3,2,0,-5,-4,-5],"Succubus":[-1,3,1,2,1,5],"Copper Dragon Wyrmling":[2,3,1,2,2,1],"Giant Wolf Spider":[1,3,1,-4,1,-3],"Bearded Devil":[5,2,4,-1,0,4],"Swarm of Poisonous Snakes":[-1,4,0,-5,0,-4],"Animated Armor":[2,0,1,-5,-4,-5],"Veteran":[3,1,2,0,0,0],"Giant Owl":[1,2,1,0,4,0],"Giant Weasel":[0,3,0,-3,1,-3],"Merrow":[4,2,2,-1,0,-1],"Young Black Dragon":[4,5,3,1,3,2],"Baboon":[-1,2,0,-3,1,-2],"Unicorn":[4,2,2,0,3,3],"Young Copper Dragon":[4,4,3,3,4,2],"Aboleth":[5,3,6,8,6,4],"Ghoul":[1,2,0,-2,0,-2],"Shambling Mound":[4,-1,3,-3,0,-3],"Werebear":[4,0,3,0,1,1],"Giant Crocodile":[5,-1,3,-4,0,-2],"Kraken":[17,7,15,6,11,5],"Basilisk":[3,-1,2,-4,-1,-2],"Adult Black Dragon":[6,7,5,2,6,4],"Giant Sea Horse":[2,1,0,-4,1,-3],"Pteranodon":[1,2,0,-4,-1,-3],"Young Brass Dragon":[4,3,3,1,3,2],"Brown Bear":[3,1,2,-4,1,-2],"Wraith":[-2,3,3,1,2,2],"Archmage":[0,2,1,9,6,3],"Giant Constrictor Snake":[4,2,1,-5,0,-4],"Lizard":[-4,0,0,-5,-1,-4],"Quasit":[-3,3,0,-2,0,0],"Lich":[0,10,10,12,9,3],"Lemure":[0,-3,0,-5,0,-4],"Rat":[-4,0,-1,-4,0,-3],"Acolyte":[2,0,1,0,2,0],"Saber-Toothed Tiger":[6,5,2,-4,1,-1],"Tiger":[3,3,2,-4,1,-1],"Guard":[1,1,1,0,0,0],"Winter Wolf":[4,1,2,-2,1,-1],"Flying Sword":[1,4,0,-5,-3,-5],"Manticore":[3,3,3,-2,1,-1],"Giant Octopus":[3,1,1,-3,0,-3],"Violet Fungus":[-4,-5,0,-5,-4,-5],"Phase Spider":[2,3,1,-2,0,-2],"Cockatrice":[-2,1,1,-4,1,-3],"Vrock":[3,5,4,-1,4,2],"Boar":[1,0,2,-4,-1,-3],"Roc":[9,4,5,-4,4,-1],"Grick":[2,2,0,-4,2,-3],"Drow":[0,2,0,0,0,1],"Knight":[3,0,4,0,2,2],"Ancient Green Dragon":[8,8,7,5,10,6],"Goblin":[-1,2,0,0,-1,-1],"Ancient Copper Dragon":[8,8,7,5,10,6],"Erinyes":[4,7,8,2,2,8],"Owl":[-4,1,-1,-4,1,-2],"Warhorse":[4,1,1,-4,3,-2],"Mummy":[3,-1,2,-2,3,1],"Ancient Blue Dragon":[9,7,8,4,10,7],"Eagle":[-2,2,1,-4,2,-2],"Horned Devil":[10,7,5,1,7,8],"Dust Mephit":[-3,2,0,-1,0,0],"Spider":[-4,2,-1,-5,0,-4]};
+var MSAVES_OLD={"Azer":1,"Sahuagin":1,"Water Weird":1,"Gnoll":1,"Half-Red Dragon Veteran":1,"Minotaur":1,"Merfolk":1,"Orc":1,"Hobgoblin":1,"Lizardfolk":1,"Kobold":1,"Deep Gnome":1,"Centaur":1,"Duergar":1,"Bugbear":1,"Drow":1,"Goblin":1};
+var SVN=['STÄ','GES','KON','INT','WEI','CHA'];
 var SRD=[];
 SRD_RAW.trim().split('\n').forEach(function(l){ var hb=l[0]==='*'; if(hb) l=l.slice(1); var p=l.split('|'); if(p.length<8||!XP.hasOwnProperty(p[2])) return;
   SRD.push({en:p[0],de:p[1],cr:p[2],t:p[3],ac:+p[4],hp:+p[5],dex:+p[6],leg:+(p[7]||0),spec:p[8]||'',hb:hb}); });
@@ -1116,6 +1131,7 @@ function srdToMon(m,f){
   if(!mon) mon={name:m.de,type:TYPES[m.t][0]+' · HG '+m.cr,ac:m.ac,hp:m.hp,bonus:m.dex,legendary:m.leg,cr:m.cr,xp:XP[m.cr],t:m.t,
     notes:(m.hb?'Eigenkreation (V), noch nicht getestet':'SRD 5.1 ('+m.en+')')+', HG '+m.cr+', '+fmt(XP[m.cr])+' XP.',actions:specActions(m)};
   if(!mon.spells&&m.en&&SPELLS[m.en]) mon.spells=buildSpells(SPELLS[m.en]);
+  if(!mon.saves&&m.en&&MSAVES[m.en]){ mon.saves=MSAVES[m.en].slice(); mon.savesSrc=MSAVES_OLD[m.en]?'SRD 5.1, Attributsmodifikatoren':'SRD 5.2.1'; }
   mon.imgKey='m:'+norm(mon.name); if(!mon.t) mon.t=m.t;
   return scaleMon(mon,f||1);
 }
@@ -2249,9 +2265,9 @@ function syncParty(){
 }
 function charToFight(c,silent){
   var name=c.short||c.name, ex=S.combatants.find(function(x){ return x.side==='hero'&&(x.cid===c.id||x.name===name||x.baseName===name); });
-  var vals={name:name,ac:parseInt(c.ac,10)||10,bonus:iniOf(c),hp:Math.max(0,parseInt(c.hpCur,10)||0),max:parseInt(c.hpMax,10)||1};
-  if(ex){ ex.cid=c.id; ex.name=vals.name; ex.ac=vals.ac; ex.bonus=vals.bonus; ex.max=vals.max; ex.hp=Math.min(vals.hp,vals.max); ex.imgKey='c:'+c.id; }
-  else { var n=addCombatant({name:vals.name,side:'hero',ini:0,bonus:vals.bonus,hp:vals.max,ac:vals.ac,imgKey:'c:'+c.id}); n.hp=Math.min(vals.hp,vals.max); n.cid=c.id; }
+  var vals={name:name,ac:parseInt(c.ac,10)||10,bonus:iniOf(c),hp:Math.max(0,parseInt(c.hpCur,10)||0),max:parseInt(c.hpMax,10)||1,thp:Math.max(0,parseInt(c.hpTemp,10)||0)};
+  if(ex){ ex.cid=c.id; ex.name=vals.name; ex.ac=vals.ac; ex.bonus=vals.bonus; ex.max=vals.max; ex.hp=Math.min(vals.hp,vals.max); ex.thp=vals.thp; ex.imgKey='c:'+c.id; }
+  else { var n=addCombatant({name:vals.name,side:'hero',ini:0,bonus:vals.bonus,hp:vals.max,ac:vals.ac,imgKey:'c:'+c.id}); n.hp=Math.min(vals.hp,vals.max); n.thp=vals.thp; n.cid=c.id; }
   if(!silent) toast(name+' ist im Fight Club.');
 }
 function charSheet(c){
@@ -3147,11 +3163,16 @@ document.addEventListener('click',function(e){
   switch(act){
     case 'ini+': c.ini++; render(); break;
     case 'ini-': c.ini--; render(); break;
-    case 'hp': setHp(c,c.hp+parseInt(t.dataset.d,10)); render(); break;
+    case 'hp': var dd=parseInt(t.dataset.d,10); if(dd<0) dealDmg(c,-dd); else setHp(c,c.hp+dd); render(); break;
+    case 'saveedit': if(!c.saves) c.saves=[0,0,0,0,0,0]; c.saveEdit=!c.saveEdit; if(!c.saveEdit&&!c.savesSrc) c.savesSrc='eigene Werte'; render(); break;
+    case 'save': { var k=parseInt(t.dataset.k,10), b=c.saves[k], adv=$('adv').checked, dis=$('dis').checked, r1=d(20), r2=d(20), r=r1, note='';
+      if(adv&&!dis){ r=Math.max(r1,r2); note=' (Vorteil '+r1+'/'+r2+')'; } else if(dis&&!adv){ r=Math.min(r1,r2); note=' (Nachteil '+r1+'/'+r2+')'; }
+      var tot=r+b; logAdd('<b>'+esc(c.name)+'</b>: '+SVN[k]+'-Rettungswurf d20('+r+')'+(b>=0?'+':'')+b+' = <b>'+tot+'</b>'+note+(r===20?' (natürliche 20)':r===1?' (natürliche 1)':''),r===20?'crit':(r===1?'fumble':''));
+      toast(c.name+': '+SVN[k]+'-RW = '+tot+note); render(); break; }
     case 'dmg': case 'heal': {
       var inp=document.querySelector('[data-amt="'+id+'"]'); var v=parseInt(inp&&inp.value,10); if(!v) break;
-      setHp(c,c.hp+(act==='dmg'?-v:v)); logAdd('<b>'+esc(c.name)+'</b>: '+(act==='dmg'?'−':'+')+v+' TP → '+c.hp+'/'+c.max); render(); break; }
-    case 'applylast': setHp(c,c.hp-c.last); logAdd('<b>'+esc(c.name)+'</b>: −'+c.last+' TP → '+c.hp+'/'+c.max); c.last=null; render(); break;
+      var ab=0; if(act==='dmg') ab=dealDmg(c,v); else setHp(c,c.hp+v); logAdd('<b>'+esc(c.name)+'</b>: '+(act==='dmg'?'−':'+')+v+' TP'+(ab?' ('+ab+' von Temp-TP)':'')+' → '+c.hp+'/'+c.max+((c.thp||0)>0?' + '+c.thp+' Temp':'')); render(); break; }
+    case 'applylast': var ab2=dealDmg(c,c.last); logAdd('<b>'+esc(c.name)+'</b>: −'+c.last+' TP'+(ab2?' ('+ab2+' von Temp-TP)':'')+' → '+c.hp+'/'+c.max); c.last=null; render(); break;
     case 'toggle': c.open=!c.open; render(); break;
     case 'dup': { var n=JSON.parse(JSON.stringify(c)); n.id=S.nextId++; n.order=S.order++; n.name=c.name+' (Kopie)'; n.open=false; S.combatants.push(n); render(); break; }
     case 'del': S.combatants=S.combatants.filter(function(x){return x.id!==id;}); if(S.turnId===id) S.turnId=null; render(); break;
@@ -3197,6 +3218,8 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){
   var t=e.target;
   if(t.dataset.f){ var c=byId(parseInt(t.dataset.id,10)); if(!c) return; var f=t.dataset.f;
+    if(/^sv\d$/.test(f)){ if(!c.saves) c.saves=[0,0,0,0,0,0]; c.saves[+f[2]]=parseInt(t.value,10)||0; save(); return; }
+    if(f==='thp'){ c.thp=Math.max(0,parseInt(t.value,10)||0); render(); return; }
     if(f==='name') c.name=t.value; else if(f==='hp'){ c.hp=Math.max(0,parseInt(t.value,10)||0); if(c.hp>c.max) c.max=c.hp; }
     else c[f]=parseInt(t.value,10)||0;
     if(f==='max'&&c.hp>c.max) c.hp=c.max;
