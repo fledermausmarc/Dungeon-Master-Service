@@ -1,5 +1,5 @@
 /* Dungeon Master Service: Offline-Speicher */
-const CACHE = 'dms-v14';
+const CACHE = 'dms-v15';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './regeln.json?v=2', './kartenschmiede.html'];
 const EXTERN = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];
 

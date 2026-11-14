@@ -67,6 +67,8 @@
   .bar{height:9px;background:#fffaf0;border:1px solid var(--edge);border-radius:6px;overflow:hidden;margin-top:6px}
   .bar{display:flex} .bar>i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s} .bar>b{display:block;height:100%;background:#5b8fd6}
   .thp{gap:4px} .thp input{width:46px;padding:0 3px} .thp.on{background:#dfe9fb;border-color:#5b8fd6;color:#24467a}
+  .memo input{width:100%;min-height:28px;margin-top:6px;padding:3px 8px;font-size:13px;border:1px dashed var(--edge);border-radius:8px;background:rgba(255,250,235,.6)} .memo input:focus{border-style:solid;background:#fffdf5}
+  .death{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px;padding:5px 8px;border:1px solid #c9a0a0;border-radius:10px;background:rgba(250,225,220,.55)} .dsg{display:inline-flex;align-items:center;gap:3px;font-size:12px} .dsb{display:inline-block;width:18px;height:18px;border:1.5px solid #7a6a4e;border-radius:5px;background:#fffdf5;cursor:pointer} .dsb.s.on{background:#4f8a45;border-color:#33602c} .dsb.f.on{background:#a83a3a;border-color:#7a2020} .dsdead{color:#a83a3a} .dsstab{color:#33602c}
   .saves{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px} .saves .svl{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted,#7a6a4e)} .saves .sv{min-height:24px;padding:0 7px;font-size:12px} .saves .sv b{font-weight:700} .saves .ed{opacity:.6} .svin{display:inline-flex;align-items:center;gap:2px;font-size:11px} .svin input{width:42px;padding:0 3px;min-height:24px}
   .dmg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
   .dmg input{width:70px}
@@ -570,8 +572,9 @@ function cardHtml(c){
      '<button class="sm" data-act="hp" data-d="1" data-id="'+c.id+'">+1</button><button class="sm" data-act="hp" data-d="5" data-id="'+c.id+'">+5</button>'+
      (down?'<span class="chip"><b>0 TP</b></span>':'')+'</div>'+
    '<div class="bar"><i style="width:'+pct+'%;background:'+col+'"></i>'+((c.thp||0)>0?'<b style="width:'+Math.min(100-pct,Math.round(c.thp/Math.max(1,c.max)*100))+'%"></b>':'')+'</div>'+
-   (c.side==='monster'?savesHtml(c):'')+
+   (c.side==='monster'?savesHtml(c):'')+deathHtml(c)+
    '<div class="dmg"><input type="number" min="0" placeholder="Menge" data-amt="'+c.id+'"><button class="sm danger" data-act="dmg" data-id="'+c.id+'">Schaden</button><button class="sm" data-act="heal" data-id="'+c.id+'">Heilen</button>'+last+'</div>'+
+   '<div class="memo"><input type="text" maxlength="200" data-f="memo" data-id="'+c.id+'" value="'+esc(c.memo||'')+'" placeholder="📝 Notiz, z. B. „markiert von Hunter’s Mark“"></div>'+
    '<div class="conds">'+conds+'<select data-act="addcond" data-id="'+c.id+'"><option value="">+ Zustand</option>'+CONDITIONS.map(function(k){return '<option>'+k+'</option>';}).join('')+'</select></div>'+
    notes+acts+'</div></div>';
 }
@@ -580,6 +583,11 @@ function savesHtml(c){
   if(!c.saves) return '<div class="saves"><span class="svl">RW</span><button class="sm sv" data-act="saveedit" data-id="'+c.id+'">✎ Rettungswürfe eintragen</button></div>';
   return '<div class="saves"><span class="svl" title="Rettungswürfe – antippen zum Würfeln. Quelle: '+esc(c.savesSrc||'eigene Werte')+'">RW</span>'+SVN.map(function(n,i){ var v=c.saves[i]; return '<button class="sm sv" data-act="save" data-id="'+c.id+'" data-k="'+i+'" title="'+n+'-Rettungswurf würfeln">'+n+' <b>'+(v>=0?'+':'')+v+'</b></button>'; }).join('')+'<button class="sm sv ed" data-act="saveedit" data-id="'+c.id+'" title="Werte ändern">✎</button></div>';
 }
+function deathHtml(c){ if(c.side!=='hero'||c.hp>0){ return ''; } var ds=c.ds||{s:0,f:0};
+  var box=function(kind,n){ var h=''; for(var i=0;i<3;i++) h+='<span class="dsb '+kind+(i<n?' on':'')+'" data-act="ds" data-id="'+c.id+'" data-k="'+kind+'" data-i="'+i+'" title="'+(kind==='s'?'Erfolg':'Fehlschlag')+'"></span>'; return h; };
+  var st=ds.f>=3?'<b class="dsdead">☠ tot</b>':ds.s>=3?'<b class="dsstab">✚ stabil</b>':'';
+  return '<div class="death"><span class="svl" data-ctip="Todesrettungswurf">TODESRW</span><span class="dsg">✔ '+box('s',ds.s)+'</span><span class="dsg">✖ '+box('f',ds.f)+'</span>'+st+
+    (ds.f<3&&ds.s<3?'<button class="sm sv" data-act="dsroll" data-id="'+c.id+'">🎲 Würfeln</button>':'')+'<button class="sm sv ed" data-act="dsreset" data-id="'+c.id+'" title="Zurücksetzen">↺</button></div>'; }
 function dealDmg(c,v){ var t=c.thp||0, a=Math.min(t,Math.max(0,v)); c.thp=t-a; setHp(c,c.hp-(v-a)); return a; }
 function render(){
   $('roundNo').textContent=S.round; $('objBar').innerHTML=objBarHtml(); $('fabRound').textContent=S.round;
@@ -705,7 +713,7 @@ function step(dir){
   var rBefore=S.round; S.turnId=arr[i].id; if(dir>0) startTurn(arr[i]); if(S.round!==rBefore&&dir>0) objRoundCheck(); render();
   var el=document.querySelector('.card.current'); if(el&&el.scrollIntoView) el.scrollIntoView({block:'center',behavior:'smooth'});
 }
-function setHp(c,v){ c.hp=Math.max(0,Math.min(c.max,v)); }
+function setHp(c,v){ var was=c.hp; c.hp=Math.max(0,Math.min(c.max,v)); if(c.hp>0&&c.ds) c.ds={s:0,f:0}; if(was>0&&c.hp<=0) c.ds={s:0,f:0}; if(c.side==='hero'&&was<=0&&c.hp<=0&&v<was){ c.ds=c.ds||{s:0,f:0}; c.ds.f=Math.min(3,c.ds.f+1); } }
 
 /* ---------- Aktionen ---------- */
 function useAction(c,i){
@@ -3119,6 +3127,7 @@ function tipShow(html,anchor,pin){ var t=tipEl(); t.innerHTML='<button class="tx
   var box=anchor.closest&&anchor.closest('#spRes'); if(box){ var br=box.getBoundingClientRect(); if(br.right+w+10<vw){ x=br.right+8; y=Math.min(Math.max(6,r.top),vh-h-6); } else if(br.left-w-10>0){ x=br.left-w-8; y=Math.min(Math.max(6,r.top),vh-h-6); } else { y=Math.max(br.bottom+6,6); if(y+h>vh-6) y=Math.max(6,vh-h-6); } }
   t.style.left=x+'px'; t.style.top=y+'px'; }
 function tipHide(force){ if(TIP.pin&&!force) return; var t=document.getElementById('tip'); if(t) t.className=''; TIP.pin=false; TIP.anchor=null; }
+COND_TXT['Todesrettungswurf']="Wenn ein Spielercharakter seinen Zug mit 0 Trefferpunkten beginnt, muss er einen Todesrettungswurf ausführen. Siehe auch Die Spielregeln (Schaden und Heilung)."; COND_EN['Todesrettungswurf']='Death Saving Throw';
 function condTip(k){ var x=COND_TXT[k]; return '<div class="tt">'+esc(k)+(COND_EN[k]?' <span style="font-weight:400;font-style:italic;color:#7a6a4e;font-family:inherit;font-size:12.5px">· '+COND_EN[k]+'</span>':'')+'</div>'+(x?mdLite(x):'<p>Keine Beschreibung.</p>')+'<div class="hint" style="font-size:11px;margin-top:4px">Quelle: SRD 5.2.1</div>'; }
 function spellFind(n){ if(!RULES) return null; var nn=rNorm(n).trim(), f=null; RULES.some(function(e){ if(e.k==='Zauber'&&(rNorm(e.t).trim()===nn||(e.en&&rNorm(e.en).trim()===nn))){ f=e; return true; } }); return f; }
 function spellSub(e){ var m=e.x.match(/^\*([^*]+)\*/); return m?m[1]:''; }
@@ -3164,6 +3173,14 @@ document.addEventListener('click',function(e){
     case 'ini+': c.ini++; render(); break;
     case 'ini-': c.ini--; render(); break;
     case 'hp': var dd=parseInt(t.dataset.d,10); if(dd<0) dealDmg(c,-dd); else setHp(c,c.hp+dd); render(); break;
+    case 'ds': { var ds=c.ds||(c.ds={s:0,f:0}), k2=t.dataset.k, i2=parseInt(t.dataset.i,10); ds[k2]=(ds[k2]>i2)?i2:i2+1; render(); break; }
+    case 'dsreset': c.ds={s:0,f:0}; render(); break;
+    case 'dsroll': { var ds2=c.ds||(c.ds={s:0,f:0}), r=d(20), msg='';
+      if(r===20){ setHp(c,1); c.ds={s:0,f:0}; msg='natürliche 20: '+c.name+' kommt mit 1 TP zu sich!'; }
+      else if(r===1){ ds2.f=Math.min(3,ds2.f+2); msg='natürliche 1: zwei Fehlschläge'; }
+      else if(r>=10){ ds2.s=Math.min(3,ds2.s+1); msg='Erfolg'; } else { ds2.f=Math.min(3,ds2.f+1); msg='Fehlschlag'; }
+      var cur=c.ds; if(cur.f>=3) msg+=' – '+c.name+' ist tot.'; else if(cur.s>=3) msg+=' – '+c.name+' ist stabil.';
+      logAdd('<b>'+esc(c.name)+'</b>: Todesrettungswurf d20('+r+') → '+msg,r===20?'crit':(r===1?'fumble':'')); toast(c.name+': '+r+' – '+msg); render(); break; }
     case 'saveedit': if(!c.saves) c.saves=[0,0,0,0,0,0]; c.saveEdit=!c.saveEdit; if(!c.saveEdit&&!c.savesSrc) c.savesSrc='eigene Werte'; render(); break;
     case 'save': { var k=parseInt(t.dataset.k,10), b=c.saves[k], adv=$('adv').checked, dis=$('dis').checked, r1=d(20), r2=d(20), r=r1, note='';
       if(adv&&!dis){ r=Math.max(r1,r2); note=' (Vorteil '+r1+'/'+r2+')'; } else if(dis&&!adv){ r=Math.min(r1,r2); note=' (Nachteil '+r1+'/'+r2+')'; }
@@ -3219,6 +3236,7 @@ document.addEventListener('change',function(e){
   var t=e.target;
   if(t.dataset.f){ var c=byId(parseInt(t.dataset.id,10)); if(!c) return; var f=t.dataset.f;
     if(/^sv\d$/.test(f)){ if(!c.saves) c.saves=[0,0,0,0,0,0]; c.saves[+f[2]]=parseInt(t.value,10)||0; save(); return; }
+    if(f==='memo'){ c.memo=t.value.trim(); save(); return; }
     if(f==='thp'){ c.thp=Math.max(0,parseInt(t.value,10)||0); render(); return; }
     if(f==='name') c.name=t.value; else if(f==='hp'){ c.hp=Math.max(0,parseInt(t.value,10)||0); if(c.hp>c.max) c.max=c.hp; }
     else c[f]=parseInt(t.value,10)||0;
