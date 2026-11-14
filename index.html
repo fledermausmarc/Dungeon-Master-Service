@@ -68,6 +68,13 @@
   .bar>i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s}
   .dmg{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
   .dmg input{width:70px}
+  #tip{position:fixed;z-index:300;max-width:min(400px,92vw);max-height:62vh;overflow:auto;background:#fbf5e4;border:1px solid #b8913f;border-radius:10px;box-shadow:0 8px 26px rgba(40,30,10,.38);padding:8px 11px;font-size:13px;line-height:1.42;color:#3a2a1c;display:none;text-align:left;font-family:inherit}
+  #tip.show{display:block} #tip p{margin:0 0 5px} #tip ul{margin:2px 0 5px 16px;padding:0} #tip .tt{font-family:Cinzel,serif;font-weight:700;font-size:14px;margin-bottom:4px;padding-right:22px} #tip .tx{position:absolute;right:6px;top:4px;display:none;border:0;background:none;font-size:16px;cursor:pointer;min-height:0;padding:2px 6px}
+  #tip.pin .tx{display:block} #tip .tsub{font-style:italic;color:#7a6a4e;margin-bottom:4px} #tip .rtab{font-size:12px}
+  .spq{position:relative;display:inline-block} #spQ{width:150px;min-height:30px;border:1px solid #b8913f;border-radius:999px;padding:3px 10px;background:#fbf5e4;font-size:13px}
+  #spRes{position:absolute;top:calc(100% + 4px);right:0;width:270px;max-height:340px;overflow:auto;background:#fbf5e4;border:1px solid #b8913f;border-radius:10px;box-shadow:0 8px 24px rgba(40,30,10,.35);z-index:250;color:#3a2a1c}
+  #spRes .si{padding:6px 10px;border-bottom:1px solid #e3d3a8;cursor:pointer;line-height:1.2} #spRes .si:hover,#spRes .si.act{background:#efe3c2} #spRes .si small{display:block;color:#7a6a4e;font-style:italic;font-size:11.5px}
+  [data-ctip],[data-sname]{text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:rgba(90,60,30,.45);text-underline-offset:2px}
   .conds{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
   .cond{background:#ece2f4;border:1px solid #8a6fae;border-radius:999px;padding:0 8px;font-size:12px;cursor:pointer}
   .cond:hover{border-color:var(--bad)}
@@ -322,6 +329,7 @@
   <label><input type="checkbox" id="dis"> Nachteil</label>
   <label><input type="checkbox" id="skipDown" checked> Besiegte Monster überspringen</label>
   <button id="toGen">Kampfgenerator</button>
+  <span class="spq"><input id="spQ" type="search" placeholder="🔮 Zauber suchen" autocomplete="off"><div id="spRes" hidden></div></span>
   <span class="sp"></span>
   <button id="sndBtn" data-snd title="Startmelodie an/aus">🔊</button>
   <button id="newFight" class="danger">Neuer Kampf</button>
@@ -421,7 +429,9 @@
 'use strict';
 var KEY='kampftracker_v1';
 var S={round:1,turnId:null,nextId:1,order:1,combatants:[],lib:[],party:[],log:[],tab:'lib',images:{},gen:null,genRes:[]};
-var CONDITIONS=['Blind','Bezaubert','Taub','Verängstigt','Gepackt','Kampfunfähig','Unsichtbar','Gelähmt','Versteinert','Vergiftet','Liegend','Festgesetzt','Betäubt','Bewusstlos','Konzentration'];
+var CONDITIONS=['Blind','Bezaubert','Taub','Verängstigt','Gepackt','Kampfunfähig','Unsichtbar','Gelähmt','Versteinert','Vergiftet','Liegend','Festgesetzt','Betäubt','Bewusstlos','Erschöpfung','Konzentration'];
+/* Zustandstexte aus dem SRD 5.2.1 (CC-BY-4.0, Wizards of the Coast; deutsche Fassung netzrenner/dnd.srd.5.2.1-de) */
+var COND_TXT={"Blind": "Wenn du den Zustand Blind hast, wirken folgende Effekte auf dich:\n\n**Nicht sehfähig.** Eine blinde Kreatur kann nicht sehen, und jeder Attributswurf, der Sicht erfordert, misslingt automatisch.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil, und deine Angriffswürfe sind im Nachteil.", "Bezaubert": "Wenn du den Zustand Bezaubert hast, wirken folgende Effekte auf dich:\n\n**Kein Schaden am Zauberwirker.** Du kannst den Zauberwirker weder angreifen noch als Ziel schädigender Fähigkeiten und magischer Effekte auswählen.\n\n**Sozialer Vorteil.** Der Zauberwirker ist bei Attributswürfen, die soziale Interaktionen mit dir betreffen, im Vorteil.", "Taub": "Wenn du den Zustand Taub hast, wirkt folgender Effekt auf dich:\n\n**Nicht hörfähig.** Du kannst nicht hören, und jeder Attributswurf, der Hörvermögen erfordert, misslingt automatisch.", "Verängstigt": "Wenn du den Zustand Verängstigt hast, wirken folgende Effekte auf dich:\n\n**Beeinträchtigte Attributs- und Angriffswürfe.** Du bist bei Attributs- und Angriffswürfen im Nachteil, solange du dich in der Sichtlinie der Quelle deiner Furcht befindest.\n\n**Keine Annäherung möglich.** Du kannst dich nicht willentlich auf die Quelle deiner Furcht zubewegen.", "Gepackt": "Wenn du den Zustand Gepackt hast, wirken folgende Effekte auf dich:\n\n**Keine Bewegungsrate.** Deine Bewegungsrate beträgt 0 und kann nicht erhöht werden.\n\n**Beeinträchtigte Angriffe.** Du bist bei Angriffswürfen gegen alle Ziele außer der Kreatur, die dich gepackt hält, im Nachteil.\n\n**Beweglich.** Die Kreatur, die dich gepackt hält, kann dich ziehen oder tragen, wenn sie sich bewegt. Allerdings kostet sie dies doppelt so viel Bewegung, sofern du nicht winzig oder um mindestens zwei Kategorien kleiner als sie bist.", "Kampfunfähig": "Wenn du den Zustand Kampfunfähig hast, wirken folgende Effekte auf dich:\n\n**Inaktiv.** Du kannst keine Aktionen, Bonusaktionen oder Reaktionen ausführen.\n\n**Keine Konzentration.** Deine Konzentration ist unterbrochen.\n\n**Stumm.** Du kannst nicht sprechen.\n\n**Überrascht.** Wenn du beim Auswürfeln der Initiative kampfunfähig bist, so bist du bei diesem Wurf im Nachteil.", "Unsichtbar": "Wenn du den Zustand Unsichtbar hast, wirken folgende Effekte auf dich:\n\n**Überraschung.** Wenn du beim Auswürfeln der Initiative unsichtbar bist, so bist du bei diesem Wurf im Vorteil.\n\n**Verborgen.** Du bist nicht von Effekten betroffen, die erfordern, dass du gesehen wirst, sofern der Effektwirker keine Möglichkeiten hat, dich trotz deiner Unsichtbarkeit zu sehen. Ausrüstung, die du trägst oder hältst, ist ebenfalls verborgen.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Nachteil, und du bist bei deinen Angriffswürfen im Vorteil. Wenn eine Kreatur Möglichkeiten hat, dich trotz deiner Unsichtbarkeit zu sehen, erhältst du diesen Vorzug gegen diese Kreatur nicht.", "Gelähmt": "Wenn du den Zustand Gelähmt hast, wirken folgende Effekte auf dich:\n\n**Kampfunfähig.** Du hast den Zustand Kampfunfähig.\n\n**Keine Bewegungsrate.** Deine Bewegungsrate beträgt 0 und kann nicht erhöht werden.\n\n**Beeinträchtigte Rettungswürfe.** Du scheiterst bei Stärke- und Geschicklichkeitsrettungswürfen automatisch.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil.\n\n**Automatische kritische Treffer.** Jeder Angriffswurf, der dich trifft, ist ein kritischer Treffer, sofern der Angreifer sich im Abstand von bis zu 1,5 Metern von dir befindet.", "Versteinert": "Wenn du den Zustand Versteinert hast, wirken folgende Effekte auf dich:\n\n**In unbelebte Substanz verwandelt.** Du wirst mit allen nichtmagischen Gegenständen, die du trägst oder hältst, in eine massive unbelebte Substanz (normalerweise Stein) verwandelt. Dein Gewicht erhöht sich auf das Zehnfache, und du hörst auf zu altern.\n\n**Kampfunfähig.** Du hast den Zustand Kampfunfähig.\n\n**Keine Bewegungsrate.** Deine Bewegungsrate beträgt 0 und kann nicht erhöht werden.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil.\n\n**Beeinträchtigte Rettungswürfe.** Du scheiterst bei Stärke- und Geschicklichkeitsrettungswürfen automatisch.\n\n**Resistenz gegen Schaden.** Du bist gegen alle Schadensarten resistent.\n\n**Immunität gegen Gift.** Du bist gegen den Zustand Vergiftet immun.", "Vergiftet": "Wenn du den Zustand Vergiftet hast, wirkt folgender Effekt auf dich:\n\n**Beeinträchtigte Attributs- und Angriffswürfe.** Du bist bei Angriffs- und Attributswürfen im Nachteil.", "Liegend": "Wenn du den Zustand Liegend hast, wirken folgende Effekte auf dich:\n\n**Eingeschränkte Bewegung.** Deine einzigen Bewegungsmöglichkeiten bestehen darin, entweder zu kriechen oder Bewegung in Höhe der Hälfte deiner Bewegungsrate (abgerundet) zu verbrauchen, um aufzustehen und den Zustand damit zu beenden. Wenn deine Bewegungsrate 0 beträgt, kannst du nicht aufstehen.\n\n**Beeinträchtigte Angriffe.** Du bist bei Angriffswürfen im Nachteil. Angriffswürfe gegen dich sind im Vorteil, wenn der Angreifer sich im Abstand von bis zu 1,5 Metern von dir befindet. Anderenfalls sind Angriffswürfe gegen dich im Nachteil.", "Festgesetzt": "Wenn du den Zustand Festgesetzt hast, wirken folgende Effekte auf dich:\n\n**Keine Bewegungsrate.** Deine Bewegungsrate beträgt 0 und kann nicht erhöht werden.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil, und deine Angriffswürfe sind im Nachteil.\n\n**Beeinträchtigte Rettungswürfe.** Du bist bei Geschicklichkeitsrettungswürfen im Nachteil.", "Betäubt": "Wenn du den Zustand Betäubt hast, wirken folgende Effekte auf dich:\n\n**Kampfunfähig.** Du hast den Zustand Kampfunfähig.\n\n**Beeinträchtigte Rettungswürfe.** Du scheiterst bei Stärke- und Geschicklichkeitsrettungswürfen automatisch.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil.", "Bewusstlos": "Wenn du den Zustand Bewusstlos hast, wirken folgende Effekte auf dich:\n\n**Inert.** Du hast die Zustände Kampfunfähig und Liegend, und du lässt fallen, was immer du gehalten hast. Wenn dieser Zustand endet, bist du weiterhin liegend.\n\n**Keine Bewegungsrate.** Deine Bewegungsrate beträgt 0 und kann nicht erhöht werden.\n\n**Beeinträchtigte Angriffe.** Angriffswürfe gegen dich sind im Vorteil.\n\n**Beeinträchtigte Rettungswürfe.** Du scheiterst bei Stärke- und Geschicklichkeitsrettungswürfen automatisch.\n\n**Automatische kritische Treffer.** Jeder Angriffswurf, der dich trifft, ist ein kritischer Treffer, sofern der Angreifer sich im Abstand von bis zu 1,5 Metern von dir befindet.\n\n**Ohne Bewusstsein.** Du nimmst deine Umgebung nicht wahr.", "Konzentration": "Manche Zauber und andere Effekte erfordern Konzentration, um aktiv zu bleiben. Dies ist in ihrer Beschreibung angegeben. Wenn der Wirker des Effekts seine Konzentration verliert, endet der Effekt. Hat der Effekt eine maximale Wirkungsdauer, so ist in der Beschreibung des Effekts angegeben, wie lange der Wirker sich auf ihn konzentrieren kann: „Bis zu 1 Minute\", „1 Stunde\" oder eine andere Dauer. Der Wirker kann seine Konzentration jederzeit beenden – dazu ist keine Aktion erforderlich. Folgende Faktoren stören oder beenden die Konzentration:\n\n**Weiterer Effekt, der Konzentration erfordert.** Du verlierst die Konzentration auf einen Effekt, sobald du einen Zauber oder einen sonstigen Effekt wirkst, der ebenfalls Konzentration erfordert.\n\n**Schaden.** Wenn du Schaden erleidest, musst du einen Konstitutionsrettungswurf bestehen, um die Konzentration aufrechtzuerhalten. Der SG beträgt 10 oder die Hälfte des erlittenen Schadens (abgerundet), je nachdem, welcher Wert höher ist. Er kann höchstens 30 betragen.\n\n**Kampfunfähig oder tot.** Deine Konzentration endet, wenn du kampfunfähig wirst oder stirbst.", "Erschöpfung": "Wenn du den Zustand Erschöpft hast, wirken folgende Effekte auf dich:\n\n**Erschöpfungsstufen.** Dieser Zustand ist kumulativ. Wann immer er auf dich wirkt, erhältst du 1 Erschöpfungsstufe hinzu. Wenn du sechs Erschöpfungsstufen hast, stirbst du.\n\n**Beeinträchtigte W20-Prüfungen.** Wenn du eine W20-Prüfung ausführst, ist das Ergebnis um einen Betrag in doppelter Höhe deiner Erschöpfungsstufen verringert.\n\n**Verringerte Bewegungsrate.** Deine Bewegungsrate ist um eine Anzahl von Metern in Höhe des 1,5-Fachen deiner Erschöpfungsstufe verringert.\n\n**Erschöpfungsstufen entfernen.** Wenn du eine lange Rast abschließt, wird eine deiner Erschöpfungsstufen entfernt. Sobald du keine Erschöpfungsstufen mehr hast, endet der Zustand."};
 var SAMPLE=[
  {name:'Sporen-Manifest',type:'Große Pflanze',ac:14,hp:126,bonus:-1,legendary:3,notes:'Anfällig: Feuer. Immun: Gift. Legendäre Resistenz 1/Tag. Phase 2 ab 63 TP: Sporenwolke lädt sofort auf, 2 Sporenlinge.',
   actions:[
@@ -534,7 +544,7 @@ function cardHtml(c){
   var pct=Math.max(0,Math.min(100,c.max?Math.round(c.hp/c.max*100):0));
   var col=pct>50?'var(--good)':pct>25?'var(--warn)':'var(--bad)';
   var down=c.hp<=0, cur=S.turnId===c.id, open=c.open;
-  var conds=c.conditions.map(function(k){return '<span class="cond" data-act="rmcond" data-id="'+c.id+'" data-k="'+esc(k)+'" title="Entfernen">'+esc(k)+' ✕</span>';}).join('');
+  var conds=c.conditions.map(function(k){return '<span class="cond" data-act="rmcond" data-id="'+c.id+'" data-k="'+esc(k)+'" data-ctip="'+esc(k)+'">'+esc(k)+' ✕</span>';}).join('');
   var pips=''; if(c.leg>0){ pips='<span class="chip">Legendär <span class="pips">'; for(var i=0;i<c.leg;i++) pips+='<span class="pip'+(i<c.legUsed?' used':'')+'" data-act="pip" data-id="'+c.id+'" data-i="'+i+'"></span>'; pips+='</span></span>'; }
   var last=c.last!=null?'<button class="sm" data-act="applylast" data-id="'+c.id+'" title="Letzten Schaden-Wurf anwenden">Letzter Wurf −'+c.last+'</button>':'';
   var acts=open?actionsBlock(c)+(c.spells?'<div class="acts">'+spellsBlock(c)+'</div>':''):'';
@@ -1364,7 +1374,7 @@ function spellsBlock(c){
     var pips=''; if(G.max&&!G.each) for(var i=0;i<G.max;i++) pips+='<span class="pip'+(i<G.used?' used':'')+'" data-act="spip" data-id="'+c.id+'" data-g="'+gi+'" data-i="'+i+'" title="Zauberplatz"></span>';
     h+='<div class="spg"><span class="spl">'+esc(G.lab)+'</span>'+(pips?'<span class="pips">'+pips+'</span>':'')+
       G.list.map(function(s,si){ var db=SPELLDB[s.n]||{}, u=G.usedBy[s.n]||0, out=G.max&&(G.each?u>=G.max:G.used>=G.max), roll=!!(s.d||db.d||db.a==='atk');
-        return '<button class="sm spell'+(roll?' roll':'')+(out?' out':'')+'" data-act="cast" data-id="'+c.id+'" data-g="'+gi+'" data-s="'+si+'" title="'+esc(db.x||'')+'">'+esc(s.n)+
+        return '<button class="sm spell'+(roll?' roll':'')+(out?' out':'')+'" data-act="cast" data-id="'+c.id+'" data-g="'+gi+'" data-s="'+si+'" data-sname="'+esc(s.n)+'" data-sx="'+esc(db.x||'')+'">'+esc(s.n)+
           (G.each&&G.max?' <small>'+(G.max-u)+'/'+G.max+'</small>':'')+'</button>'; }).join('')+'</div>';
   });
   return h;
@@ -2944,7 +2954,7 @@ function loadRules(){ if(RULES||RL.loading) return; RL.loading=true; RL.err='';
   fetch('regeln.json?v='+RULES_V).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
    .then(function(d){ d.forEach(function(e,i){ e.i=i; e.nt=' '+rNorm(e.t)+' '; e.nx=' '+rNorm(e.x)+' '; }); RULES=d; })
    .catch(function(e){ RL.err='Regelwerk nicht ladbar ('+e.message+'). Es liegt als regeln.json auf GitHub und braucht beim ersten Mal Internet.'; })
-   .then(function(){ RL.loading=false; if(S.view==='rule') renderRule(); }); }
+   .then(function(){ RL.loading=false; if(S.view==='rule') renderRule(); spRefresh(); }); }
 var RSYN={status:'zustand',zustaende:'zustand',condition:'zustand',conditions:'zustand',statuseffekt:'zustand',effekt:'zustand',
  grapple:'gepackt',grappled:'gepackt',greifen:'gepackt',festhalten:'gepackt',ringen:'gepackt',prone:'liegend',umgestossen:'liegend',
  ac:'ruestungsklasse',rk:'ruestungsklasse',hp:'trefferpunkte',tp:'trefferpunkte',lp:'trefferpunkte',lebenspunkte:'trefferpunkte',leben:'trefferpunkte',
@@ -3081,6 +3091,52 @@ document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.
     if(!f){ var r=rSearch(k,1); f=r[0]; } if(f){ RL.modal=f.i; renderRule(); } }
   else if(a==='rclose'){ if(t.classList.contains('rmodal')&&e.target!==t) return; RL.modal=null; renderRule(); }
   else if(a==='raskE'){ var en=RULES[+k]; RL.mode='chat'; renderRule(); var i=$('rIn'); if(i){ i.value='Erklär mir „'+en.t.split(' › ').pop()+'“ kurz und mit Beispiel.'; i.focus(); } } });
+
+
+/* =================== Infokästchen: Zustände & Zauber =================== */
+var TIP={pin:false,lp:0,swallow:false,anchor:null};
+function tipEl(){ var t=document.getElementById('tip'); if(!t){ t=document.createElement('div'); t.id='tip'; t.innerHTML=''; document.body.appendChild(t); t.addEventListener('click',function(e){ if(e.target.classList.contains('tx')) tipHide(true); }); } return t; }
+function tipShow(html,anchor,pin){ var t=tipEl(); t.innerHTML='<button class="tx" title="Schließen">✕</button>'+html; t.className='show'+(pin?' pin':''); TIP.pin=!!pin; TIP.anchor=anchor;
+  var r=anchor.getBoundingClientRect(), vw=innerWidth, vh=innerHeight; t.style.left='0px'; t.style.top='0px'; var w=t.offsetWidth, h=t.offsetHeight;
+  var x=Math.min(Math.max(6,r.left),vw-w-6), y=r.bottom+6; if(y+h>vh-6) y=Math.max(6,r.top-h-6);
+  var box=anchor.closest&&anchor.closest('#spRes'); if(box){ var br=box.getBoundingClientRect(); if(br.right+w+10<vw){ x=br.right+8; y=Math.min(Math.max(6,r.top),vh-h-6); } else if(br.left-w-10>0){ x=br.left-w-8; y=Math.min(Math.max(6,r.top),vh-h-6); } else { y=Math.max(br.bottom+6,6); if(y+h>vh-6) y=Math.max(6,vh-h-6); } }
+  t.style.left=x+'px'; t.style.top=y+'px'; }
+function tipHide(force){ if(TIP.pin&&!force) return; var t=document.getElementById('tip'); if(t) t.className=''; TIP.pin=false; TIP.anchor=null; }
+function condTip(k){ var x=COND_TXT[k]; return '<div class="tt">'+esc(k)+'</div>'+(x?mdLite(x):'<p>Keine Beschreibung.</p>')+'<div class="hint" style="font-size:11px;margin-top:4px">Quelle: SRD 5.2.1</div>'; }
+function spellFind(n){ if(!RULES) return null; var nn=rNorm(n).trim(), f=null; RULES.some(function(e){ if(e.k==='Zauber'&&rNorm(e.t).trim()===nn){ f=e; return true; } }); return f; }
+function spellSub(e){ var m=e.x.match(/^\*([^*]+)\*/); return m?m[1]:''; }
+function spellTip(e,full){ var x=e.x.replace(/^\*[^*]+\*\s*/,''), long=x.length>1100; if(!full&&long) x=x.slice(0,1100).replace(/\s+\S*$/,'')+' …';
+  return '<div class="tt">'+esc(e.t)+'</div><div class="tsub">'+esc(spellSub(e))+'</div>'+mdLite(x)+(!full&&long?'<div class="hint" style="font-size:11px">Antippen/Klicken zeigt den ganzen Text.</div>':'')+'<div class="hint" style="font-size:11px;margin-top:4px">Quelle: SRD 5.2.1</div>'; }
+function tipFor(el,full){ if(el.dataset.ctip) return condTip(el.dataset.ctip);
+  if(el.dataset.stip!=null){ var e=RULES&&RULES[+el.dataset.stip]; return e?spellTip(e,full):''; }
+  if(el.dataset.sname){ if(!RULES){ loadRules(); return el.dataset.sx?'<div class="tt">'+esc(el.dataset.sname)+'</div><p>'+esc(el.dataset.sx)+'</p>':''; } var f=spellFind(el.dataset.sname); return f?spellTip(f,full):(el.dataset.sx?'<div class="tt">'+esc(el.dataset.sname)+'</div><p>'+esc(el.dataset.sx)+'</p><div class="hint" style="font-size:11px">Nicht im SRD 5.2.1.</div>':''); }
+  return ''; }
+var TIPSEL='[data-ctip],[data-stip],[data-sname]';
+document.addEventListener('mouseover',function(e){ if(TIP.pin) return; var el=e.target.closest&&e.target.closest(TIPSEL); if(!el||el===TIP.anchor) return; var h=tipFor(el,false); if(h) tipShow(h,el,false); });
+document.addEventListener('mouseout',function(e){ if(TIP.pin) return; var el=e.target.closest&&e.target.closest(TIPSEL); if(!el) return; if(e.relatedTarget&&el.contains(e.relatedTarget)) return; tipHide(); });
+document.addEventListener('pointerdown',function(e){ var t=document.getElementById('tip'); if(t&&TIP.pin&&!t.contains(e.target)&&!(e.target.closest&&e.target.closest('#spRes'))) tipHide(true);
+  if(e.pointerType!=='touch') return; var el=e.target.closest&&e.target.closest('[data-ctip],[data-sname]'); if(!el) return;
+  clearTimeout(TIP.lp); TIP.lp=setTimeout(function(){ var h=tipFor(el,true); if(h){ tipShow(h,el,true); TIP.swallow=true; } },450); },true);
+['pointerup','pointercancel','pointermove'].forEach(function(n){ document.addEventListener(n,function(e){ if(n==='pointermove'&&e.pointerType!=='touch') return; clearTimeout(TIP.lp); },true); });
+document.addEventListener('click',function(e){ if(TIP.swallow){ TIP.swallow=false; e.preventDefault(); e.stopPropagation(); } },true);
+document.addEventListener('contextmenu',function(e){ if(e.target.closest&&e.target.closest('[data-ctip],[data-sname]')&&TIP.pin) e.preventDefault(); });
+window.addEventListener('scroll',function(){ if(!TIP.pin) tipHide(); },true);
+/* Zaubersuche */
+var SPQ={act:-1};
+function spRefresh(){ var q=document.getElementById('spQ'), box=document.getElementById('spRes'); if(!q||!box) return; var v=q.value.trim();
+  if(!v){ box.hidden=true; return; } box.hidden=false;
+  if(!RULES){ loadRules(); box.innerHTML='<div class="si">'+(RL.err?esc(RL.err):'📚 Lade Zauber …')+'</div>'; return; }
+  var n=rNorm(v).trim(), res=[]; RULES.forEach(function(e){ if(e.k!=='Zauber') return; var t=rNorm(e.t).trim(), p=t.indexOf(n); if(p<0) p=t.replace(/ /g,'').indexOf(n.replace(/ /g,'')); if(p<0) return; res.push([p===0?0:(t.indexOf(' '+n)>=0?1:2),t.length,e]); });
+  res.sort(function(a,b){ return a[0]-b[0]||a[1]-b[1]; }); res=res.slice(0,10); SPQ.act=-1;
+  box.innerHTML=res.length?res.map(function(r){ return '<div class="si" data-stip="'+r[2].i+'" data-pick="1">'+esc(r[2].t)+'<small>'+esc(spellSub(r[2]))+'</small></div>'; }).join(''):'<div class="si">Kein Zauber gefunden.</div>'; }
+document.addEventListener('input',function(e){ if(e.target.id==='spQ') spRefresh(); });
+document.addEventListener('focusin',function(e){ if(e.target.id==='spQ'){ loadRules(); if(e.target.value) spRefresh(); } });
+document.addEventListener('keydown',function(e){ if(e.target.id!=='spQ') return; var box=document.getElementById('spRes'), it=box?box.querySelectorAll('.si[data-stip]'):[];
+  if(e.key==='Escape'){ e.target.value=''; box.hidden=true; tipHide(true); return; }
+  if((e.key==='ArrowDown'||e.key==='ArrowUp')&&it.length){ e.preventDefault(); SPQ.act=(SPQ.act+(e.key==='ArrowDown'?1:-1)+it.length)%it.length; [].forEach.call(it,function(x,i){ x.classList.toggle('act',i===SPQ.act); }); tipShow(tipFor(it[SPQ.act],false),it[SPQ.act],false); }
+  if(e.key==='Enter'&&it.length){ e.preventDefault(); var el=it[Math.max(0,SPQ.act)]; tipShow(tipFor(el,true),el,true); } });
+document.addEventListener('click',function(e){ var p=e.target.closest&&e.target.closest('#spRes .si[data-pick]'); if(p){ tipShow(tipFor(p,true),p,true); return; }
+  if(!(e.target.closest&&(e.target.closest('.spq')||e.target.closest('#tip')))){ var b=document.getElementById('spRes'); if(b) b.hidden=true; } });
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener('click',function(e){
